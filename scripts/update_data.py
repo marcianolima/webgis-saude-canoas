@@ -316,13 +316,30 @@ def build_cnes(rows):
         kind=str(pick(r,'descricao_tipo_unidade','tipo_unidade','tipo_estabelecimento','ds_tipo_unidade','estabelecimento_tipo_unidade','ds_tipo_estabelecimento','no_tipo_estabelecimento','ds_tp_unidade','tp_unidade_desc') or 'Não informado')
         type_code=str(pick(r,'tp_unidade','co_tipo_unidade') or '').strip().zfill(2)
         if kind == 'Não informado':
-            named={'01':'Posto de saúde','02':'Centro de saúde/UBS','05':'Hospital geral',
-                   '07':'Hospital especializado','20':'Pronto-socorro geral','21':'Pronto-socorro especializado',
-                   '73':'Pronto atendimento','36':'Clínica/centro de especialidade'}
+            named={
+                '01':'Posto de saúde','02':'Centro de saúde/UBS','04':'Policlínica',
+                '05':'Hospital geral','07':'Hospital especializado','15':'Unidade mista',
+                '20':'Pronto-socorro geral','21':'Pronto-socorro especializado',
+                '22':'Consultório isolado','32':'Unidade móvel fluvial',
+                '36':'Clínica/centro de especialidade','39':'Serviço de apoio a diagnóstico e terapia (SADT)',
+                '40':'Unidade móvel terrestre','42':'Unidade móvel pré-hospitalar de urgência',
+                '43':'Farmácia','50':'Vigilância em saúde',
+                '60':'Cooperativa/cessão de trabalhadores','61':'Centro de parto normal',
+                '62':'Hospital-dia isolado','67':'Laboratório central de saúde pública',
+                '68':'Central de gestão em saúde','69':'Centro de atenção hemoterápica',
+                '70':'Centro de atenção psicossocial (CAPS)','71':'Apoio à saúde da família',
+                '72':'Atenção à saúde indígena','73':'Pronto atendimento',
+                '74':'Polo Academia da Saúde','75':'Telessaúde',
+                '76':'Regulação médica das urgências','77':'Atenção domiciliar (home care)',
+                '78':'Atenção em regime residencial','79':'Oficina ortopédica',
+                '80':'Laboratório de saúde pública','81':'Central de regulação do acesso',
+                '82':'Central de transplantes','83':'Polo de prevenção e promoção da saúde',
+                '84':'Central de abastecimento','85':'Centro de imunização'}
             kind=named.get(type_code,'Tipo CNES '+type_code)
         cat=('ubs' if type_code in ('01','02') else
-             'hospital' if type_code in ('05','07') else
-             'urgencia' if type_code in ('20','21','73') else normalize_type(kind))
+             'hospital' if type_code in ('05','07','62') else
+             'urgencia' if type_code in ('20','21','42','73','76') else
+             'clinica' if type_code in ('04','22','36','39') else normalize_type(kind))
         kinds[kind]+=1
         ubs+=cat=='ubs';hosp+=cat=='hospital'
         bairro=str(pick(r,'bairro_estabelecimento','bairro','no_bairro','no_bairro_estabelecimento') or 'Não informado')
@@ -336,7 +353,7 @@ def build_cnes(rows):
         street=str(pick(r,'endereco_estabelecimento','logradouro','no_logradouro','no_logr') or '')
         sus=pick(r,'vinculo_sus','estabelecimento_faz_atendimento_sus','atendimento_sus','co_ambulatorial_sus')
         sus_bool=True if str(sus).lower() in ('1','s','sim','true') else False if str(sus).lower() in ('0','n','nao','não','false') else None
-        code=str(pick(r,'codigo_cnes','co_cnes','cnes'))
+        code=str(pick(r,'codigo_cnes','co_cnes','cnes') or '').strip().zfill(7)
         points.append({'type':'Feature','id':code,'geometry':{'type':'Point','coordinates':[round(lng,6),round(lat,6)]},'properties':{'cnes':code,'name':str(pick(r,'nome_fantasia','no_fantasia','estabelecimento_nome_fantasia','no_fantasia_estabelecimento') or 'Estabelecimento CNES'),'type':kind,'category':cat,'address':', '.join(x for x in (street,number) if x),'neighborhood':bairro,'phone':str(pick(r,'numero_telefone_estabelecimento','telefone','nu_telefone') or ''),'hasBeds':None,'sus':sus_bool}})
     stats={'total':len(rows),'withCoordinates':len(points),'ubs':ubs,'hospitals':hosp,'byType':[{'name':k,'value':v} for k,v in kinds.most_common(20)],'byNeighborhood':[{'name':k,'value':v} for k,v in bairros.most_common(40)],'asOf':now()[:10]}
     return {'type':'FeatureCollection','features':points},stats
@@ -394,7 +411,8 @@ def update_beds(s):
         if (a is not None and a<0) or (b is not None and b<0):
             raise ValueError('Quantidades negativas de leitos na fonte')
         recognized+=1;total+=(a or 0);sus+=(b or 0)
-        cn=str(pick(r,'co_cnes','codigo_cnes','cnes') or '')
+        cn=str(pick(r,'co_cnes','codigo_cnes','cnes') or '').strip()
+        if cn:cn=cn.zfill(7)
         if cn:per_cnes[cn]+=(a or 0)
     if not recognized:raise ValueError('CNES leitos não contém campos de quantidade reconhecidos')
     # Para Canoas, amostra de apenas uma linha não permite inferir o total municipal.
@@ -468,6 +486,7 @@ def run():
         write_json(GEO,geo);s['facilities']=stats
         s['sourceInfo']['cnes']['url']=CNES_CATALOG
         mark(s,'cnes',f'Retrato diário CNES · captura {now()[:10]} (sem competência mensal)',len(rows))
+        s['sourceInfo']['cnes']['classifierVersion']='cnes-2026-v2'
         s['sourceInfo']['cnes']['note']=(
             f"CSV nacional validado: {quality['national']} linhas; {quality['municipal']} em Canoas; "
             f"{quality['disabled']} desabilitados excluídos; {len(geo['features'])} com localização.")

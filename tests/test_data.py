@@ -26,6 +26,25 @@ class DataTests(unittest.TestCase):
         self.assertEqual(mod.normalize_type('HOSPITAL GERAL'),'hospital')
         self.assertEqual(mod.normalize_type('UNIDADE BASICA DE SAUDE'),'ubs')
         self.assertEqual(mod.normalize_type('CENTRO DE SAÚDE'),'ubs')
+    def test_official_cnes_typologies_and_normalized_codes(self):
+        records=[
+            {'CO_CNES':'31461','CO_IBGE':'430460','TP_UNIDADE':'22',
+             'NO_FANTASIA':'Consultório Exemplo','NO_BAIRRO':'CENTRO',
+             'NU_LATITUDE':'-29.92','NU_LONGITUDE':'-51.18'},
+            {'CO_CNES':'31569','CO_IBGE':'430460','TP_UNIDADE':'43',
+             'NO_FANTASIA':'Farmácia Exemplo','NO_BAIRRO':'CENTRO',
+             'NU_LATITUDE':'-29.92','NU_LONGITUDE':'-51.18'},
+            {'CO_CNES':'32778','CO_IBGE':'430460','TP_UNIDADE':'39',
+             'NO_FANTASIA':'SADT Exemplo','NO_BAIRRO':'CENTRO',
+             'NU_LATITUDE':'-29.92','NU_LONGITUDE':'-51.18'}
+        ]
+        geo,stats=mod.build_cnes(records)
+        self.assertEqual([r['properties']['category'] for r in geo['features']],['clinica','outros','clinica'])
+        self.assertEqual([r['properties']['type'] for r in geo['features']],
+                         ['Consultório isolado','Farmácia','Serviço de apoio a diagnóstico e terapia (SADT)'])
+        self.assertEqual(geo['features'][0]['properties']['cnes'],'0031461')
+        self.assertEqual(stats['total'],3)
+
     def test_pagination_page_index(self):
         payloads=[{'estabelecimentos':[{'id':i} for i in range(20)],'total':24},
                   {'estabelecimentos':[{'id':i} for i in range(20,24)],'total':24}]
