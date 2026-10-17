@@ -34,6 +34,7 @@ class SusMGDITests(unittest.TestCase):
   self.assertIn('valor_medio_aih',m.CONFIG)
   self.assertEqual(m.CONFIG['consultas_aps_razao']['kind'],'rate')
   self.assertEqual(m.CONFIG['consultas_especializadas_razao']['kind'],'rate')
+  self.assertEqual(m.CONFIG['consultas_especializadas_razao']['unit'],'por 100 hab.')
   self.assertEqual(m.CONFIG['valor_medio_aih']['kind'],'currency')
   for key in ('consultas_aps_razao','consultas_especializadas_razao','valor_medio_aih'):
    self.assertTrue(m.CONFIG[key]['method'])

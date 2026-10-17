@@ -43,9 +43,9 @@ CONFIG={
    'method':'Razão anual de consultas médicas do SUS em estabelecimentos de Atenção Primária por 100 habitantes. Não é contagem total de consultas e não mede consultas individuais.'
  },
  'consultas_especializadas_razao':{
-   'file':'mgdi_ms_0bx','label':'Razão de consultas médicas especializadas','unit':'por habitante','kind':'rate','cadence':'annual','category':'TC',
+   'file':'mgdi_ms_0bx','label':'Razão de consultas médicas especializadas','unit':'por 100 hab.','kind':'rate','cadence':'annual','category':'TC',
    'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_0bx_csv',
-   'method':'Razão de consultas médicas na atenção especializada do SUS por habitante, segundo metodologia RIPSA. Não é total da produção SIA/SUS.'
+   'method':'Razão de consultas médicas na atenção especializada do SUS por 100 habitantes, segundo metodologia RIPSA. Não é total da produção SIA/SUS.'
  },
  'sih_internacoes_anuais':{
    'file':'ripsa019rc','label':'Internações hospitalares SUS (AIHs)','unit':'internações','kind':'count','cadence':'annual','parser':'ripsa_aih',
