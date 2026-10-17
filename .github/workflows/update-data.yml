@@ -51,7 +51,7 @@ jobs:
           snapshot=json.loads(Path('public/data/summary.json').read_text(encoding='utf-8'))
           sources=snapshot.get('sourceInfo',{})
           # A primeira publicação NÃO pode depender da ação agendada: inicializa CNES no push.
-          initial=sources.get('cnes',{}).get('status') != 'ok' or snapshot.get('facilities',{}).get('total') is None or sources.get('cnes',{}).get('classifierVersion') != 'cnes-2026-v2'
+          initial=sources.get('cnes',{}).get('status') != 'ok' or snapshot.get('facilities',{}).get('total') is None or sources.get('cnes',{}).get('classifierVersion') != 'cnes-2026-v2' or sources.get('beds',{}).get('status') != 'ok' or snapshot.get('beds',{}).get('total') is None
           run=os.environ['EVENT_NAME'] != 'push' or initial
           with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf8') as out:
               out.write(f'collect={str(run).lower()}\n')
