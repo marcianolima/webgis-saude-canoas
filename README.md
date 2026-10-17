@@ -7,7 +7,7 @@
 - **GitHub Pages:** deploy concluído; compilação TypeScript e build Vite passaram no GitHub Actions.
 - **CNES:** CSV nacional diário oficial de estabelecimentos; **969 registros ativos únicos de Canoas** na coleta de 17/10/2026, **962 georreferenciados**. Contém estabelecimentos públicos e privados e não equivale somente à rede municipal SUS.
 - **Qualidade:** dados municipais, códigos CNES únicos, classificação por tipo e geometria são validados antes da publicação. O arquivo diário não representa uma competência mensal do CNES.
-- **Leitos SUS/total, dengue, SIA e SIH:** ainda sem extração municipal integral comprovada; não devem ser interpretados como zero. Esses indicadores permanecem indisponíveis até validação da fonte.
+- **Leitos (arquivo anual oficial):** 668 existentes, dos quais 539 SUS, competência **08/2026**, com cinco CNES confirmados e agregação de um único mês. **Dengue, SIA e SIH** ainda aguardam validação das fontes; não devem ser interpretados como zero.
 - **Automação:** snapshot CNES/IBGE diariamente às 08:17 UTC (05:17 de Brasília). Coletas exploratórias mais pesadas somente pelo disparo manual do workflow.
  Aplicação estática, responsiva, com mapas e gráficos interativos, GitHub Pages e atualização programada via GitHub Actions.
 
@@ -72,7 +72,7 @@ As URLs e parâmetros abaixo foram estudados em **16/10/2026**; a execução dos
 | IBGE Cidades | https://www.ibge.gov.br/cidades-e-estados/rs/canoas.html | Estimativa 2026 (**359.845**), Censo 2022 (**347.657**), área **130,774 km²** e densidade Censo 2022 **2.658,15 hab./km²** | **Valor inicial verificado** |
 | IBGE SIDRA | `https://apisidra.ibge.gov.br/values/t/6579/n6/4304606/v/9324/p/all?formato=json` | Série anual de população; última estimativa se disponível e validada | Coletor implementado, ainda não executado online |
 | CNES — estabelecimentos | `https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip` | Extrato nacional diário, filtrado para Canoas, unidades ativas, coordenadas, tipo, bairro e CNES | **Coleta oficial funcionando; 969 ativos e 962 pontos em 17/10/2026** |
-| CNES — leitos | `https://apidadosabertos.saude.gov.br/assistencia-a-saude/cnes-leitos?co_ibge=430460` | Leitos existentes e SUS, conforme campos e competência retornados | Adaptador experimental; somente após validação |
+| CNES — leitos | `https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/Leitos_SUS/Leitos_csv_2026.zip` | Leitos existentes e SUS por CNES único, na competência mensal validada | **668 existentes / 539 SUS (08/2026)** |
 | DEMAS dengue | `https://apidadosabertos.saude.gov.br/arboviroses/dengue?id_municip=430460&nu_ano=2025` | Número de registros de notificação no município notificante, por ano | Adaptador experimental; somente após validação |
 | SIA produção ambulatorial | `https://apidadosabertos.saude.gov.br/assistencia-a-saude/sia-procedimentos-ambulatoriais?co_ibge=430460&nu_ano=2025` | Quantidade de procedimentos **se a coluna estiver presente** | Adaptador experimental; somente após validação |
 | SIH produção hospitalar | `https://apidadosabertos.saude.gov.br/assistencia-a-saude/sih-procedimentos-hospitalares?co_ibge=430460&nu_ano=2025` | Produção hospitalar/AIHs **se houver coluna identificável** | Adaptador experimental; somente após validação |
