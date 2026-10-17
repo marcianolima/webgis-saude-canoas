@@ -2,7 +2,7 @@ import {safe,fmtDate,urlAsset,nf,dlCsv} from './utils';
 import type {DataSummary} from './types';
 
 type Evidence={label?:string;status?:string;url?:string;reference?:string|null;retrievedAt?:string|null;
-  note?:string;method?:string;records?:number|null;yearsAvailable?:number[];unit?:string;cadence?:string;kind?:string};
+  note?:string|null;method?:string|null;records?:number|null;yearsAvailable?:number[];unit?:string;cadence?:string;kind?:string};
 type Json={sources:Record<string,Evidence>;series?:Record<string,Array<Record<string,unknown>>>;updatedAt?:string|null};
 type Row=Evidence & {id:string;family:string;years?:string};
 let active=0;
@@ -66,13 +66,13 @@ export async function mountSources(summary:DataSummary){
   const q=(document.querySelector<HTMLInputElement>('#sources-search')?.value||'').toLocaleLowerCase('pt-BR');
   const display=list.filter(r=>(filter==='all'||filter==='ok'&&r.status==='ok'||filter==='pending'&&r.status!=='ok')&&
    (!q||[r.label,r.id,r.note,r.method,r.family].some(x=>String(x||'').toLocaleLowerCase('pt-BR').includes(q))));
-  parent.innerHTML=groups.map(name=>{
+  parent!.innerHTML=groups.map(name=>{
    const group=display.filter(r=>r.family===name);
    if(!group.length)return '';
    return '<section><h3 class="subheading text-base mb-3">'+safe(name)+' <span class="text-xs font-normal text-slate-500">('+group.length+')</span></h3>'+
     '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">'+group.map(sourceCard).join('')+'</div></section>';
   }).join('')||'<div class="empty p-4">Nenhuma fonte corresponde ao filtro.</div>';
-  status.textContent=list.filter(x=>x.status==='ok').length+' fontes/indicadores disponíveis de '+list.length+' cadastrados. '+display.length+' exibidos.';
+  status!.textContent=list.filter(x=>x.status==='ok').length+' fontes/indicadores disponíveis de '+list.length+' cadastrados. '+display.length+' exibidos.';
  }
  render();
  document.getElementById('sources-filter')?.addEventListener('change',render);
