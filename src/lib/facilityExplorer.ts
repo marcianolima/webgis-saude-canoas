@@ -102,7 +102,7 @@ function scopePanel(item:FacilityRecord){
  '<p><strong>Bairro:</strong> '+textLabel(item.neighborhood)+'</p>'+
  '<p><strong>Endereço:</strong> '+textLabel(item.address)+'</p>'+
  '<p><strong>Telefone:</strong> '+textLabel(item.phone)+'</p>'+
- '<p><strong>Natureza jurídica:</strong> '+textLabel(item.legalNature)+'</p>'+
+ '<p><strong>Natureza organizacional (CNES):</strong> '+textLabel(item.legalNature)+'</p>'+
  '<p><strong>Gestão cadastrada:</strong> '+textLabel(item.management)+'</p>'+
  '<p><strong>Relação com o SUS:</strong> '+safe(susStatement)+'</p>'+
  (item.coordinates?'<p class="text-xs text-emerald-700 dark:text-emerald-300">Coordenadas geográficas disponíveis</p>':'<p class="text-xs text-amber-700 dark:text-amber-300">Sem localização CNES para este cadastro</p>')+

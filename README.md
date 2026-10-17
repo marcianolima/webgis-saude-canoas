@@ -80,3 +80,17 @@ A versão 1.0 é um painel exploratório público; não é produto oficial da SM
 **Fonte:** arquivos anuais do Ministério da Saúde extraídos em 17/10/2026. Os anos recentes são sujeitos a revisão; particularmente, 2025 no SIM/SINASC e 2026 nas arboviroses têm caráter preliminar. Não comparar notificações com casos confirmados.
 
 Rede CNES: 969 estabelecimentos ativos, 962 com posição geográfica, 35 UBS classificadas e 6 estabelecimentos hospitalares (incluindo hospital-dia). Leitos: 668 existentes, 539 SUS, competência 08/2026.
+
+## Seleção individual e análise cruzada — v1.1
+
+A aplicação oferece um **explorador contextual de estabelecimentos** nas abas Visão geral, Mapa, Estabelecimentos e Indicadores. Ao selecionar o CNES pela busca, pelo marcador, pela lista ou pelo gráfico de comparação de capacidade, a seleção permanece ativa ao trocar de aba e pode ser compartilhada pelo parâmetro `?cnes=NNNNNNN`.
+
+O arquivo `public/data/facilities.json` é gerado pelo coletor diário e inclui todos os **969 estabelecimentos ativos** do município, inclusive os 7 sem coordenadas publicadas. Os atributos são públicos e cadastrais: CNES, nome, tipologia, bairro, endereço, telefone, gestão quando preenchida e vínculo SUS quando declarado.
+
+A base de leitos possui **capacidade individual por CNES** na competência 08/2026: leitos existentes, leitos SUS e respectivos subconjuntos de UTI. A visualização evita a soma duplicada das UTIs. Registros sem correspondência em leitos recebem **valor indisponível**, nunca zero presumido. O gráfico comparativo é clicável e seleciona o estabelecimento da barra escolhida.
+
+Quando há seleção, o painel geral troca os cartões para dados da unidade e passa a calcular os gráficos territoriais com o recorte do seu bairro e da sua categoria. Gráficos de dengue, nascimentos, mortalidade e população permanecem **explicitamente municipais**, pois os microdados foram agregados por residência e não identificam atendimento por CNES.
+
+Não são fornecidos prontuários, nome de pacientes, CPF/CNS, atendimentos individuais nem inferência de ocupação de leitos. Alguns campos cadastrais podem vir em branco na fonte e são exibidos como não informados.
+
+Teste técnico: `python -m unittest discover -s tests -v` e `npm run build`; o workflow executa ambos os procedimentos e publica o site.
