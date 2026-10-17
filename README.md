@@ -25,8 +25,8 @@ Tecnologias: TypeScript, Vite, Tailwind CSS, MapLibre, Leaflet, ECharts e Python
 | Dengue | Sinan/Dengue | Registros notificados de residentes (ID_MN_RESI); não equivale a casos confirmados | Validado |
 | Nascidos vivos | SINASC | Residência materna CODMUNRES; 2025 preliminar | Validado |
 | Óbitos não fetais | SIM | Residência CODMUNRES e TIPOBITO=2; 2025 preliminar | Validado |
-| Chikungunya | Sinan/Febre de Chikungunya | Notificações por residência; confirmar esquema e cobertura | Validação em andamento |
-| Zika | Sinan/Vírus Zika | Notificações por residência; confirmar esquema e cobertura | Validação em andamento |
+| Chikungunya | Sinan/Febre de Chikungunya | Notificações de residentes, arquivo anual completo; não casos confirmados | Validado, 2025–2026 |
+| Zika | Sinan/Vírus Zika | Notificações de residentes, arquivo anual completo; não casos confirmados | Validado, 2025–2026 |
 | SIA | DATASUS e DEMAS | Produção ambulatorial por competência; não equivale a pacientes únicos | Cobertura insuficiente na API testada, sem total publicado |
 | SIH | DATASUS e DEMAS | Produção hospitalar por competência, local de internação ou residência | Cobertura insuficiente na API testada, sem total publicado |
 | PNI/RNDS | OPENDATASUS | Doses/cobertura requerem denominador e coortes verificadas | Pendente |
@@ -66,3 +66,17 @@ Para desenvolver localmente, execute npm install, python -m unittest discover -s
 A aplicação foi construída para leitura em desktop e dispositivos móveis, com informação progressiva, legendas, tabelas de apoio e explicações metodológicas. A revisão visual detalhada em aparelhos físicos e as preferências de layout do usuário são parte da homologação posterior à entrega técnica.
 
 A versão 1.0 é um painel exploratório público; não é produto oficial da SMS e não substitui os sistemas municipais ou nacionais de saúde.
+
+## Resultados confirmados da primeira carga v1.0
+
+| Série por residência | 2024 | 2025 | 2026 |
+|---|---:|---:|---:|
+| Dengue (notificações) | — | 1.037 | 32 |
+| Chikungunya (notificações) | — | 6 | 4 |
+| Zika (notificações) | — | 3 | 0 |
+| SINASC (nascidos vivos) | 3.435 | 3.698 | — |
+| SIM (óbitos não fetais) | 3.136 | 1.771 | — |
+
+**Fonte:** arquivos anuais do Ministério da Saúde extraídos em 17/10/2026. Os anos recentes são sujeitos a revisão; particularmente, 2025 no SIM/SINASC e 2026 nas arboviroses têm caráter preliminar. Não comparar notificações com casos confirmados.
+
+Rede CNES: 969 estabelecimentos ativos, 962 com posição geográfica, 35 UBS classificadas e 6 estabelecimentos hospitalares (incluindo hospital-dia). Leitos: 668 existentes, 539 SUS, competência 08/2026.

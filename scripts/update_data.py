@@ -577,7 +577,7 @@ def run():
         for key,endpoint,params,fields in jobs:
             try:annual(s,key,endpoint,params,fields);success+=1
             except Exception as e:fail(s,key,e)
-    get_logo()
+    # Identidade institucional exibida como texto até que o logotipo oficial esteja disponível.
     if success:s['generatedAt']=now()
     write_json(SUMMARY,s)
     LOG.info('Atualização: %s fonte(s) concluída(s); falhas preservaram snapshots.',success)
