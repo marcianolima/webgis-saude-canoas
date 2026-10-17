@@ -92,9 +92,15 @@ class PipelineTests(unittest.TestCase):
                         return {'leitos':[{'co_ibge':'430460','nu_comp':202609,'co_cnes':'1000','qt_exist':8,'qt_sus':6}, {'co_ibge':'430460','nu_comp':202609,'co_cnes':'1001','qt_exist':1,'qt_sus':1}],'total':2}
                     return {'leitos':[],'total':0}
                 raise AssertionError('URL inesperada '+url)
+            def fake_beds_archive(snapshot):
+                snapshot['beds']={'total':9,'sus':7,'asOf':'202609'}
+                features=json.loads(geo.read_text('utf8'))
+                for feature in features['features']:
+                    feature['properties']['hasBeds']=feature['properties']['cnes'] in ('0001000','0001001')
+                geo.write_text(json.dumps(features),encoding='utf8')
             with patch.object(up,'SUMMARY',summary),patch.object(up,'GEO',geo), \
                  patch.object(up,'request_json',side_effect=fake_api),patch.object(up,'get_logo'), \
-                 patch.object(up,'latest_bed_competence',return_value=202609), \
+                 patch.object(up,'update_beds_archive',side_effect=fake_beds_archive), \
                  patch.object(up,'fetch_cnes_snapshot',return_value=(records,{'national':640000,'municipal':21,'disabled':0,'active':21})), \
                  patch.dict('os.environ',{'SKIP_HEAVY':'true'}):
                 up.run()
