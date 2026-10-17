@@ -42,6 +42,30 @@ class SusMGDITests(unittest.TestCase):
   self.assertIsNone(m.decimal_value(None))
   self.assertIsNone(m.decimal_value('n/d'))
   self.assertNotEqual(m.decimal_value(None),m.Decimal(0))
+ def test_categoria_tc_avoids_combining_age_strata(self):
+  rows=[{'co_ibge':str(400000+i),'co_anomes':'202412','vl_indicador_calculado_mun':'2','sg_categoria':'TC'} for i in range(700)]
+  rows += [
+   {'co_ibge':'430460','co_anomes':'202412','vl_indicador_calculado_mun':'84','sg_categoria':'FXETC2'},
+   {'co_ibge':'430460','co_anomes':'202412','vl_indicador_calculado_mun':'130.4','sg_categoria':'TC'},
+   {'co_ibge':'430460','co_anomes':'202312','vl_indicador_calculado_mun':'120.2','sg_categoria':'TC'}]
+  p=m.extract(iter(rows),['co_ibge','co_anomes','vl_indicador_calculado_mun','sg_categoria'],'rate',category='TC')
+  self.assertEqual(p['lastValue'],130.4)
+  self.assertEqual(p['municipalRecords'],2)
+ def test_ripsa_aih_annual_hospitalizations_and_average(self):
+  cols=['indicador','ano','municipio','multiplicador',
+   'denominador - número de internaçoes hospitalares',
+   'numerador - valor de internaçoes hospitalares']
+  rows=[{'municipio':str(400000+i),'indicador':'REC.3.02','ano':'2022',
+         'multiplicador':'1','denominador - número de internaçoes hospitalares':'10',
+         'numerador - valor de internaçoes hospitalares':'5000'} for i in range(700)]
+  rows += [{'municipio':'430460','indicador':'REC.3.02','ano':str(y),
+          'multiplicador':'1','denominador - número de internaçoes hospitalares':str(100+y-2021),
+          'numerador - valor de internaçoes hospitalares':'250000'} for y in (2021,2022,2023)]
+  patients=m.extract_ripsa_aih(iter(rows),cols,'count')
+  self.assertEqual([x['value'] for x in patients['series']],[100,101,102])
+  average=m.extract_ripsa_aih(iter(rows),cols,'currency')
+  self.assertGreater(average['lastValue'],2400)
+  self.assertEqual(average['latest'],'2023')
  def test_no_patient_identifiers_in_configuration(self):
   for s in m.CONFIG.values():
    self.assertIn(s['kind'],('count','currency','rate'))

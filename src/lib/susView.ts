@@ -21,7 +21,7 @@ const num=(n:number,k:string)=>{
  if(k==='rate')return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(n);
  return nf(n);
 };
-const indicators=['emulti_custeadas','emulti_homologadas','emulti_repasses','citopatologicos','mamografias','consultas_aps_razao'];
+const indicators=['emulti_custeadas','emulti_homologadas','emulti_repasses','citopatologicos','mamografias','consultas_aps_razao','consultas_especializadas_razao','sih_internacoes_anuais','valor_medio_aih'];
 export function stopSus(){active++;observer?.disconnect();observer=null;graph?.dispose();graph=null;}
 export function susPage(){
  const selected=selectedFacility();
