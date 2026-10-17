@@ -99,7 +99,12 @@ def fetch_parquet(system,period):
         paths=[Path(str(getattr(x,"path",x))) for x in local]
     elif local:paths=[Path(str(getattr(local,"path",local)))]
     paths=[p for p in paths if p.exists() and p.suffix==".parquet"]
-    if len(paths)!=1:raise ValueError("Parquet local ausente ou não único")
+    if len(paths)!=1:
+        # FileBag.download_one pode retornar um wrapper iterable; os bytes
+        # ficam no cache público definido pelo próprio PySUS.
+        cache=Path(os.environ.get("PYSUS_CACHEPATH","/tmp"))
+        paths=[p for p in cache.rglob("*.parquet") if prefix.upper() in p.name.upper()]
+    if len(paths)!=1:raise ValueError("Parquet local ausente ou não único: "+prefix)
     parquet=pq.ParquetFile(paths[0])
     required=set(COLUMNS[system])
     if not required.issubset(parquet.schema.names):
@@ -139,11 +144,13 @@ def run():
     limit=max(1,min(limit,42))
     force=os.getenv("PRODUCTION_FORCE","false").lower()=="true"
     processed=0
+    attempted=0
     for period in wanted:
         for system in ("sih","sia"):
             existing=state["periods"].get(period,{}).get(system)
             if existing and not force:continue
-            if processed>=limit:break
+            if attempted>=limit:break
+            attempted+=1
             try:
                 with tempfile.TemporaryDirectory(prefix="production-pysus-") as root:
                     os.environ["PYSUS_CACHEPATH"]=root
@@ -157,7 +164,7 @@ def run():
                 LOG.warning("PRODUCTION %s %s FAILED: %s",system,period,str(exc)[:190])
                 # Não marca sucesso nem publica zero. Próxima execução tentará novamente.
             # Não bloquear o processamento de fontes disponíveis se outra fonte falhar.
-        if processed>=limit:break
+        if attempted>=limit:break
     for system in ("sih","sia"):
         available=[p for p in sorted(wanted) if system in state["periods"].get(p,{})]
         state["sources"][system]={
