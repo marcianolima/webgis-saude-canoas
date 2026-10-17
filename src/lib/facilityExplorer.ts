@@ -130,6 +130,7 @@ function renderSuggestions(){
  el.classList.remove('hidden');input.setAttribute('aria-expanded','true');
 }
 function disposeCharts(){
+ updateNumber++;
  chartVersion++;
  chartResize?.disconnect();chartResize=null;
  if(chart){chart.dispose();chart=null}

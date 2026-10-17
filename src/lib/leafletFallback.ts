@@ -28,7 +28,8 @@ export async function leafletFallback(
  target:HTMLElement,
  points:()=>FacilityFeature[],
  isCurrent:()=>boolean,
- notice:(text:string)=>void
+ notice:(text:string)=>void,
+ onSelect?:(cnes:string)=>unknown
 ):Promise<any>{
  await ensureLeaflet();
  if(!isCurrent())return null;
@@ -50,7 +51,7 @@ export async function leafletFallback(
    const color=({ubs:'#10a978',hospital:'#2563eb',urgencia:'#f59e0b',clinica:'#8b5cf6',outros:'#64748b'} as Record<string,string>)[f.properties.category]||'#64748b';
    const p=f.properties;
    const popup=`<div class="map-tooltip"><h3>${safe(p.name)}</h3><div class="small"><b>${safe(p.type)}</b><br>CNES: ${safe(p.cnes)}<br>${safe(p.address||'Endereço não informado')}<br>${safe(p.neighborhood||'')}${p.phone?'<br>Telefone: '+safe(p.phone):''}</div></div>`;
-   L.circleMarker([lat,lon],{radius:6,color:'#ffffff',weight:2,fillColor:color,fillOpacity:.9,renderer:canvas}).bindPopup(popup).addTo(pointsLayer);
+   L.circleMarker([lat,lon],{radius:6,color:'#ffffff',weight:2,fillColor:color,fillOpacity:.9,renderer:canvas}).bindPopup(popup).on('click',()=>onSelect?.(p.cnes)).addTo(pointsLayer);
   }
  };
  (map as any).__refreshPoints=refresh;

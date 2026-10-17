@@ -7,6 +7,6 @@ export interface DataSummary {
   series:{population:{year:number;value:number}[];dengue:{year:number;value:number}[];sih:{year:number;value:number}[];sia:{year:number;value:number}[]};
   sourceInfo: Record<string,SourceMeta>;
 }
-export interface FacilityProps {cnes:string;name:string;type:string;category:'ubs'|'hospital'|'urgencia'|'clinica'|'outros';address:string;neighborhood:string;phone:string;hasBeds:boolean|null;sus:boolean|null }
+export interface FacilityProps {cnes:string;name:string;type:string;category:'ubs'|'hospital'|'urgencia'|'clinica'|'outros';address:string;neighborhood:string;phone:string;hasBeds:boolean|null;sus:boolean|null; bedsTotal?:number|null;bedsSus?:number|null;bedsAsOf?:string|null }
 export interface FacilityFeature {type:'Feature';id:string;geometry:{type:'Point';coordinates:[number,number]};properties:FacilityProps}
 export interface FacilitiesGeoJSON {type:'FeatureCollection';features:FacilityFeature[]}
