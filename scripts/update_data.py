@@ -72,10 +72,16 @@ def normalize_type(x):
     return 'outros'
 
 def valid_canoas(r):
-    code=pick(r,'codigo_municipio','co_municipio_gestor','co_ibge','municipio_codigo')
-    if code is not None:return re.sub(r'\D','',str(code)) in ('430460','4304606')
-    city=pick(r,'municipio','nome_municipio','no_municipio')
-    return city is None or str(city).strip().upper()=='CANOAS'  # filtro municipal no servidor
+    """Aceita apenas município explicitamente confirmado pelo registro.
+
+    Falha fechada: respostas sem localização não provam que o filtro remoto funcionou.
+    """
+    code=pick(r,'codigo_municipio','co_municipio_gestor','co_ibge',
+        'municipio_codigo','codigo_ibge','codigo_municipio_estabelecimento')
+    if code is not None:
+        return re.sub(r'\D','',str(code).split('.')[0]) in ('430460','4304606')
+    city=pick(r,'municipio','nome_municipio','no_municipio','municipio_estabelecimento')
+    return city is not None and str(city).strip().upper()=='CANOAS'
 
 def unpack(payload, candidates=()):
     if isinstance(payload,list):return [r for r in payload if isinstance(r,dict)],None
@@ -93,13 +99,29 @@ def unpack(payload, candidates=()):
     raise ValueError('Resposta JSON sem lista identificável: '+str(list(payload)[:8]))
 
 def paginate(endpoint, params, limit, cap, consume, candidates=()):
+    """Paginação por índice de página. Rejeita respostas repetidas/incompletas.
+
+    Não publica uma amostra truncada: qualquer inconsistência invalida a extração.
+    """
     read=0
+    fingerprints=set()
     for page in range(cap):
-        rows,total=unpack(request_json(API+endpoint+'?'+urlencode({**params,'limit':limit,'offset':page})),candidates)
-        if page==0 and not rows:raise ValueError(endpoint+': nenhum registro para os filtros')
+        payload=request_json(API+endpoint+'?'+urlencode({**params,'limit':limit,'offset':page}))
+        rows,total=unpack(payload,candidates)
+        if page==0:
+            if not rows:raise ValueError(endpoint+': nenhum registro para os filtros')
+            LOG.info('%s: primeira resposta possui %s linhas; chaves: %s; total informado: %s',
+                endpoint,len(rows),sorted(rows[0].keys())[:25],total)
+        if not rows:
+            return read
+        # Detecta API/proxy que ignora offset ou repete a mesma página.
+        fingerprint=json.dumps(rows,sort_keys=True,ensure_ascii=False,default=str)
+        if fingerprint in fingerprints:
+            raise ValueError(f'{endpoint}: página {page} repetida; verificar filtro/offset da API')
+        fingerprints.add(fingerprint)
         for row in rows:consume(row)
         read+=len(rows)
-        if page%25==0:LOG.info('%s: página %s, registros %s',endpoint,page,read)
+        if page<3 or page%10==0:LOG.info('%s: página %s, registros lidos %s',endpoint,page,read)
         if len(rows)<limit or (total is not None and read>=total):return read
         time.sleep(.1)
     raise ValueError(f'{endpoint}: extrato incompleto (limite {cap} páginas)')
@@ -135,36 +157,80 @@ def update_ibge(s):
     s['municipality'].update(population=rows[-1]['value'],populationYear=rows[-1]['year'])
     mark(s,'ibge',f'Estimativas SIDRA até {rows[-1]["year"]}',len(rows))
 
-def fetch_cnes():
+def latest_cnes_competence():
+    """Localiza o mês mais recente com amostra municipal suficiente do CNES.
+
+    Não usa a competência dos leitos: a publicação dessas fontes pode defasar.
+    """
+    fixed=os.getenv('CNES_COMPETENCE','').strip()
+    if fixed:
+        if not re.fullmatch(r'20\d{4}',fixed) or not 1<=int(fixed[-2:])<=12:
+            raise ValueError('CNES_COMPETENCE deve estar no formato AAAAMM')
+        return int(fixed)
+    current=datetime.now(timezone.utc)
+    for delta in range(18):
+        months=current.year*12+current.month-1-delta
+        comp=(months//12)*100+(months%12)+1
+        url=API+'/assistencia-a-saude/cnes-estabelecimentos?'+urlencode(
+            {'co_ibge':int(IBGE_6),'nu_comp':comp,'limit':1000,'offset':0})
+        rows,_=unpack(request_json(url),('estabelecimentos',))
+        if not rows:continue
+        if len(rows)<20:
+            LOG.warning('CNES competência %s: somente %s linhas na primeira página',comp,len(rows))
+            continue
+        # Um código explícito precisa confirmar que a API respeitou o município.
+        if not valid_canoas(rows[0]):
+            raise ValueError('CNES: a amostra não confirma filtro municipal; verificar esquema da API')
+        LOG.info('CNES competência inicial selecionada: %s (%s linhas na primeira página)',comp,len(rows))
+        return comp
+    raise ValueError('CNES: não existe competência recente com amostra municipal validável')
+
+def fetch_cnes(competence=None):
+    """CNES por competência: até mil linhas por página, sem misturar meses.
+
+    Endpoint documentado no Swagger DEMAS em /assistencia-a-saude/cnes-estabelecimentos.
+    Nunca usa registros municipais sem identificador explícito de município.
+    """
     out={}
+    params={'co_ibge':int(IBGE_6)}
+    if competence is not None:params['nu_comp']=int(competence)
     def consume(r):
-        if not valid_canoas(r):raise ValueError('O servidor incluiu município diferente de Canoas')
-        code=str(pick(r,'codigo_cnes','co_cnes','cnes') or '').strip()
-        if code:out[code]=r
-    n=paginate('/cnes/estabelecimentos',{'codigo_municipio':int(IBGE_6),'status':1},20,250,consume)
-    if len(out)<20:raise ValueError('CNES retornou menos de 20 estabelecimentos; consulta suspeita')
+        if not valid_canoas(r):
+            LOG.error('CNES: registro incompatível com Canoas; chaves=%s',sorted(r.keys())[:35])
+            raise ValueError('CNES: código do município ausente ou diferente; API pode ignorar o filtro')
+        if competence is not None:
+            observed=parse_number(pick(r,'nu_comp','competencia'))
+            if observed is not None and observed!=int(competence):
+                raise ValueError('CNES: a API ignorou o filtro de competência')
+        code=str(pick(r,'co_cnes','codigo_cnes','cnes') or '').strip()
+        if not code:raise ValueError('CNES: registro sem código CNES')
+        out[code]=r
+    n=paginate('/assistencia-a-saude/cnes-estabelecimentos',params,1000,40,consume,('estabelecimentos',))
+    if len(out)<20:raise ValueError(f'CNES retornou somente {len(out)} unidades; extrato suspeito')
+    if n>len(out)*3:
+        raise ValueError(f'CNES retornou {n} linhas mas só {len(out)} códigos únicos; verifique competências e paginação')
     return list(out.values()),n
 
 def build_cnes(rows):
     points=[];kinds=Counter();bairros=Counter();ubs=hosp=0
     for r in rows:
-        kind=str(pick(r,'descricao_tipo_unidade','tipo_unidade','tipo_estabelecimento','ds_tipo_unidade','estabelecimento_tipo_unidade') or 'Não informado')
+        kind=str(pick(r,'descricao_tipo_unidade','tipo_unidade','tipo_estabelecimento','ds_tipo_unidade','estabelecimento_tipo_unidade','ds_tipo_estabelecimento','no_tipo_estabelecimento','ds_tp_unidade') or 'Não informado')
         cat=normalize_type(kind)
         kinds[kind]+=1
         ubs+=cat=='ubs';hosp+=cat=='hospital'
-        bairro=str(pick(r,'bairro_estabelecimento','bairro','no_bairro') or 'Não informado')
+        bairro=str(pick(r,'bairro_estabelecimento','bairro','no_bairro','no_bairro_estabelecimento') or 'Não informado')
         bairros[bairro]+=1
-        lat=coord(pick(r,'latitude_estabelecimento','latitude','nu_latitude','vl_latitude'))
-        lng=coord(pick(r,'longitude_estabelecimento','longitude','nu_longitude','vl_longitude'))
+        lat=coord(pick(r,'latitude_estabelecimento','latitude','nu_latitude','vl_latitude','latitude_estab'))
+        lng=coord(pick(r,'longitude_estabelecimento','longitude','nu_longitude','vl_longitude','longitude_estab'))
         if lat is None or lng is None:continue
         if -51.4<lat<-50.99 and -30.1<lng<-29.73:lat,lng=lng,lat
         if not(-30.1<lat<-29.73 and -51.4<lng<-50.99):continue
-        number=str(pick(r,'numero_estabelecimento','numero','nu_endereco') or '')
-        street=str(pick(r,'endereco_estabelecimento','logradouro','no_logradouro') or '')
+        number=str(pick(r,'numero_estabelecimento','numero','nu_endereco','nu_numero') or '')
+        street=str(pick(r,'endereco_estabelecimento','logradouro','no_logradouro','no_logr') or '')
         sus=pick(r,'vinculo_sus','estabelecimento_faz_atendimento_sus','atendimento_sus')
         sus_bool=True if str(sus).lower() in ('1','s','sim','true') else False if str(sus).lower() in ('0','n','nao','não','false') else None
         code=str(pick(r,'codigo_cnes','co_cnes','cnes'))
-        points.append({'type':'Feature','id':code,'geometry':{'type':'Point','coordinates':[round(lng,6),round(lat,6)]},'properties':{'cnes':code,'name':str(pick(r,'nome_fantasia','no_fantasia','estabelecimento_nome_fantasia') or 'Estabelecimento CNES'),'type':kind,'category':cat,'address':', '.join(x for x in (street,number) if x),'neighborhood':bairro,'phone':str(pick(r,'numero_telefone_estabelecimento','telefone','nu_telefone') or ''),'hasBeds':None,'sus':sus_bool}})
+        points.append({'type':'Feature','id':code,'geometry':{'type':'Point','coordinates':[round(lng,6),round(lat,6)]},'properties':{'cnes':code,'name':str(pick(r,'nome_fantasia','no_fantasia','estabelecimento_nome_fantasia','no_fantasia_estabelecimento') or 'Estabelecimento CNES'),'type':kind,'category':cat,'address':', '.join(x for x in (street,number) if x),'neighborhood':bairro,'phone':str(pick(r,'numero_telefone_estabelecimento','telefone','nu_telefone') or ''),'hasBeds':None,'sus':sus_bool}})
     stats={'total':len(rows),'withCoordinates':len(points),'ubs':ubs,'hospitals':hosp,'byType':[{'name':k,'value':v} for k,v in kinds.most_common(20)],'byNeighborhood':[{'name':k,'value':v} for k,v in bairros.most_common(40)],'asOf':now()[:10]}
     return {'type':'FeatureCollection','features':points},stats
 
@@ -224,7 +290,11 @@ def update_beds(s):
         cn=str(pick(r,'co_cnes','codigo_cnes','cnes') or '')
         if cn:per_cnes[cn]+=(a or 0)
     if not recognized:raise ValueError('CNES leitos não contém campos de quantidade reconhecidos')
+    # Para Canoas, amostra de apenas uma linha não permite inferir o total municipal.
+    # Regra de qualidade: exigir mais de um CNES antes de apresentar agregação.
     if not per_cnes:raise ValueError('CNES leitos não contém códigos CNES reconhecidos; filtro de leitos suspenso')
+    if len(per_cnes)<2:
+        raise ValueError('CNES leitos: somente um estabelecimento na resposta; agregado municipal não validado')
     if sus>total:raise ValueError('Leitos SUS superam o total existente; conferir mapeamento')
     s['beds']={'total':total,'sus':sus,'asOf':str(competence)}
     mark(s,'beds',f'Competência {competence}',n)
@@ -283,11 +353,21 @@ def run():
         try:call();success+=1
         except Exception as e:fail(s,key,e)
     try:
-        rows,n=fetch_cnes();geo,stats=build_cnes(rows)
+        competence=latest_cnes_competence()
+        rows,n=fetch_cnes(competence);geo,stats=build_cnes(rows)
         if not geo['features']:raise ValueError('CNES sem pontos geográficos válidos')
+        if len(geo['features'])<10:
+            raise ValueError('CNES possui menos de 10 pontos com coordenadas válidas; verificar esquema')
         write_json(GEO,geo);s['facilities']=stats
-        mark(s,'cnes',f'Estabelecimentos ativos · coleta {now()[:10]}',n);success+=1
+        mark(s,'cnes',f'Competência {competence} · coleta {now()[:10]}',n);success+=1
     except Exception as e:fail(s,'cnes',e)
+    # Revoga o número anteriormente publicado sem validação (uma única linha).
+    old=s.get('sourceInfo',{}).get('beds',{})
+    if (old.get('records') in (0,1) and s.get('beds',{}).get('total') is not None):
+        LOG.warning('Invalidando agregado de leitos baseado em %s registro(s)',old['records'])
+        s['beds']={'total':None,'sus':None,'asOf':None}
+        old['status']='error';old['records']=None;old['reference']=None
+        old['note']='Extração anterior de uma linha não comprovou o total de leitos do município.'
     try:update_beds(s);success+=1
     except Exception as e:fail(s,'beds',e)
     if os.environ.get('SKIP_HEAVY','false').lower()!='true':

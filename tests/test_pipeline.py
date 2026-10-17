@@ -26,7 +26,7 @@ class PipelineTests(unittest.TestCase):
     def test_beds_one_competence_and_per_cnes(self):
         s=json.loads((ROOT/'public/data/summary.json').read_text())
         rows=[{'co_ibge':430460,'nu_comp':202609,'co_cnes':'101','qt_exist':3,'qt_sus':2},
-              {'co_ibge':430460,'nu_comp':202609,'co_cnes':'101','qt_exist':2,'qt_sus':1}]
+              {'co_ibge':430460,'nu_comp':202609,'co_cnes':'102','qt_exist':2,'qt_sus':1}]
         with patch.object(up,'latest_bed_competence',return_value=202609), \
              patch.object(up,'paginate',side_effect=lambda a,b,c,d,consume,e: [consume(r) for r in rows] and len(rows)), \
              patch.object(up,'write_json') as writing,patch.object(up,'GEO',Path('/tmp/webgis-no-geojson-fixture.geojson')):
@@ -85,16 +85,17 @@ class PipelineTests(unittest.TestCase):
                     return [{'D3C':'Ano','V':'Valor'},{'D3C':'2025','V':'351000'},{'D3C':'2026','V':'359845'}]
                 path=urlparse(url).path
                 q=parse_qs(urlparse(url).query)
-                if path=='/cnes/estabelecimentos':
-                    return {'estabelecimentos':records[20*int(q.get('offset',['0'])[0]):20*(int(q.get('offset',['0'])[0])+1)],'total':21}
+                if path=='/assistencia-a-saude/cnes-estabelecimentos':
+                    return {'estabelecimentos':records[1000*int(q.get('offset',['0'])[0]):1000*(int(q.get('offset',['0'])[0])+1)],'total':21}
                 if path=='/assistencia-a-saude/cnes-leitos':
                     if q.get('nu_comp')==['202609']:
-                        return {'leitos':[{'co_ibge':'430460','nu_comp':202609,'co_cnes':'1000','qt_exist':8,'qt_sus':6}],'total':1}
+                        return {'leitos':[{'co_ibge':'430460','nu_comp':202609,'co_cnes':'1000','qt_exist':8,'qt_sus':6}, {'co_ibge':'430460','nu_comp':202609,'co_cnes':'1001','qt_exist':1,'qt_sus':1}],'total':2}
                     return {'leitos':[],'total':0}
                 raise AssertionError('URL inesperada '+url)
             with patch.object(up,'SUMMARY',summary),patch.object(up,'GEO',geo), \
                  patch.object(up,'request_json',side_effect=fake_api),patch.object(up,'get_logo'), \
                  patch.object(up,'latest_bed_competence',return_value=202609), \
+                 patch.object(up,'latest_cnes_competence',return_value=202609), \
                  patch.dict('os.environ',{'SKIP_HEAVY':'true'}):
                 up.run()
             result=json.loads(summary.read_text('utf8'))
@@ -102,11 +103,50 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(result['facilities']['total'],21)
             self.assertEqual(result['facilities']['ubs'],21)
             self.assertEqual(result['municipality']['population'],359845)
-            self.assertEqual(result['beds']['total'],8)
+            self.assertEqual(result['beds']['total'],9)
             self.assertEqual(result['sourceInfo']['cnes']['status'],'ok')
             self.assertEqual(len(points),21)
             self.assertTrue(points[0]['properties']['hasBeds'])
-            self.assertFalse(points[1]['properties']['hasBeds'])
+            self.assertTrue(points[1]['properties']['hasBeds'])
+            self.assertFalse(points[2]['properties']['hasBeds'])
+
+    def test_repeated_pages_are_rejected(self):
+        row={'co_ibge':430460,'co_cnes':'101'}
+        with patch.object(up,'request_json',return_value={'dados':[row,dict(row)]}):
+            with self.assertRaisesRegex(ValueError,'página 1 repetida'):
+                up.paginate('/assistencia-a-saude/cnes-estabelecimentos',{'co_ibge':430460},2,3,lambda r:None)
+
+    def test_municipal_filter_cannot_be_assumed(self):
+        self.assertFalse(up.valid_canoas({'co_cnes':'1001','no_fantasia':'UBS EXEMPLO'}))
+        self.assertTrue(up.valid_canoas({'co_ibge':430460,'co_cnes':'1001'}))
+
+    def test_cnes_competence_not_tied_to_beds(self):
+        from datetime import datetime, timezone
+        def api(url,*args,**kwargs):
+            from urllib.parse import parse_qs,urlparse
+            comp=int(parse_qs(urlparse(url).query)['nu_comp'][0])
+            return {'dados':([{'co_ibge':430460,'co_cnes':str(i)} for i in range(21)] if comp==202609 else []), 'total':21 if comp==202609 else 0}
+        with patch.dict('os.environ',{'CNES_COMPETENCE':''}), \
+             patch.object(up,'datetime') as clock, patch.object(up,'request_json',side_effect=api):
+            clock.now.return_value=datetime(2026,10,16,tzinfo=timezone.utc)
+            self.assertEqual(up.latest_cnes_competence(),202609)
+
+    def test_cnes_modern_endpoint_one_competence(self):
+        records=[{'co_cnes':str(10000+i),'co_ibge':430460,'nu_comp':202607} for i in range(22)]
+        with patch.object(up,'request_json',return_value={'estabelecimentos':records,'total':22}) as mock:
+            rows,n=up.fetch_cnes(202607)
+        self.assertEqual(len(rows),22)
+        self.assertEqual(n,22)
+        self.assertIn('/assistencia-a-saude/cnes-estabelecimentos',mock.call_args.args[0])
+        self.assertIn('nu_comp=202607',mock.call_args.args[0])
+        self.assertIn('limit=1000',mock.call_args.args[0])
+
+    def test_single_bed_row_does_not_validate_canoas_total(self):
+        s=json.loads((ROOT/'public/data/summary.json').read_text())
+        with patch.object(up,'latest_bed_competence',return_value=202607), \
+             patch.object(up,'paginate',side_effect=lambda a,b,c,d,consume,e: consume({'co_ibge':430460,'nu_comp':202607,'co_cnes':'101','qt_exist':21,'qt_sus':0}) or 1):
+            with self.assertRaisesRegex(ValueError,'somente um estabelecimento'):
+                up.update_beds(s)
 
     def test_source_status_matches_published_indicator(self):
         s=json.loads((ROOT/'public/data/summary.json').read_text())
