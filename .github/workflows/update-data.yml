@@ -51,7 +51,7 @@ jobs:
           snapshot=json.loads(Path('public/data/summary.json').read_text(encoding='utf-8'))
           sources=snapshot.get('sourceInfo',{})
           # A primeira publicação NÃO pode depender da ação agendada: inicializa CNES no push.
-          initial=not Path('public/data/aps.json').exists() or not Path('public/data/production.json').exists() or (Path('public/data/production.json').exists() and not any(json.loads(Path('public/data/production.json').read_text()).get('sources',{}).get(k,{}).get('monthsAvailable') for k in ('sih','sia'))) or any(k not in json.loads(Path('public/data/sus.json').read_text()).get('sources',{}) for k in ('consultas_aps_razao','consultas_especializadas_razao','valor_medio_aih','sih_internacoes_anuais')) if Path('public/data/sus.json').exists() else True
+          initial=not Path('public/data/aps.json').exists() or not Path('public/data/production.json').exists() or (Path('public/data/production.json').exists() and any(len(json.loads(Path('public/data/production.json').read_text()).get('sources',{}).get(k,{}).get('monthsAvailable',[]))<12 for k in ('sih','sia'))) or any(k not in json.loads(Path('public/data/sus.json').read_text()).get('sources',{}) for k in ('consultas_aps_razao','consultas_especializadas_razao','valor_medio_aih','sih_internacoes_anuais')) if Path('public/data/sus.json').exists() else True
           initial=initial or not Path('public/data/sus.json').exists() or (Path('public/data/sus.json').exists() and json.loads(Path('public/data/sus.json').read_text()).get('updatedAt') is None) or not Path('public/data/indicators.json').exists() or json.loads(Path('public/data/indicators.json').read_text()).get('updatedAt') is None or not all(json.loads(Path('public/data/indicators.json').read_text()).get('series',{}).get(k) for k in ('chikungunya','zika')) or not Path('public/data/facilities.json').exists() or (Path('public/data/facilities.json').exists() and json.loads(Path('public/data/facilities.json').read_text()).get('facilityMetricsVersion') != 'leitos-uti-v1') or sources.get('cnes',{}).get('status') != 'ok' or snapshot.get('facilities',{}).get('total') is None or sources.get('cnes',{}).get('classifierVersion') != 'cnes-2026-v2' or sources.get('beds',{}).get('status') != 'ok' or snapshot.get('beds',{}).get('total') is None
           run=os.environ['EVENT_NAME'] != 'push' or initial
           with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf8') as out:
@@ -88,17 +88,12 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: python -m pip install --quiet "pysus==2.11.7"
-      - name: Investigar espelho estadual de vacinação PNI (temporário)
-        if: steps.decide.outputs.collect == 'true'
-        continue-on-error: true
-        timeout-minutes: 3
-        run: python scripts/probe_pni_parquet.py
       - name: Consolidar produção SIH/SIA por competência e CNES
         if: steps.decide.outputs.collect == 'true'
         continue-on-error: true
         timeout-minutes: 18
         env:
-          PRODUCTION_MAX_DOWNLOADS: '10'
+          PRODUCTION_MAX_DOWNLOADS: '32'
         run: python scripts/production_sus.py
       - name: Consolidar indicadores históricos da APS SISAB
         if: steps.decide.outputs.collect == 'true'
