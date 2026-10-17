@@ -208,7 +208,10 @@ export function facilityPopupHTML(cnes:string){
  if(!item)return '<p>Estabelecimento não encontrado.</p>';
  return '<div class="map-tooltip"><h3>'+safe(item.name)+'</h3><div class="small">'+safe(item.type)+'<br><b>CNES '+safe(item.cnes)+'</b>'+
  '<br>'+safe(item.address||'Endereço não informado')+
+ '<br>Bairro: '+safe(item.neighborhood||'não informado')+
+ (item.phone?'<br>Contato: '+safe(item.phone):'')+
  '<br>Leitos existentes: '+fmt(item.bedsTotal)+' · SUS: '+fmt(item.bedsSus)+
+ '<br>Leitos UTI: '+fmt(item.utiTotal)+
  (item.bedsAsOf?'<br>Competência '+safe(item.bedsAsOf):'')+
  '<br><span class="text-teal-700 font-bold">Unidade selecionada · detalhes e gráficos no painel</span></div></div>';
 }
