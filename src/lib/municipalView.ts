@@ -110,7 +110,15 @@ function buildMetrics(health:Health|null,sus:SUS|null,aps:APS|null,production:Pr
    values.push({key:'production_'+system+'_'+metric,section:'production',
     label:system==='sih'?(metric==='quantity'?'Internações mensais · SIH/RD':'Valores de internações SIH/RD'):(metric==='quantity'?'Procedimentos mensais · SIA/PA':'Valores aprovados SIA/PA'),
     value:production.periods[recent][system]!.municipal[metric],reference:stamp(recent),
-    unit:metric==='quantity'?(system==='sih'?'AIHs RD':'procedimentos PA'):'R(row:Selection){
+    unit:metric==='quantity'?(system==='sih'?'AIHs RD':'procedimentos PA'):'R$',
+    kind:metric==='quantity'?'count':'currency',
+    notes:source.method+' Cobertura: '+months.length+'/'+source.monthsRequested+' meses do recorte previsto; sem extrapolar um total anual.',
+    source:source.url,series});
+  }
+ }
+ return values;
+}
+function indicatorCard(row:Selection){
  const state=row.provisional?' · preliminar':'';
  return '<button type="button" data-municipal-metric="'+safe(row.key)+'" data-municipal-group="'+row.section+'" '+
  'class="text-left rounded-xl border border-slate-200 dark:border-slate-700 p-4 focus-visible:ring-2 focus-visible:ring-teal-500 hover:border-teal-400">'+
@@ -155,105 +163,6 @@ export async function mountMunicipal(dark:boolean){
     (entries.length?'':'<div class="text-sm text-slate-500 dark:text-slate-300">Fonte ainda não validada para Canoas.</div>')+'</div></section>';
   }).join('');
   const sources=[...(stored.health?Object.entries(stored.health.sources):[]),...(stored.sus?Object.entries(stored.sus.sources):[]),...(stored.aps?Object.entries(stored.aps.sources):[]),...(stored.production?Object.entries(stored.production.sources).map(([k,v]):[string,Origin]=>['production_'+k,{label:v.label,status:v.status,method:v.method,reference:v.reference||undefined}]):[])]
-   .filter(([key,s])=>!metrics.some(m=>m.key===key)&&(s.status==='not_loaded'||s.status==='error'||s.status==='partial'));
-  const unique=new Map<string,Origin>();
-  for(const [key,s] of sources)if(!unique.has(key))unique.set(key,s);
-  pending.innerHTML=[...unique].map(([key,s])=>'<article class="rounded-xl border border-slate-200 dark:border-slate-700 p-3">'+
-   '<div class="text-sm font-semibold">'+safe(s.label||key)+'</div><p class="mt-1 text-xs text-slate-500 dark:text-slate-300">'+
-   safe(s.note||s.method||'Extração municipal ainda não validada.')+'</p></article>').join('')||
-   '<p class="text-sm text-slate-500">Não há novas pendências registradas.</p>';
-  const ec=await import('echarts');
-  if(nonce!==live||!cards.isConnected)return;
-  const renderPlot=(record:Selection)=>{
-   const target=document.getElementById('municipal-chart');
-   if(!target)return;
-   plotCleanup();target.innerHTML='';
-   document.getElementById('municipal-plot-title')!.textContent=record.label;
-   document.getElementById('municipal-method')!.textContent=record.notes+
-    ' · Série municipal. Não é produção atribuída ao CNES selecionado.';
-   const source=document.getElementById('municipal-plot-source');
-   if(source)source.innerHTML=record.source?'<a href="'+safe(record.source)+'" target="_blank" rel="noopener noreferrer" class="underline">Fonte oficial ↗</a>':'Fonte oficial';
-   const table=document.getElementById('municipal-table');
-   if(table)table.innerHTML='<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-xs text-slate-500 border-b border-slate-200 dark:border-slate-700"><th class="text-left py-2">Período</th><th class="text-right py-2">Valor</th></tr></thead><tbody>'+
-    record.series.slice().reverse().map(v=>'<tr class="border-b border-slate-100 dark:border-slate-700"><td class="py-2">'+safe(v.period)+'</td><td class="py-2 text-right font-semibold tabular-nums">'+display(v.value,record.kind)+'</td></tr>').join('')+'</tbody></table></div>';
-   document.querySelectorAll<HTMLElement>('[data-municipal-metric]').forEach(e=>e.classList.toggle('ring-2',e.dataset.municipalMetric===record.key));
-   if(!record.series.length){target.innerHTML='Sem dados por período.';return}
-   plot=ec.init(target);
-   const muted=dark?'#9db3c5':'#64748b';
-   plot.setOption({animationDuration:280,grid:{top:18,left:12,right:16,bottom:50,containLabel:true},
-    tooltip:{trigger:'axis',valueFormatter:(value:number)=>display(Number(value),record.kind)},
-    xAxis:{type:'category',data:record.series.map(x=>x.period),axisLabel:{color:muted,rotate:35},axisTick:{show:false}},
-    yAxis:{type:'value',axisLabel:{color:muted},splitLine:{lineStyle:{color:dark?'#32475a':'#edf2f6'}}},
-    series:[{type:record.series.length<=3?'bar':'line',smooth:true,barMaxWidth:72,
-      lineStyle:{color:'#0d9488',width:3},itemStyle:{color:'#0d9488'},data:record.series.map(x=>x.value)}]});
-   obs=new ResizeObserver(()=>plot?.resize());obs.observe(target);
-  };
-  function plotCleanup(){obs?.disconnect();obs=null;plot?.dispose();plot=null}
-  cards.addEventListener('click',event=>{
-   const button=(event.target as HTMLElement).closest<HTMLElement>('[data-municipal-metric]');
-   if(!button)return;
-   const found=metrics.find(m=>m.key===button.dataset.municipalMetric&&m.section===button.dataset.municipalGroup);
-   if(found){renderPlot(found);document.getElementById('municipal-plot-title')?.scrollIntoView({behavior:'smooth',block:'nearest'});}
-  });
-  if(metrics.length)renderPlot(metrics.find(m=>m.key==='dengue')||metrics[0]);
-  else document.getElementById('municipal-chart')!.innerHTML='<div class="empty p-5">Séries adicionais indisponíveis. Os dados demográficos e CNES permanecem no painel.</div>';
- }catch(error){
-  console.error('Painel municipal',error);
-  if(nonce===live&&status.isConnected)status.textContent='Algumas bases municipais não responderam. Os indicadores IBGE e CNES continuam disponíveis.';
- }
-}
-,
-    kind:metric==='quantity'?'count':'currency',
-    notes:source.method+' Cobertura: '+months.length+'/'+source.monthsRequested+' meses do recorte previsto; sem extrapolar um total anual.',
-    source:source.url,series});
-  }
- }
- return values;
-}
-function indicatorCard(row:Selection){
- const state=row.provisional?' · preliminar':'';
- return '<button type="button" data-municipal-metric="'+safe(row.key)+'" data-municipal-group="'+row.section+'" '+
- 'class="text-left rounded-xl border border-slate-200 dark:border-slate-700 p-4 focus-visible:ring-2 focus-visible:ring-teal-500 hover:border-teal-400">'+
- '<span class="block text-xs font-semibold text-slate-600 dark:text-slate-300">'+safe(row.label)+'</span>'+
- '<span class="block mt-2 text-xl font-bold tabular-nums">'+display(row.value,row.kind)+'</span>'+
- '<span class="block mt-1 text-xs text-slate-500 dark:text-slate-300">'+safe(row.unit)+' · '+safe(row.reference+state)+'</span>'+
- '<span class="block mt-2 text-[11px] font-semibold text-teal-700 dark:text-teal-300">Ver evolução →</span></button>';
-}
-const stages:{name:string;keys:string[]}[]=[
- {name:'Vigilância epidemiológica',keys:['dengue','chikungunya','zika']},
- {name:'Natalidade e mortalidade',keys:['sinasc','sim']},
- {name:'Atenção Primária e financiamento',keys:['emulti_custeadas','emulti_homologadas','emulti_repasses','consultas_aps_razao','consultas_especializadas_razao']},
- {name:'Assistência hospitalar · RIPSA',keys:['sih_internacoes_anuais','valor_medio_aih']},
- {name:'Prevenção e rastreamento',keys:['citopatologicos','mamografias']},
- {name:'Atenção Primária · Previne Brasil (histórico até 2024)',keys:['aps_prenatal','aps_gestantes_testes','aps_gestantes_odontologia','aps_citopatologico','aps_vacinacao_infantil','aps_hipertensao','aps_diabetes']}
-];
-export async function mountMunicipal(dark:boolean){
- const nonce=++live;
- const status=document.getElementById('municipal-status'),cards=document.getElementById('municipal-indicator-list');
- const pending=document.getElementById('municipal-pending');
- if(!status||!cards||!pending)return;
- try{
-  if(!stored){
-   const load=async(path:string)=>{
-    const result=await fetch(urlAsset('data/'+path),{cache:'no-cache'});
-    if(!result.ok)throw new Error(path+' HTTP '+result.status);
-    return result.json();
-   };
-   const [h,s,a]=await Promise.allSettled([load('indicators.json'),load('sus.json'),load('aps.json')]);
-   stored={health:h.status==='fulfilled'?h.value as Health:null,sus:s.status==='fulfilled'?s.value as SUS:null,aps:a.status==='fulfilled'?a.value as APS:null};
-  }
-  if(nonce!==live||!cards.isConnected)return;
-  const metrics=buildMetrics(stored.health,stored.sus,stored.aps);
-  status.textContent=metrics.length+' séries municipais com extração validada';
-  cards.innerHTML=stages.map(group=>{
-   const entries=group.keys.map(key=>metrics.find(m=>m.key===key)).filter((m):m is Selection=>Boolean(m));
-   const missing=group.keys.filter(k=>!metrics.some(m=>m.key===k)).length;
-   return '<section><h4 class="subheading text-sm mb-3">'+group.name+
-    '<span class="text-xs ml-2 text-slate-400 font-normal">'+entries.length+' disponíveis'+(missing?' · '+missing+' pendente(s)':'')+'</span></h4>'+
-    '<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">'+entries.map(indicatorCard).join('')+
-    (entries.length?'':'<div class="text-sm text-slate-500 dark:text-slate-300">Fonte ainda não validada para Canoas.</div>')+'</div></section>';
-  }).join('');
-  const sources=[...(stored.health?Object.entries(stored.health.sources):[]),...(stored.sus?Object.entries(stored.sus.sources):[]),...(stored.aps?Object.entries(stored.aps.sources):[])]
    .filter(([key,s])=>!metrics.some(m=>m.key===key)&&(s.status==='not_loaded'||s.status==='error'||s.status==='partial'));
   const unique=new Map<string,Origin>();
   for(const [key,s] of sources)if(!unique.has(key))unique.set(key,s);

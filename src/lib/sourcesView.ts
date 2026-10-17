@@ -62,35 +62,11 @@ export async function mountSources(summary:DataSummary){
   const months=Array.isArray((meta as any).monthsAvailable)?(meta as any).monthsAvailable as string[]:[];
   rows.push({id,family:'Produção mensal SIH/SIA · Parquet',label:meta.label,status:meta.status,
    reference:meta.reference,method:(meta.method||'')+' · '+months.length+'/'+((meta as any).monthsRequested||'?')+' meses processados.',
-   url:meta.url,retrievedAt:undefined,unit:'registros e valores R
- const list=rows.filter(row=>{const k=row.family+':'+row.id;if(duplicates.has(k))return false;duplicates.add(k);return true});
- const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento','SISAB · indicadores históricos Previne Brasil','Produção mensal SIH/SIA · Parquet'];
- function render(){
-  const filter=(document.querySelector<HTMLSelectElement>('#sources-filter')?.value||'all');
-  const q=(document.querySelector<HTMLInputElement>('#sources-search')?.value||'').toLocaleLowerCase('pt-BR');
-  const display=list.filter(r=>(filter==='all'||filter==='ok'&&r.status==='ok'||filter==='pending'&&r.status!=='ok')&&
-   (!q||[r.label,r.id,r.note,r.method,r.family].some(x=>String(x||'').toLocaleLowerCase('pt-BR').includes(q))));
-  parent!.innerHTML=groups.map(name=>{
-   const group=display.filter(r=>r.family===name);
-   if(!group.length)return '';
-   return '<section><h3 class="subheading text-base mb-3">'+safe(name)+' <span class="text-xs font-normal text-slate-500">('+group.length+')</span></h3>'+
-    '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">'+group.map(sourceCard).join('')+'</div></section>';
-  }).join('')||'<div class="empty p-4">Nenhuma fonte corresponde ao filtro.</div>';
-  status!.textContent=list.filter(x=>x.status==='ok').length+' fontes/indicadores disponíveis de '+list.length+' cadastrados. '+display.length+' exibidos.';
- }
- render();
- document.getElementById('sources-filter')?.addEventListener('change',render);
- document.getElementById('sources-search')?.addEventListener('input',render);
- const exportButton=document.querySelector<HTMLButtonElement>('#source-export');
- if(exportButton){exportButton.disabled=false;exportButton.onclick=()=>dlCsv(list.map(r=>({
-  Categoria:r.family,Indicador:r.label||r.id,Situacao:statusText(r.status||''),Referencia:r.reference||'',
-  Unidade:r.unit||'',Fonte:r.url||'',Metodologia:r.method||r.note||'',Coleta:r.retrievedAt||''
- })),'catalogo-fontes-webgis-saude-canoas.csv')}
-},years:months.length+' competências'});
+   url:meta.url,retrievedAt:undefined,unit:'registros e valores R$',years:months.length+' competências'});
  }
  const duplicates=new Set<string>();
  const list=rows.filter(row=>{const k=row.family+':'+row.id;if(duplicates.has(k))return false;duplicates.add(k);return true});
- const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento','SISAB · indicadores históricos Previne Brasil'];
+ const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento','SISAB · indicadores históricos Previne Brasil','Produção mensal SIH/SIA · Parquet'];
  function render(){
   const filter=(document.querySelector<HTMLSelectElement>('#sources-filter')?.value||'all');
   const q=(document.querySelector<HTMLInputElement>('#sources-search')?.value||'').toLocaleLowerCase('pt-BR');
