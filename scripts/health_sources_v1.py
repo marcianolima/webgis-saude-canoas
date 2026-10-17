@@ -6,6 +6,7 @@ registros individuais em public/, repositório, logs ou artefatos do Actions.
 """
 import csv, io, json, logging, os, re, tempfile, zipfile
 from datetime import datetime, timezone
+from contextlib import contextmanager
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -54,6 +55,7 @@ def municipal(value):
     if value is None:return False
     return re.sub(r'[^0-9]','',str(value).split('.')[0]) in CITY
 
+@contextmanager
 def read_zip_csv(url):
     """Itera CSV em modo streaming e retorna linhas durante o contexto."""
     with tempfile.TemporaryDirectory(prefix='webgis-health-') as folder:
@@ -136,16 +138,18 @@ def run():
     successes=0
     force=os.getenv('HEALTH_FORCE','').lower()=='true'
     for kind,spec in CONFIG.items():
+        success_this_source=0
         old={int(r['year']):r for r in data.get('series',{}).get(kind,[]) if isinstance(r,dict) and r.get('year')}
         failures=[]
         for year,url in spec['years'].items():
             if year in old and not force and year<datetime.now(timezone.utc).year:continue
             try:
-                (fields,rows),=read_zip_csv(url)
-                entry=aggregate(rows,kind,year,fields)
+                with read_zip_csv(url) as (fields,rows):
+                    entry=aggregate(rows,kind,year,fields)
                 check_consistency(kind,entry)
                 old[year]=entry
                 successes+=1
+                success_this_source+=1
                 LOG.info('%s %s: %s registros de residentes em %s linhas nacionais',kind,year,entry['value'],entry['scanned'])
             except Exception as exc:
                 failures.append(year)
@@ -154,7 +158,7 @@ def run():
         data.setdefault('sources',{})[kind]={
             'label':spec['title'],'url':spec['catalog'],
             'status':'ok' if old and not failures else 'partial' if old else 'error',
-            'retrievedAt':utcnow() if successes else None,
+            'retrievedAt':utcnow() if success_this_source else data.get('sources',{}).get(kind,{}).get('retrievedAt'),
             'reference':'2024–2026 conforme arquivo anual; município de residência',
             'note':spec['method']+(' Não foi possível atualizar: '+', '.join(map(str,failures)) if failures else ''),
             'yearsAvailable':sorted(old)

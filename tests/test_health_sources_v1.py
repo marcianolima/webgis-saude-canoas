@@ -13,12 +13,9 @@ class HealthSourcesV1Tests(unittest.TestCase):
         self.assertFalse(h.municipal('431490'))
         self.assertFalse(h.municipal(None))
     def test_aggregate_residence_dengue(self):
-        with patch.object(h.datetime,'now') as clock:
-            from datetime import datetime,timezone
-            clock.return_value=datetime(2026,10,16,tzinfo=timezone.utc)
-            rows=[{'ID_MN_RESI':'430460','NU_ANO':'2026','CLASSI_FIN':''}]*10001
-            rows.append({'ID_MN_RESI':'431490','NU_ANO':'2026','CLASSI_FIN':'10'})
-            r=h.aggregate(iter(rows),'dengue',2026,['ID_MN_RESI','NU_ANO','CLASSI_FIN'])
+        rows=[{'ID_MN_RESI':'430460','NU_ANO':'2026','CLASSI_FIN':''}]*10001
+        rows.append({'ID_MN_RESI':'431490','NU_ANO':'2026','CLASSI_FIN':'10'})
+        r=h.aggregate(iter(rows),'dengue',2026,['ID_MN_RESI','NU_ANO','CLASSI_FIN'])
         self.assertEqual(r['value'],10001)
         self.assertEqual(r['scanned'],10002)
     def test_aggregate_sinasc_subtotals(self):
