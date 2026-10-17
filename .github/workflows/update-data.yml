@@ -80,6 +80,10 @@ jobs:
           rows=[f"### Dados da saúde: coleta {os.environ['COLLECT_OUTCOME']}", '']
           for key,item in s.get('sourceInfo',{}).items():
               rows.append(f"- **{key}**: {item.get('status')} · {item.get('records')} registros · {item.get('reference') or 'sem referência'}")
+              if key=='cnes' and item.get('status')!='ok':
+                  print('::warning title=CNES indisponível::O deploy foi concluído, mas o mapa de estabelecimentos ainda está sem dados. Confira a etapa de coleta.')
+              elif key=='beds' and item.get('status')!='ok':
+                  print('::warning title=Leitos não validados::A capacidade hospitalar permanecerá indisponível até obtermos uma extração municipal completa.')
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf8') as f:f.write('\n'.join(rows)+'\n')
           if os.environ['COLLECT_OUTCOME']!='success':
               print('::warning::Algumas APIs falharam. Consulte os logs, sem inventar valores indisponíveis.')
