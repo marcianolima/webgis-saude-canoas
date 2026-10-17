@@ -209,6 +209,35 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(s['sourceInfo']['beds']['records'],2)
         self.assertTrue(all(f['properties']['hasBeds'] for f in final['features']))
 
+    def test_archive_uti_fields_are_subtotals_not_extra_beds(self):
+        import csv,io,tempfile,zipfile
+        snapshot=json.loads((ROOT/'public/data/summary.json').read_text())
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            output=io.StringIO()
+            cols=['COMP','CO_IBGE','CNES','MOTIVO_DESABILITACAO','LEITOS_EXISTENTES','LEITOS_SUS','UTI_TOTAL_EXIST','UTI_TOTAL_SUS']
+            writer=csv.DictWriter(output,fieldnames=cols,delimiter=';')
+            writer.writeheader()
+            for code,exist,sus,uti,uti_sus in [('0031461',20,12,5,4),('0031569',40,29,6,5)]:
+                writer.writerow(dict(zip(cols,['202608','430460',code,'',exist,sus,uti,uti_sus])))
+            geo=root/'establishments.geojson'
+            geo.write_text(json.dumps({'type':'FeatureCollection','features':[
+                {'type':'Feature','geometry':{'type':'Point','coordinates':[-51.18,-29.92]},
+                 'properties':{'cnes':'0031461','hasBeds':None}}
+            ]}),encoding='utf8')
+            catalog=root/'facilities.json'
+            catalog.write_text(json.dumps({'facilities':[{'cnes':'0031461','name':'Hospital teste','bedsTotal':None}]}),encoding='utf8')
+            def fake_download(url,destination,max_bytes):
+                with zipfile.ZipFile(destination,'w') as archive:archive.writestr('Leitos_2026.csv',output.getvalue())
+            with patch.object(up,'download_cnes_zip',side_effect=fake_download),patch.object(up,'GEO',geo),patch.object(up,'datetime') as clock:
+                from datetime import datetime,timezone
+                clock.now.return_value=datetime(2026,10,17,tzinfo=timezone.utc)
+                up.update_beds_archive(snapshot)
+            result=json.loads(catalog.read_text())['facilities'][0]
+        self.assertEqual(snapshot['beds'],{'total':60,'sus':41,'asOf':'202608'})
+        self.assertEqual(result['utiTotal'],5)
+        self.assertEqual(result['utiSus'],4)
+
     def test_official_beds_csv_rejects_conflicting_duplicates(self):
         import csv,io,tempfile,zipfile
         s=json.loads((ROOT/'public/data/summary.json').read_text())

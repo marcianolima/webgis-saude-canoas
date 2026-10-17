@@ -386,8 +386,9 @@ def build_facility_catalog(rows, geo, previous=None, preserve_beds=False):
                 'phone':str(pick(row,'NU_TELEFONE') or ''),
                 'sus':None,'hasBeds':None,'coordinates':None
             }
-        item['legalNature']=str(pick(row,'DS_NATUREZA_JURIDICA','NO_NATUREZA_JURIDICA') or '').strip() or None
-        item['management']=str(pick(row,'TP_GESTAO','DS_TP_GESTAO') or '').strip() or None
+        item['legalNature']=str(pick(row,'DS_NATUREZA_ORGANIZACAO','DS_NATUREZA_JURIDICA','NO_NATUREZA_JURIDICA') or '').strip() or None
+        gestao=str(pick(row,'TP_GESTAO','DS_TP_GESTAO') or '').strip().upper()
+        item['management']={'M':'Municipal','E':'Estadual','D':'Dupla'}.get(gestao,gestao or None)
         old=previous_by_code.get(code,{}) if preserve_beds else {}
         for key in ('bedsTotal','bedsSus','utiTotal','utiSus','bedsAsOf'):
             item[key]=old.get(key)
@@ -513,7 +514,15 @@ def update_beds_archive(s):
                     sus=parse_number(pick(rec,'LEITOS_SUS'))
                     if exists is None or sus is None or exists<0 or sus<0 or sus>exists:
                         raise ValueError('CSV de leitos: quantidades inconsistentes para CNES '+cnes)
-                    value=(exists,sus)
+                    uti_exist=parse_number(pick(rec,'UTI_TOTAL_EXIST'))
+                    uti_sus=parse_number(pick(rec,'UTI_TOTAL_SUS'))
+                    if any(v is not None and v<0 for v in (uti_exist,uti_sus)):
+                        raise ValueError('CSV de leitos: UTI negativa para CNES '+cnes)
+                    if uti_exist is not None and uti_exist>exists:
+                        raise ValueError('CSV de leitos: UTI supera leitos existentes')
+                    if uti_sus is not None and (uti_sus>sus or (uti_exist is not None and uti_sus>uti_exist)):
+                        raise ValueError('CSV de leitos: UTI SUS supera capacidade informada')
+                    value=(exists,sus,uti_exist,uti_sus)
                     previous=by_month[period].get(cnes)
                     if previous is not None and previous != value:
                         raise ValueError('CSV de leitos: valores conflitantes para mesmo CNES/competência')
@@ -538,6 +547,8 @@ def update_beds_archive(s):
                 item['bedsTotal']=amount[0]
                 item['bedsSus']=amount[1]
                 item['bedsAsOf']=period
+                item['utiTotal']=amount[2]
+                item['utiSus']=amount[3]
                 item['hasBeds']=amount[0]>0
         # Um CNES sem ficha no CSV de leitos não recebe zero presumido.
         for item in catalog['facilities']:
@@ -554,6 +565,8 @@ def update_beds_archive(s):
             p['bedsTotal'] = records[code][0] if code in records else None
             p['bedsSus'] = records[code][1] if code in records else None
             p['bedsAsOf'] = period if code in records else None
+            p['utiTotal'] = records[code][2] if code in records else None
+            p['utiSus'] = records[code][3] if code in records else None
         write_json(GEO,geo)
     if catalog is not None:write_json(catalog_file,catalog)
     s['beds']={'total':total,'sus':sus,'asOf':period}
