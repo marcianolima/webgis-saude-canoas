@@ -142,7 +142,7 @@ export async function mountMunicipal(dark:boolean){
    '<p class="text-sm text-slate-500">Não há novas pendências registradas.</p>';
   const ec=await import('echarts');
   if(nonce!==live||!cards.isConnected)return;
-  const plot=(record:Selection)=>{
+  const renderPlot=(record:Selection)=>{
    const target=document.getElementById('municipal-chart');
    if(!target)return;
    plotCleanup();target.innerHTML='';
@@ -171,9 +171,9 @@ export async function mountMunicipal(dark:boolean){
    const button=(event.target as HTMLElement).closest<HTMLElement>('[data-municipal-metric]');
    if(!button)return;
    const found=metrics.find(m=>m.key===button.dataset.municipalMetric&&m.section===button.dataset.municipalGroup);
-   if(found){plot(found);document.getElementById('municipal-plot-title')?.scrollIntoView({behavior:'smooth',block:'nearest'});}
+   if(found){renderPlot(found);document.getElementById('municipal-plot-title')?.scrollIntoView({behavior:'smooth',block:'nearest'});}
   });
-  if(metrics.length)plot(metrics.find(m=>m.key==='dengue')||metrics[0]);
+  if(metrics.length)renderPlot(metrics.find(m=>m.key==='dengue')||metrics[0]);
   else document.getElementById('municipal-chart')!.innerHTML='<div class="empty p-5">Séries adicionais indisponíveis. Os dados demográficos e CNES permanecem no painel.</div>';
  }catch(error){
   console.error('Painel municipal',error);
