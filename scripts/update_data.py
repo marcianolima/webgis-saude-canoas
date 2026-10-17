@@ -360,6 +360,47 @@ def build_cnes(rows):
     stats={'total':len(rows),'withCoordinates':len(points),'ubs':ubs,'hospitals':hosp,'byType':[{'name':k,'value':v} for k,v in kinds.most_common(20)],'byNeighborhood':[{'name':k,'value':v} for k,v in bairros.most_common(40)],'asOf':now()[:10]}
     return {'type':'FeatureCollection','features':points},stats
 
+def build_facility_catalog(rows, geo, previous=None, preserve_beds=False):
+    """Retorna todas as unidades ativas, inclusive sem ponto, com identificador CNES.
+    
+    Não publica CNPJ, CPF, CNS, dados clínicos ou identificadores de pessoas.
+    A associação a leitos mantém sua própria competência.
+    """
+    by_code={f['properties']['cnes']:f for f in geo['features']}
+    previous_by_code={r['cnes']:r for r in (previous or {}).get('facilities',[])}
+    result=[]
+    for row in rows:
+        code=str(pick(row,'CO_CNES','CODIGO_CNES','CNES') or '').strip().zfill(7)
+        point=by_code.get(code)
+        if point is not None:
+            item=dict(point['properties'])
+            item['coordinates']=point['geometry']['coordinates']
+        else:
+            item={
+                'cnes':code,
+                'name':str(pick(row,'NO_FANTASIA','NOME_FANTASIA','NO_RAZAO_SOCIAL') or 'Estabelecimento CNES'),
+                'type':str(pick(row,'DS_TIPO_UNIDADE','TP_UNIDADE') or 'Tipo não informado'),
+                'category':'outros',
+                'address':', '.join(str(x) for x in (pick(row,'NO_LOGRADOURO'),pick(row,'NU_ENDERECO')) if x),
+                'neighborhood':str(pick(row,'NO_BAIRRO') or 'Não informado'),
+                'phone':str(pick(row,'NU_TELEFONE') or ''),
+                'sus':None,'hasBeds':None,'coordinates':None
+            }
+        item['legalNature']=str(pick(row,'DS_NATUREZA_JURIDICA','NO_NATUREZA_JURIDICA') or '').strip() or None
+        item['management']=str(pick(row,'TP_GESTAO','DS_TP_GESTAO') or '').strip() or None
+        old=previous_by_code.get(code,{}) if preserve_beds else {}
+        for key in ('bedsTotal','bedsSus','utiTotal','utiSus','bedsAsOf'):
+            item[key]=old.get(key)
+        if preserve_beds and old.get('bedsTotal') is not None:
+            item['hasBeds']=old['bedsTotal']>0
+        result.append(item)
+    if len(result)!=len(rows) or len({r['cnes'] for r in result})!=len(result):
+        raise ValueError('Catálogo CNES: divergência de contagem ou códigos duplicados')
+    return {'schemaVersion':'1.1','updatedAt':now(),
+            'source':'CNES nacional diário · apenas estabelecimentos ativos de Canoas',
+            'facilities':sorted(result,key=lambda r:(r['name'].casefold(),r['cnes']))}
+
+
 def latest_bed_competence():
     """Procura a competência mais recente COM registros, evitando varrer anos do CNES.
 
@@ -486,13 +527,35 @@ def update_beds_archive(s):
     if total<=0 or sus>total:raise ValueError('Total municipal de leitos inválido')
     LOG.info('LEITOS CSV: %s linhas nacionais, competência %s, %s CNES, %s existentes, %s SUS',
              read,period,len(records),total,sus)
-    # Somente após validação completa atualiza os indicadores e o GeoJSON.
+    # Enriquecimento por CNES sem misturar competências e sem somar UTI em duplicidade.
+    catalog_file=GEO.with_name('facilities.json')
+    catalog=json.loads(catalog_file.read_text(encoding='utf8')) if catalog_file.exists() else None
+    if catalog is not None:
+        by_code={r['cnes']:r for r in catalog.get('facilities',[])}
+        for code,amount in records.items():
+            if code in by_code:
+                item=by_code[code]
+                item['bedsTotal']=amount[0]
+                item['bedsSus']=amount[1]
+                item['bedsAsOf']=period
+                item['hasBeds']=amount[0]>0
+        # Um CNES sem ficha no CSV de leitos não recebe zero presumido.
+        for item in catalog['facilities']:
+            if item['cnes'] not in records:
+                for key in ('bedsTotal','bedsSus','bedsAsOf','utiTotal','utiSus'):item[key]=None
+                item['hasBeds']=None
+        catalog['updatedAt']=now()
     geo=json.loads(GEO.read_text('utf8')) if GEO.exists() else None
     if geo is not None:
         for feature in geo.get('features',[]):
             code=str(feature.get('properties',{}).get('cnes') or '').zfill(7)
-            feature['properties']['hasBeds'] = (records[code][0]>0) if code in records else None
+            p=feature['properties']
+            p['hasBeds'] = (records[code][0]>0) if code in records else None
+            p['bedsTotal'] = records[code][0] if code in records else None
+            p['bedsSus'] = records[code][1] if code in records else None
+            p['bedsAsOf'] = period if code in records else None
         write_json(GEO,geo)
+    if catalog is not None:write_json(catalog_file,catalog)
     s['beds']={'total':total,'sus':sus,'asOf':period}
     s['sourceInfo']['beds']['url']=BEDS_CATALOG
     mark(s,'beds','Competência '+period+' · CSV Leitos 2026',len(records))
@@ -551,8 +614,19 @@ def run():
         geo,stats=build_cnes(rows)
         if len(geo['features'])<10:
             raise ValueError('CNES CSV retornou menos de 10 pontos válidos; conferir coordenadas')
-        # Após validação integral, publicamos ambos os arquivos.
-        write_json(GEO,geo);s['facilities']=stats
+        # Catálogo por CNES: inclui unidades sem coordenadas, sem expor microdados.
+        catalog_file=GEO.with_name('facilities.json')
+        previous=None
+        if catalog_file.exists():
+            try:previous=json.loads(catalog_file.read_text(encoding='utf8'))
+            except (ValueError,OSError):previous=None
+        catalog=build_facility_catalog(rows,geo,previous,
+            preserve_beds=s.get('sourceInfo',{}).get('beds',{}).get('status')=='ok')
+        if len(catalog['facilities'])!=stats['total']:
+            raise ValueError('CNES: total do catálogo difere do indicador')
+        write_json(GEO,geo)
+        write_json(catalog_file,catalog)
+        s['facilities']=stats
         s['sourceInfo']['cnes']['url']=CNES_CATALOG
         mark(s,'cnes',f'Retrato diário CNES · captura {now()[:10]} (sem competência mensal)',len(rows))
         s['sourceInfo']['cnes']['classifierVersion']='cnes-2026-v2'

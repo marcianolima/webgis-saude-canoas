@@ -154,6 +154,25 @@ class PipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'somente um estabelecimento'):
                 up.update_beds(s)
 
+    def test_catalog_keeps_non_geocoded_and_preserves_beds(self):
+        rows=[
+            {'CO_CNES':'31461','CO_IBGE':'430460','NO_FANTASIA':'UBS A','TP_UNIDADE':'02','NO_BAIRRO':'Centro',
+             'NU_LATITUDE':'-29.92','NU_LONGITUDE':'-51.18'},
+            {'CO_CNES':'31569','CO_IBGE':'430460','NO_FANTASIA':'Unidade B','TP_UNIDADE':'22',
+             'NU_LATITUDE':'','NU_LONGITUDE':''}
+        ]
+        geo,stats=up.build_cnes(rows)
+        self.assertEqual(stats['total'],2)
+        self.assertEqual(len(geo['features']),1)
+        previous={'facilities':[{'cnes':'0031461','bedsTotal':13,'bedsSus':8,'bedsAsOf':'202608'}]}
+        c=up.build_facility_catalog(rows,geo,previous,preserve_beds=True)
+        by_id={p['cnes']:p for p in c['facilities']}
+        self.assertEqual(len(by_id),2)
+        self.assertIsNone(by_id['0031569']['coordinates'])
+        self.assertEqual(by_id['0031461']['bedsTotal'],13)
+        self.assertEqual(by_id['0031461']['bedsSus'],8)
+        self.assertIsNone(by_id['0031569']['bedsTotal'])
+
     def test_official_beds_csv_keeps_only_latest_month_and_unique_cnes(self):
         import csv,io,tempfile,zipfile
         s=json.loads((ROOT/'public/data/summary.json').read_text())
