@@ -5,7 +5,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '17 8 * * 1,4' # segunda e quinta às 05:17 no horário de Brasília UTC-3
+    - cron: '17 8 * * *' # diariamente às 05:17 em Brasília (UTC-3)
 
 permissions:
   contents: write
@@ -64,8 +64,8 @@ jobs:
         env:
           DATA_YEARS: '2025,2026'
           MAX_PAGES_PER_SERIES: '160'
-          # Em push inicial, prioriza preencher o mapa. Manual/agendado coleta demais séries.
-          SKIP_HEAVY: ${{ github.event_name == 'push' && 'true' || 'false' }}
+          # Coleta diária CNES+IBGE. SIA/SIH/dengue somente com disparo manual e validação.
+          SKIP_HEAVY: ${{ github.event_name != 'workflow_dispatch' && 'true' || 'false' }}
         run: python scripts/update_data.py
       - name: Informar qualidade do snapshot e falhas de coleta
         if: steps.decide.outputs.collect == 'true'

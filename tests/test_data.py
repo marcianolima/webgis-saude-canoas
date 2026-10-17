@@ -12,6 +12,25 @@ class DataTests(unittest.TestCase):
         for f in geo['features']:
             lon,lat=f['geometry']['coordinates']
             self.assertTrue(-51.40<lon<-50.99 and -30.10<lat<-29.73)
+    def test_published_cnes_snapshot_matches_geojson(self):
+        s=json.loads((ROOT/'public/data/summary.json').read_text(encoding='utf8'))
+        g=json.loads((ROOT/'public/data/establishments.geojson').read_text(encoding='utf8'))
+        if s['sourceInfo']['cnes']['status']!='ok':
+            self.assertIsNone(s['facilities']['total'])
+            return
+        features=g['features']
+        facilities=s['facilities']
+        self.assertGreater(facilities['total'],0)
+        self.assertEqual(len(features),facilities['withCoordinates'])
+        self.assertGreaterEqual(facilities['total'],facilities['withCoordinates'])
+        self.assertLessEqual(facilities['ubs']+facilities['hospitals'],facilities['total'])
+        codes=[f['properties']['cnes'] for f in features]
+        self.assertEqual(len(codes),len(set(codes)))
+        self.assertTrue(all(len(c)==7 and c.isdigit() for c in codes))
+        for item in features:
+            lon,lat=item['geometry']['coordinates']
+            self.assertTrue(-51.40<lon<-50.99 and -30.10<lat<-29.73)
+
     def test_summary(self):
         s=json.loads((ROOT/'public/data/summary.json').read_text())
         self.assertEqual(s['municipality']['ibge'],'4304606')
