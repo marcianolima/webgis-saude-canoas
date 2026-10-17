@@ -236,20 +236,37 @@ def update_beds(s):
         write_json(GEO,geo)
 
 def annual(s,key,endpoint,params,fields):
-    result=[];count=0
+    """Atualiza anos separadamente. Não transforma ano ausente/falho em 0.
+
+    Um ano válido não deve desaparecer por uma falha isolada de outro ano.
+    """
+    result=[];count=0;failures=[]
     for year in YEARS:
         amount=0;known=0
         def consume(r):
             nonlocal amount,known
-            if fields is None:amount+=1;known+=1
+            if fields is None:
+                amount+=1;known+=1
             else:
                 n=parse_number(pick(r,*fields))
                 if n is not None and n>=0:amount+=n;known+=1
-        n=paginate(endpoint,{**params,'nu_ano':year},1000,MAX_PAGES,consume,(key,'dados','procedimentos'))
-        if not known:raise ValueError(f'{key} {year}: coluna agregável ausente; nenhum total foi criado')
+        try:
+            n=paginate(endpoint,{**params,'nu_ano':year},1000,MAX_PAGES,consume,(key,'dados','procedimentos'))
+            if not known:raise ValueError('nenhum valor agregável retornado')
+        except Exception as exc:
+            failures.append(year)
+            LOG.warning('%s %s indisponível: %s',key,year,exc)
+            continue
         count+=n;result.append({'year':year,'value':amount})
-    s['series'][key]=result
-    mark(s,key,'; '.join(map(str,YEARS)),count)
+    if not result:raise ValueError(f'{key}: nenhum dos anos pôde ser extraído integralmente')
+    # Preserve anos anteriores que não foram reconsultados com êxito nesta rodada.
+    previous={r['year']:r for r in s['series'].get(key,[]) if r.get('year') in failures}
+    previous.update({r['year']:r for r in result})
+    s['series'][key]=sorted(previous.values(),key=lambda r:r['year'])
+    mark(s,key,'; '.join(str(x['year']) for x in result),count)
+    if failures:
+        s['sourceInfo'][key]['status']='partial'
+        s['sourceInfo'][key]['note']='Sem atualização validada nos anos: '+', '.join(map(str,failures))+'. Séries previamente coletadas foram preservadas.'
 
 def get_logo():
     # Só armazena o arquivo original, quando disponibilizado pelo domínio institucional.

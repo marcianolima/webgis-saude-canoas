@@ -54,6 +54,18 @@ class PipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'incompleto'):
                 up.paginate('/fake',{},2,1,lambda r:None)
 
+    def test_annual_partial_year_does_not_discard_previous_year(self):
+        s=json.loads((ROOT/'public/data/summary.json').read_text())
+        s['series']['dengue']=[{'year':2026,'value':30}]
+        def fake_page(endpoint,params,limit,cap,consume,candidates):
+            if params['nu_ano']==2026:raise ConnectionError('ano indisponível')
+            for _ in range(4):consume({'id':'notificacao'})
+            return 4
+        with patch.object(up,'YEARS',[2025,2026]),patch.object(up,'paginate',side_effect=fake_page):
+            up.annual(s,'dengue','/arboviroses/dengue',{'id_municip':'430460'},None)
+        self.assertEqual(s['series']['dengue'],[{'year':2025,'value':4},{'year':2026,'value':30}])
+        self.assertEqual(s['sourceInfo']['dengue']['status'],'partial')
+
     def test_run_end_to_end_with_simulated_official_responses(self):
         """Teste de contrato: respostas sintéticas nunca são gravadas no projeto real."""
         import tempfile
