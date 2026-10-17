@@ -24,6 +24,8 @@ IBGE_6='430460'
 # o site recebe apenas GeoJSON e agregados do município.
 CNES_CSV_URL = 'https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip'
 CNES_CATALOG = 'https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude'
+BEDS_CSV_URL = 'https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/Leitos_SUS/Leitos_csv_2026.zip'
+BEDS_CATALOG = 'https://dadosabertos.saude.gov.br/dataset/hospitais-e-leitos'
 YEARS = sorted(set(int(x) for x in os.getenv('DATA_YEARS','2025,2026').split(',') if x.strip().isdigit()))
 MAX_PAGES = int(os.getenv('MAX_PAGES_PER_SERIES', '160'))
 LOG=logging.getLogger('webgis')
@@ -430,6 +432,73 @@ def update_beds(s):
             f['properties']['hasBeds']=per_cnes.get(cn,0)>0
         write_json(GEO,geo)
 
+def update_beds_archive(s):
+    """Consolida o CSV anual oficial por município, competência e CNES único.
+
+    O total LEITOS_EXISTENTES já é um campo agregado; não somar UTIs outra vez.
+    Mantém o último snapshot se o extrato não passar pela validação.
+    """
+    by_month=defaultdict(dict)
+    read=0
+    with tempfile.TemporaryDirectory(prefix='webgis-beds-') as folder:
+        target=Path(folder)/'leitos.zip'
+        download_cnes_zip(url=BEDS_CSV_URL,destination=target,max_bytes=200*1024*1024)
+        with zipfile.ZipFile(target) as archive:
+            members=[x for x in archive.infolist() if x.filename.lower().endswith('.csv')]
+            if len(members)!=1:raise ValueError('CSV de leitos: quantidade inesperada de arquivos CSV')
+            with archive.open(members[0]) as raw:
+                preview=raw.peek(16384)[:16384]
+                try:preview.decode('utf-8-sig');charset='utf-8-sig'
+                except UnicodeDecodeError:charset='cp1252'
+                txt=io.TextIOWrapper(raw,encoding=charset,errors='replace',newline='')
+                head=txt.readline()
+                delimiter=';' if head.count(';')>head.count(',') else ','
+                keys=[x.strip().lstrip('\ufeff').upper() for x in next(csv.reader([head],delimiter=delimiter))]
+                required={'COMP','CO_IBGE','CNES','LEITOS_EXISTENTES','LEITOS_SUS','MOTIVO_DESABILITACAO'}
+                if not required.issubset(keys):
+                    raise ValueError('CSV de leitos: campos ausentes: '+str(sorted(required-set(keys))))
+                for rec in csv.DictReader(txt,fieldnames=keys,delimiter=delimiter):
+                    read+=1
+                    if not valid_canoas(rec):continue
+                    if str(pick(rec,'MOTIVO_DESABILITACAO') or '').strip().upper() not in ('','0','00','NAN','NULL','NONE'):continue
+                    period=str(pick(rec,'COMP') or '').strip()
+                    if not re.fullmatch(r'20\d{4}',period) or not 1<=int(period[-2:])<=12:
+                        raise ValueError('CSV de leitos: competência inválida em Canoas')
+                    if int(period[:4]) != datetime.now(timezone.utc).year:continue
+                    cnes=str(pick(rec,'CNES') or '').strip()
+                    if not cnes.isdigit():raise ValueError('CSV de leitos: CNES inválido em Canoas')
+                    cnes=cnes.zfill(7)
+                    exists=parse_number(pick(rec,'LEITOS_EXISTENTES'))
+                    sus=parse_number(pick(rec,'LEITOS_SUS'))
+                    if exists is None or sus is None or exists<0 or sus<0 or sus>exists:
+                        raise ValueError('CSV de leitos: quantidades inconsistentes para CNES '+cnes)
+                    value=(exists,sus)
+                    previous=by_month[period].get(cnes)
+                    if previous is not None and previous != value:
+                        raise ValueError('CSV de leitos: valores conflitantes para mesmo CNES/competência')
+                    by_month[period][cnes]=value
+    latest=sorted((m for m,v in by_month.items() if len(v)>=2),reverse=True)
+    if not latest:raise ValueError('CSV de leitos sem competência municipal válida com múltiplos CNES')
+    period=latest[0]
+    records=by_month[period]
+    total=sum(e for e,_ in records.values())
+    sus=sum(q for _,q in records.values())
+    if total<=0 or sus>total:raise ValueError('Total municipal de leitos inválido')
+    LOG.info('LEITOS CSV: %s linhas nacionais, competência %s, %s CNES, %s existentes, %s SUS',
+             read,period,len(records),total,sus)
+    # Somente após validação completa atualiza os indicadores e o GeoJSON.
+    geo=json.loads(GEO.read_text('utf8')) if GEO.exists() else None
+    if geo is not None:
+        for feature in geo.get('features',[]):
+            code=str(feature.get('properties',{}).get('cnes') or '').zfill(7)
+            feature['properties']['hasBeds'] = (records[code][0]>0) if code in records else None
+        write_json(GEO,geo)
+    s['beds']={'total':total,'sus':sus,'asOf':period}
+    s['sourceInfo']['beds']['url']=BEDS_CATALOG
+    mark(s,'beds','Competência '+period+' · CSV Leitos 2026',len(records))
+    s['sourceInfo']['beds']['note']='Agregado de LEITOS_EXISTENTES e LEITOS_SUS por CNES único, sem somar campos de UTI separadamente.'
+
+
 def annual(s,key,endpoint,params,fields):
     """Atualiza anos separadamente. Não transforma ano ausente/falho em 0.
 
@@ -499,7 +568,7 @@ def run():
         s['beds']={'total':None,'sus':None,'asOf':None}
         old['status']='error';old['records']=None;old['reference']=None
         old['note']='Extração anterior de uma linha não comprovou o total de leitos do município.'
-    try:update_beds(s);success+=1
+    try:update_beds_archive(s);success+=1
     except Exception as e:fail(s,'beds',e)
     if os.environ.get('SKIP_HEAVY','false').lower()!='true':
         jobs=[('dengue','/arboviroses/dengue',{'id_municip':IBGE_6},None),

@@ -148,6 +148,60 @@ class PipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'somente um estabelecimento'):
                 up.update_beds(s)
 
+    def test_official_beds_csv_keeps_only_latest_month_and_unique_cnes(self):
+        import csv,io,tempfile,zipfile
+        s=json.loads((ROOT/'public/data/summary.json').read_text())
+        with tempfile.TemporaryDirectory() as folder:
+            folder=Path(folder)
+            geo=folder/'establishments.geojson'
+            geo.write_text(json.dumps({'type':'FeatureCollection','features':[
+                {'type':'Feature','geometry':{'type':'Point','coordinates':[-51.18,-29.92]},
+                 'properties':{'cnes':'0031461','hasBeds':None}},
+                {'type':'Feature','geometry':{'type':'Point','coordinates':[-51.18,-29.92]},
+                 'properties':{'cnes':'0031569','hasBeds':None}}]}),encoding='utf-8')
+            output=io.StringIO()
+            fields=['COMP','CO_IBGE','CNES','MOTIVO_DESABILITACAO','LEITOS_EXISTENTES','LEITOS_SUS']
+            writer=csv.DictWriter(output,fieldnames=fields,delimiter=';')
+            writer.writeheader()
+            for row in [
+              ('202608','430460','0031461','','20','14'),
+              ('202608','430460','0031569','','25','10'),
+              ('202609','430460','0031461','','30','19'),
+              ('202609','430460','0031569','','15','12'),
+              ('202609','430460','0031569','','15','12'),
+              ('202609','430460','9999999','09','100','100'),
+              ('202609','431490','9999998','','300','100')]:
+                writer.writerow(dict(zip(fields,row)))
+            def download(url,destination,max_bytes):
+                with zipfile.ZipFile(destination,'w') as archive:
+                    archive.writestr('Leitos_2026.csv',output.getvalue())
+            with patch.object(up,'download_cnes_zip',side_effect=download),patch.object(up,'GEO',geo),patch.object(up,'datetime') as clock:
+                from datetime import datetime,timezone
+                clock.now.return_value=datetime(2026,10,16,tzinfo=timezone.utc)
+                up.update_beds_archive(s)
+            final=json.loads(geo.read_text())
+        self.assertEqual(s['beds'],{'total':45,'sus':31,'asOf':'202609'})
+        self.assertEqual(s['sourceInfo']['beds']['records'],2)
+        self.assertTrue(all(f['properties']['hasBeds'] for f in final['features']))
+
+    def test_official_beds_csv_rejects_conflicting_duplicates(self):
+        import csv,io,tempfile,zipfile
+        s=json.loads((ROOT/'public/data/summary.json').read_text())
+        with tempfile.TemporaryDirectory() as folder:
+            output=io.StringIO()
+            cols=['COMP','CO_IBGE','CNES','MOTIVO_DESABILITACAO','LEITOS_EXISTENTES','LEITOS_SUS']
+            writer=csv.DictWriter(output,fieldnames=cols,delimiter=';')
+            writer.writeheader()
+            for e in [10,11]:
+                writer.writerow({'COMP':'202609','CO_IBGE':'430460','CNES':'0031461',
+                                 'MOTIVO_DESABILITACAO':'','LEITOS_EXISTENTES':e,'LEITOS_SUS':5})
+            def download(url,destination,max_bytes):
+                with zipfile.ZipFile(destination,'w') as archive:
+                    archive.writestr('Leitos_2026.csv',output.getvalue())
+            with patch.object(up,'download_cnes_zip',side_effect=download):
+                with self.assertRaisesRegex(ValueError,'conflitantes'):
+                    up.update_beds_archive(s)
+
     def test_archive_csv_filters_canoas_actives_and_validates_geojson(self):
         import tempfile,zipfile,csv,io
         with tempfile.TemporaryDirectory() as folder:
