@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root{font-family:'DM Sans',system-ui,sans-serif;font-synthesis:none;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:#f4f7fa;color:#203348}
+button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #4bd6a8;outline-offset:3px}
+.app-shell{min-height:100dvh}.content-width{max-width:1560px;margin:0 auto}
+.sidebar{position:fixed;inset:0 auto 0 0;width:246px;z-index:40;background:#10293d;display:flex;flex-direction:column;color:#c8d9e4}
+.brand-mark{display:grid;place-items:center;background:linear-gradient(135deg,#12ac88,#0e7f96);height:40px;width:40px;border-radius:12px;color:white}
+.sidebar-link{display:flex;align-items:center;gap:12px;width:100%;border-radius:11px;padding:13px 14px;text-align:left;color:#b8cddd;font-weight:600;font-size:13px;transition:.16s}
+.sidebar-link:hover{background:#20435a;color:white}.sidebar-link.active{background:linear-gradient(105deg,#108e7c,#106b82);color:white;box-shadow:0 7px 20px #03151e3d}
+.panel{@apply bg-white rounded-panel border border-slate-200/80 shadow-panel}
+.heading{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;letter-spacing:-.035em;color:#1a3145}
+.subheading{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;letter-spacing:-.025em;color:#1c3348}
+.kpi{position:relative;overflow:hidden;min-height:148px}
+.kpi-icon{height:40px;width:40px;display:grid;place-items:center;border-radius:13px}
+.kpi::after{content:'';position:absolute;border:1px solid #0f779b0b;width:140px;height:140px;top:-60px;right:-60px;border-radius:50%}
+.kpi-val{font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.045em;font-size:clamp(1.65rem,2.5vw,2.25rem);font-weight:800;line-height:1.3;color:#1d3549}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700}
+.field{@apply h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-teal}
+.chart{width:100%;min-height:270px}.chart-tall{min-height:310px}
+.nav-mobile{scrollbar-width:none}.nav-mobile::-webkit-scrollbar{display:none}
+.map-container{height:clamp(360px,65vh,700px);border-radius:15px;overflow:hidden;position:relative;background:#e8f0ee}
+.map-short{height:310px}
+.maplibregl-popup-content{padding:0!important;border-radius:14px!important;overflow:hidden;box-shadow:0 14px 50px #143c4650!important;max-width:290px!important}
+.maplibregl-popup-close-button{font-size:19px!important;padding:4px 10px!important}
+.maplibregl-ctrl-attrib{font-size:10px!important}
+.map-tooltip{padding:17px 18px;background:white;min-width:240px;max-width:290px;line-height:1.5}
+.map-tooltip h3{font-size:15px;font-weight:800;padding-right:20px;color:#153044;margin:0 0 6px}
+.map-tooltip .small{font-size:12px;color:#64748b}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block}
+.skel{background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:shine 1.5s infinite;border-radius:10px}@keyframes shine{to{background-position:-200% 0}}
+.empty{text-align:center;padding:30px 15px;color:#6b7c8b;font-size:13px}
+.dark body{background:#0b1724;color:#c9d7e3}.dark .panel{background:#142638;border-color:#284256;box-shadow:none}.dark .heading,.dark .subheading,.dark .kpi-val{color:#e6f0f7}.dark .field{background:#183044;color:#e4eef8;border-color:#325068}
+.dark .muted{color:#95adbf}.dark .map-tooltip{background:#142638;color:#d8e7ef}.dark .map-tooltip h3{color:#fff}
+.dark .metric-rule{border-color:#284256}
+@media(min-width:1024px){.main-shift{margin-left:246px}.mobile-bar{display:none}}
+@media(max-width:1023px){.sidebar{display:none}.main-shift{margin-left:0}.content-width{padding:0 2px}.chart{min-height:235px}.chart-tall{min-height:260px}}
+@media(max-width:480px){.kpi{min-height:139px}.kpi-val{font-size:1.65rem}.map-container{height:54dvh;min-height:360px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
