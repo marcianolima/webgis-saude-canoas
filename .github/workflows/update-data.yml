@@ -39,6 +39,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Investigar fontes oficiais complementares (temporário)
+        if: github.event_name == 'push'
+        timeout-minutes: 6
+        continue-on-error: true
+        run: python scripts/probe_secondary_sources.py
       - name: Decidir se a coleta é necessária
         id: decide
         shell: bash
