@@ -51,38 +51,27 @@ class PublishedSnapshotsV1Tests(unittest.TestCase):
             self.assertTrue(all(f['bedsAsOf']==s['beds']['asOf'] for f in with_data))
 
     def test_sus_mgdi_contract_and_no_patient_records(self):
-        file=ROOT/'public/data/sus.json'
-        if not file.exists():return
-        snapshot=json.loads(file.read_text(encoding='utf8'))
-        self.assertEqual(snapshot['schemaVersion'],'1.0')
-        self.assertIsInstance(snapshot['sources'],dict)
-        self.assertIsInstance(snapshot['series'],dict)
-        for key,records in snapshot['series'].items():
+        import re
+        path=ROOT/'public/data/sus.json'
+        if not path.exists():
+            return
+        data=json.loads(path.read_text(encoding='utf8'))
+        self.assertEqual(data['schemaVersion'],'1.0')
+        self.assertIsInstance(data['sources'],dict)
+        self.assertIsInstance(data['series'],dict)
+        for kind,entries in data['series'].items():
             periods=set()
-            for r in records:
-                self.assertNotIn(r['period'],periods)
-                periods.add(r['period'])
-                self.assertGreaterEqual(r['value'],0)
-                self.assertRegex(r['period'],r'^20\\d{4}$|^20\\d{2}
-        summary=json.loads((ROOT/'public/data/summary.json').read_text(encoding='utf8'))
-        geo=json.loads((ROOT/'public/data/establishments.geojson').read_text(encoding='utf8'))
-        self.assertEqual(summary['municipality']['ibge'],'4304606')
-        if summary['sourceInfo']['cnes']['status']=='ok':
-            self.assertEqual(summary['facilities']['withCoordinates'],len(geo['features']))
-            self.assertGreaterEqual(summary['facilities']['total'],len(geo['features']))
-        if summary['sourceInfo']['beds']['status']=='ok':
-            self.assertGreaterEqual(summary['beds']['total'],summary['beds']['sus'])
-        sensitive={'cpf','cns','paciente','nome_mae','dt_nasc','data_nascimento'}
-        for f in geo['features']:
-            self.assertFalse(sensitive & set(f['properties']))
-if __name__=='__main__':unittest.main()
-)
-                self.assertEqual(set(r),{'period','value'})
-                self.assertFalse(any(p in str(r).lower() for p in ('cpf','cns','nome_paciente')))
-            if records:
-                self.assertEqual(snapshot['sources'][key]['status'],'ok')
-        for key in ('sih','sia'):
-            self.assertEqual(snapshot['sources'][key]['status'],'not_loaded')
+            for row in entries:
+                period=row['period']
+                self.assertNotIn(period,periods)
+                periods.add(period)
+                self.assertIsNotNone(re.fullmatch(r'20[0-9]{4}|20[0-9]{2}',period))
+                self.assertGreaterEqual(row['value'],0)
+                self.assertEqual(set(row),{'period','value'})
+            if entries:
+                self.assertEqual(data['sources'][kind]['status'],'ok')
+        self.assertEqual(data['sources']['sih']['status'],'not_loaded')
+        self.assertEqual(data['sources']['sia']['status'],'not_loaded')
 
     def test_cnes_geojson_and_summary_agree(self):
         summary=json.loads((ROOT/'public/data/summary.json').read_text(encoding='utf8'))
@@ -94,6 +83,8 @@ if __name__=='__main__':unittest.main()
         if summary['sourceInfo']['beds']['status']=='ok':
             self.assertGreaterEqual(summary['beds']['total'],summary['beds']['sus'])
         sensitive={'cpf','cns','paciente','nome_mae','dt_nasc','data_nascimento'}
-        for f in geo['features']:
-            self.assertFalse(sensitive & set(f['properties']))
-if __name__=='__main__':unittest.main()
+        for row in geo['features']:
+            self.assertFalse(sensitive & set(row['properties']))
+
+if __name__=='__main__':
+    unittest.main()
