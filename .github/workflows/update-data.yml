@@ -5,7 +5,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '17 8 * * 1,4' # segunda e quinta, 05:17 em Brasília (UTC-3)
+    - cron: '17 8 * * 1,4' # segunda e quinta às 05:17 no horário de Brasília UTC-3
 
 permissions:
   contents: write
@@ -25,12 +25,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Testar o coletor e validar os arquivos de dados
+      - name: Validar o código e os dados
         run: python -m unittest discover -s tests -v
 
   update:
-    # Coleta apenas em agendamentos e disparo manual; evita reiniciar API em cada commit.
-    if: github.event_name != 'push'
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 55
@@ -41,14 +39,56 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Coletar snapshots de fontes oficiais
+      - name: Decidir se a coleta é necessária
+        id: decide
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          snapshot=json.loads(Path('public/data/summary.json').read_text(encoding='utf-8'))
+          sources=snapshot.get('sourceInfo',{})
+          # A primeira publicação NÃO pode depender da ação agendada: inicializa CNES no push.
+          initial=sources.get('cnes',{}).get('status') != 'ok' or snapshot.get('facilities',{}).get('total') is None
+          run=os.environ['EVENT_NAME'] != 'push' or initial
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf8') as out:
+              out.write(f'collect={str(run).lower()}\n')
+          print('Coleta:', 'sim (primeira execução ou atualização)' if run else 'não (snapshot CNES já disponível)')
+          PY
+      - name: Atualizar dados públicos de saúde
+        if: steps.decide.outputs.collect == 'true'
+        id: collect
+        continue-on-error: true # Falha de API não bloqueia publicar o frontend e os dados anteriores.
         env:
           DATA_YEARS: '2025,2026'
           MAX_PAGES_PER_SERIES: '160'
+          # Em push inicial, prioriza preencher o mapa. Manual/agendado coleta demais séries.
+          SKIP_HEAVY: ${{ github.event_name == 'push' && 'true' || 'false' }}
         run: python scripts/update_data.py
-      - name: Validar os novos dados
+      - name: Informar qualidade do snapshot e falhas de coleta
+        if: steps.decide.outputs.collect == 'true'
+        shell: bash
+        env:
+          COLLECT_OUTCOME: ${{ steps.collect.outcome }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          s=json.loads(Path('public/data/summary.json').read_text(encoding='utf-8'))
+          rows=[f"### Dados da saúde: coleta {os.environ['COLLECT_OUTCOME']}", '']
+          for key,item in s.get('sourceInfo',{}).items():
+              rows.append(f"- **{key}**: {item.get('status')} · {item.get('records')} registros · {item.get('reference') or 'sem referência'}")
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf8') as f:f.write('\n'.join(rows)+'\n')
+          if os.environ['COLLECT_OUTCOME']!='success':
+              print('::warning::Algumas APIs falharam. Consulte os logs, sem inventar valores indisponíveis.')
+          PY
+      - name: Testar os dados atualizados
+        if: steps.decide.outputs.collect == 'true'
         run: python -m unittest discover -s tests -v
-      - name: Comitar apenas dados públicos processados
+      - name: Persistir JSON, GeoJSON e logo institucional
+        if: steps.decide.outputs.collect == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -79,7 +119,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Instalar dependências e gerar o frontend
+      - name: Instalar dependências e compilar aplicação
         shell: bash
         run: |
           if test -f package-lock.json; then
