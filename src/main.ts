@@ -76,7 +76,7 @@ async function initMap(id:string,compact:boolean){
  try{
   const maplibregl=(await import('maplibre-gl')).default;
   if(!isCurrent())return;
-  if(!maplibregl.supported())throw new Error('WebGL não é suportado neste navegador');
+  if(!document.createElement('canvas').getContext('webgl2'))throw new Error('WebGL 2 não é suportado neste navegador');
   map=new maplibregl.Map({
    container:target,
    style:{version:8,glyphs:'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
