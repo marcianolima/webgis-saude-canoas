@@ -1,211 +1,68 @@
-# WebGIS Saúde Canoas
+# WebGIS Saúde Canoas — V1.0
 
-**Dashboard territorial de saúde pública de Canoas/RS — código IBGE 4304606.**
+Aplicação pública territorial sobre Canoas/RS, código IBGE 4304606.
 
-### Situação operacional verificada em 17/10/2026
+**Acesso:** https://marcianolima.github.io/webgis-saude-canoas/  
+**GitHub Actions:** https://github.com/marcianolima/webgis-saude-canoas/actions/workflows/update-data.yml
 
-- **GitHub Pages:** deploy concluído; compilação TypeScript e build Vite passaram no GitHub Actions.
-- **CNES:** CSV nacional diário oficial de estabelecimentos; **969 registros ativos únicos de Canoas** na coleta de 17/10/2026, **962 georreferenciados**. Contém estabelecimentos públicos e privados e não equivale somente à rede municipal SUS.
-- **Qualidade:** dados municipais, códigos CNES únicos, classificação por tipo e geometria são validados antes da publicação. O arquivo diário não representa uma competência mensal do CNES.
-- **Leitos (arquivo anual oficial):** 668 existentes, dos quais 539 SUS, competência **08/2026**, com cinco CNES confirmados e agregação de um único mês. **Dengue, SIA e SIH** ainda aguardam validação das fontes; não devem ser interpretados como zero.
-- **Automação:** snapshot CNES/IBGE diariamente às 08:17 UTC (05:17 de Brasília). Coletas exploratórias mais pesadas somente pelo disparo manual do workflow.
- Aplicação estática, responsiva, com mapas e gráficos interativos, GitHub Pages e atualização programada via GitHub Actions.
+## O que a versão 1.0 entrega
 
-> **Versão revisada / experimental, não oficial.** Não substitui os dados primários do Ministério da Saúde ou da Secretaria Municipal de Saúde. Um campo sem coleta válida aparece como **— / indisponível**, nunca como `0` inventado. Os arquivos `public/data/` são snapshots públicos produzidos pelo GitHub Actions; o sistema informa a ausência de coleta validada por fonte.
+1. Visão geral de estabelecimentos, população e leitos, com gráficos por tipologia e bairro.
+2. Mapa MapLibre com fallback Leaflet, agrupamento, pesquisa, filtros por categoria e disponibilidade de leitos.
+3. Rede assistencial com catálogo CNES, busca por bairro e exportação CSV dos pontos filtrados.
+4. Nova seção de indicadores com séries anuais de dengue, chikungunya, Zika, nascidos vivos (SINASC) e óbitos (SIM), sujeitas à disponibilidade e validação do arquivo oficial.
+5. Transparência sobre fonte, competência, metodologia, situação da coleta e períodos preliminares.
 
-## O que já está implementado
+Tecnologias: TypeScript, Vite, Tailwind CSS, MapLibre, Leaflet, ECharts e Python 3.12. Hospedagem no GitHub Pages, sem servidor próprio.
 
-- Painel mobile-first com indicadores do IBGE, CNES e leitos, gráficos ECharts com séries anuais e classificação por tipo, estados vazios informativos.
-- Mapa MapLibre GL JS, base CARTO/OSM, clusters com contador, pop-ups enriquecidos e expansão de agrupamentos.
-- Filtros por tipo (UBS, hospital, urgência, clínica, outros e unidades com leitos confirmados), nome, bairro ou CNES; lista de estabelecimentos e exportação CSV dos pontos filtrados.
-- Tema claro/escuro, acessibilidade básica, rotas de navegação sem recarregar página e tela de metodologia/proveniência.
-- Coleta agendada sem servidor próprio, armazenamento leve em `public/data/` e deploy na mesma Action.
+## Fontes e critérios
 
-**Tecnologias:** Vite 6, TypeScript, Tailwind CSS 3, ECharts 5, MapLibre 4, Lucide e Python 3.12 (biblioteca padrão). Os navegadores acessam somente os arquivos estáticos e a base cartográfica; os servidores de dados públicos são consultados **no workflow**, não no celular do visitante.
-
-## Publicar usando somente o celular (Android)
-
-O aplicativo GitHub no celular é excelente para navegar e editar arquivos individuais, **mas não é um método adequado para importar a estrutura completa de um ZIP**. A alternativa mais segura é usar **Termux + GitHub CLI**, após extrair o pacote baixado. O diretório raiz deve conter `package.json`, `index.html`, `src/`, `public/`, `scripts/`, `tests/` e `.github/` — **sem uma pasta externa extra**.
-
-### Método A — Termux (recomendado)
-
-1. Instale o Termux por uma fonte oficial do projeto, abra e conceda acesso aos arquivos compartilhados.
-2. Baixe o ZIP desta conversa para a pasta `Downloads` e extraia os arquivos usando o gerenciador do Android, ou use os comandos abaixo.
-3. Execute:
-
-```bash
-pkg update -y
-pkg install -y git gh unzip
-termux-setup-storage
-cd ~/storage/downloads
-unzip -o webgis-saude-canoas.zip
-cd webgis-saude-canoas
-gh auth login
-# Abra o link de autenticação informado pelo gh no navegador.
-git init -b main
-git add .
-git -c user.name='WebGIS Canoas' -c user.email='webgis@users.noreply.github.com' commit -m 'feat: iniciar WebGIS Saúde Canoas'
-gh repo create webgis-saude-canoas --public --source=. --remote=origin --push
-```
-
-Se já tiver criado o repositório pelo aplicativo, em vez de `gh repo create ...`, faça `git remote add origin https://github.com/SEU_USUARIO/webgis-saude-canoas.git` e `git push -u origin main`. Se precisar, configure `git config user.name` e `git config user.email` com suas credenciais de autoria **antes do commit**. A autenticação `gh auth login` não exige colocar tokens no código do projeto. Não inclua senhas ou dados pessoais no GitHub.
-
-### Método B — navegador em modo desktop
-
-No Chrome/Firefox do smartphone, entre no repositório no `github.com` → **Add file → Upload files**, envie o **conteúdo extraído**. Dependendo do navegador, a seleção de diretórios inteiros pode não funcionar; nesse caso, use o Termux. **Não envie apenas o ZIP**: GitHub Pages não executa um arquivo compactado.
-
-### Habilitar a publicação
-
-1. Abra **Settings → Pages → Build and deployment → Source → GitHub Actions**.
-2. Abra **Settings → Actions → General → Workflow permissions → Read and write permissions** para permitir commits dos JSONs. Em contas/organizações que bloqueiam esta opção, ajuste a política com o administrador.
-3. Abra **Actions → Verificar, atualizar dados e publicar WebGIS Saúde → Run workflow** para forçar atualização e consultar os logs da etapa `Atualizar dados públicos de saúde` e os arquivos `public/data/`.
-4. O mesmo workflow constrói o frontend (`npm run build`) e publica em **`https://SEU_USUARIO.github.io/webgis-saude-canoas/`**. O endereço também aparece no resultado do job `deploy`. O primeiro `push` da `main` já faz uma publicação inicial.
-
-A Action executa **diariamente, 08:17 UTC (05:17 de Brasília, UTC−3)**, além dos disparos manuais e commits na `main`. Os commits disparam verificação e publicação, enquanto as atualizações públicas são executadas apenas por agenda ou manualmente. Atualizações fazem commit na mesma branch antes do deploy. A publicação **não exige PAT ou segredo adicional** quando o GitHub Pages e o `GITHUB_TOKEN` estão habilitados. Como commits feitos com `GITHUB_TOKEN` geralmente não disparam outros workflows de `push`, tudo está reunido em **um único workflow**.
-
-## Fontes e dados efetivamente tratados
-
-As URLs e parâmetros abaixo foram estudados em **16/10/2026**; a execução dos endpoints de dados em produção depende da Action. Não afirmar disponibilidade de um indicador até o arquivo atualizado conter o valor e o status `ok`.
-
-| Fonte | API ou referência | Indicadores planejados/implementados | Situação no ZIP |
+| Indicador | Origem | Recorte/método | Situação |
 |---|---|---|---|
-| IBGE Cidades | https://www.ibge.gov.br/cidades-e-estados/rs/canoas.html | Estimativa 2026 (**359.845**), Censo 2022 (**347.657**), área **130,774 km²** e densidade Censo 2022 **2.658,15 hab./km²** | **Valor inicial verificado** |
-| IBGE SIDRA | `https://apisidra.ibge.gov.br/values/t/6579/n6/4304606/v/9324/p/all?formato=json` | Série anual de população; última estimativa se disponível e validada | Coletor implementado, ainda não executado online |
-| CNES — estabelecimentos | `https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip` | Extrato nacional diário, filtrado para Canoas, unidades ativas, coordenadas, tipo, bairro e CNES | **Coleta oficial funcionando; 969 ativos e 962 pontos em 17/10/2026** |
-| CNES — leitos | `https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/Leitos_SUS/Leitos_csv_2026.zip` | Leitos existentes e SUS por CNES único, na competência mensal validada | **668 existentes / 539 SUS (08/2026)** |
-| DEMAS dengue | `https://apidadosabertos.saude.gov.br/arboviroses/dengue?id_municip=430460&nu_ano=2025` | Número de registros de notificação no município notificante, por ano | Adaptador experimental; somente após validação |
-| SIA produção ambulatorial | `https://apidadosabertos.saude.gov.br/assistencia-a-saude/sia-procedimentos-ambulatoriais?co_ibge=430460&nu_ano=2025` | Quantidade de procedimentos **se a coluna estiver presente** | Adaptador experimental; somente após validação |
-| SIH produção hospitalar | `https://apidadosabertos.saude.gov.br/assistencia-a-saude/sih-procedimentos-hospitalares?co_ibge=430460&nu_ano=2025` | Produção hospitalar/AIHs **se houver coluna identificável** | Adaptador experimental; somente após validação |
+| População | IBGE SIDRA/Cidades | Estimativas anuais, IBGE 4304606 | Validado |
+| Estabelecimentos | Cadastro Nacional de Estabelecimentos de Saúde (CNES) | CSV nacional, ativos em Canoas, CNES únicos; inclui setor privado | Validado |
+| Leitos existentes/SUS | Hospitais e Leitos, Ministério da Saúde | Uma competência e CNES único; não somar novamente campos de UTI | Validado |
+| Dengue | Sinan/Dengue | Registros notificados de residentes (ID_MN_RESI); não equivale a casos confirmados | Validado |
+| Nascidos vivos | SINASC | Residência materna CODMUNRES; 2025 preliminar | Validado |
+| Óbitos não fetais | SIM | Residência CODMUNRES e TIPOBITO=2; 2025 preliminar | Validado |
+| Chikungunya | Sinan/Febre de Chikungunya | Notificações por residência; confirmar esquema e cobertura | Validação em andamento |
+| Zika | Sinan/Vírus Zika | Notificações por residência; confirmar esquema e cobertura | Validação em andamento |
+| SIA | DATASUS e DEMAS | Produção ambulatorial por competência; não equivale a pacientes únicos | Cobertura insuficiente na API testada, sem total publicado |
+| SIH | DATASUS e DEMAS | Produção hospitalar por competência, local de internação ou residência | Cobertura insuficiente na API testada, sem total publicado |
+| PNI/RNDS | OPENDATASUS | Doses/cobertura requerem denominador e coortes verificadas | Pendente |
+| e-SUS APS/PEC | SISAB e rede municipal | Extração de dados clínicos locais depende de acesso autorizado e LGPD | Pendente |
 
-**Documentação oficial da API:** https://apidadosabertos.saude.gov.br/static/swagger.json  
-**Catálogo:** https://dadosabertos.saude.gov.br/  
-**DATASUS:** https://datasus.saude.gov.br/  
-**SES/RS (referência de comparação):** http://bipublico.saude.rs.gov.br/  
-**GeoCanoas:** https://geo.canoas.rs.gov.br/  
-**Relatórios municipais:** https://www.canoas.rs.gov.br/
+Fontes oficiais:
+- https://www.ibge.gov.br/cidades-e-estados/rs/canoas.html
+- https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude
+- https://dadosabertos.saude.gov.br/dataset/hospitais-e-leitos
+- https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue
+- https://dadosabertos.saude.gov.br/dataset/arboviroses-febre-de-chikungunya
+- https://dadosabertos.saude.gov.br/dataset/arboviroses-zika-virus
+- https://dadosabertos.saude.gov.br/dataset/sistema-de-informacao-sobre-nascidos-vivos-sinasc
+- https://dadosabertos.saude.gov.br/dataset/sim
+- https://datasus.saude.gov.br/assistencia-a-saude/
+- https://apidadosabertos.saude.gov.br/static/swagger.json
 
-**Não integrados nesta primeira versão:** SIM (mortalidade), SINASC (nascidos vivos), SINAN por agravo além da API de dengue, SIOPS (financiamento), cobertura vacinal, causas detalhadas por CID-10, pirâmide etária, bairros GeoCanoas e limites oficiais. Foram deliberadamente deixados fora da carga automática porque não foi possível validar um fluxo leve e reprodutível para eles. O layout e a estrutura de arquivos suportam extensões futuras.
+**Regras de qualidade:** só publicar totais com cobertura comprovada; não substituir ausências por zero; não usar notificações como casos confirmados; não combinar períodos diferentes ou dados de residência e ocorrência. Referência da fonte difere da data de coleta.
 
-## Interpretação epidemiológica e limitações
+## Privacidade e processamento
 
-- **IBGE:** 4304606 é o código de **sete dígitos**. Algumas APIs federais requerem **430460**, com seis dígitos. O script tenta validar o município em cada registro CNES.
-- **CNES:** cadastro de estabelecimentos não equivale necessariamente a oferta assistencial SUS. Os dados podem conter unidades privadas. O mapa só mostra coordenadas públicas plausíveis para Canoas; a contagem CNES inclui registros sem coordenadas.
-- **Classificação UBS/hospital:** derivada dos códigos oficiais de tipo de unidade do CNES (TP_UNIDADE). Cadastro de UBS não é indicador de cobertura da Atenção Primária.
-- **CNES leitos:** somatórios por competência devem distinguir total existente e leitos SUS; **não** deduzir leitos pelo nome hospital.
-- **Dengue:** registros do município **notificante** não são taxa de incidência entre residentes nem necessariamente casos confirmados. Não calcular incidência com esses valores sem metodologia.
-- **SIA e SIH:** produção de procedimentos/AIHs não é contagem de pacientes únicos, nem necessariamente de internações de moradores de Canoas. Não rotular esses números como internações únicas.
-- **Ano de referência:** o dashboard identifica competência ou ano quando disponível. Não se deve aplicar ano de notificações aos estabelecimentos CNES (fotografia de competência diferente).
-- **Segurança:** o repositório contém somente agregados e informações públicas de estabelecimentos. Nunca publique dados individuais de pacientes, CPF, CNS ou endereços residenciais.
-- **Resiliência:** falhas de fonte preservam os números anteriores e indicam status/nota de coleta. O Python não publica dados de páginas parcialmente carregadas de um mesmo indicador.
-- **Georreferenciamento:** coordenadas inválidas/ausentes não são geocodificadas por aproximação.
+As bases nacionais podem conter microdados sensíveis. O processamento acontece somente no runner temporário do GitHub Actions. Os arquivos individuais não são salvos em public/, não são enviados como artefatos e nunca são persistidos no repositório. Os visitantes recebem apenas agregados municipais e campos cadastrais públicos do CNES.
 
-## Estrutura
+Arquivos publicados:
+- public/data/summary.json: população, CNES, leitos e fontes;
+- public/data/establishments.geojson: pontos públicos de estabelecimentos;
+- public/data/indicators.json: séries anuais validadas e metadados.
 
-```text
-webgis-saude-canoas/
-├── .github/workflows/update-data.yml  # atualização + build + Pages
-├── public/
-│   ├── assets/favicon.svg
-│   └── data/
-│       ├── summary.json               # indicadores agregados e proveniência
-│       └── establishments.geojson      # pontos públicos georreferenciados
-├── scripts/update_data.py             # coletor Python; sem pandas
-├── src/
-│   ├── main.ts                         # páginas, filtros, mapas, gráficos
-│   ├── style.css                       # Tailwind e componentes
-│   └── lib/                            # tipos, leitura, utilitários
-├── tests/test_data.py
-├── index.html
-├── package.json
-├── tailwind.config.js
-└── vite.config.ts
-```
+## Atualização e deploy
 
-## Executar localmente e testar
+O workflow verifica testes, atualiza snapshots e publica a pasta dist/ no GitHub Pages. Executa diariamente às 08:17 UTC (05:17 Brasília). Bases nacionais volumosas têm cache temporal de 7 dias quando preliminares e 30 dias nos arquivos históricos. É possível solicitar reprocessamento manual pela aba Actions.
 
-Requisitos: Node.js 22+, npm e Python 3.12+. Com acesso às dependências do npm:
+Para desenvolver localmente, execute npm install, python -m unittest discover -s tests -v e npm run build. Node.js 22+ e Python 3.12+.
 
-```bash
-npm install
-npm run dev
-npm run build
-python -m unittest discover -s tests -v
-python scripts/update_data.py
-```
+## Homologação UX
 
-Os assets são copiados de `public/` para `dist/`. O `base: './'` do Vite permite hospedagem sob o nome do repositório. Não abra `index.html` diretamente com `file://` sem passar pelo Vite/build. Para economizar chamadas nos conjuntos mais extensos, o coletor aceita `SKIP_HEAVY=true` (pula SIA/SIH/dengue), `DATA_YEARS=2025,2026` e `MAX_PAGES_PER_SERIES=160`. Se o volume exceder o limite configurado, o indicador **não será publicado parcialmente**.
+A aplicação foi construída para leitura em desktop e dispositivos móveis, com informação progressiva, legendas, tabelas de apoio e explicações metodológicas. A revisão visual detalhada em aparelhos físicos e as preferências de layout do usuário são parte da homologação posterior à entrega técnica.
 
-### Integridade e qualidade
-
-`python -m unittest discover -s tests -v` verifica contrato JSON/GeoJSON, município, coordenadas, classificação e campos ausentes. O build executa `tsc --noEmit`, além da compilação Vite. Para validação real de mapa e responsividade em celulares, testar também no navegador após o primeiro deploy, pois tiles e APIs exigem acesso à rede externa. Verifique erros no console caso haja restrições de WebGL ou de acesso aos servidores de mapas.
-
-## Logo institucional GeoCanoas
-
-O portal GeoCanoas referencia `assets/img/profile/GEOCANOAS_Vetorizado2.webp`. O cabeçalho tenta carregar primeiro `public/assets/geocanoas-oficial.webp` e depois a URL do próprio portal `https://geo.canoas.rs.gov.br/assets/img/profile/GEOCANOAS_Vetorizado2.webp`. O coletor tenta copiar **os bytes originais** do site institucional para o repositório durante as atualizações. **No ZIP não há logotipo local**, pois o arquivo original não pôde ser obtido/validado nesta execução. Se a imagem remota não estiver pública ou bloquear hotlink, solicite o arquivo à equipe GeoCanoas e adicione o original a `public/assets/geocanoas-oficial.webp`. Não foi criada logo falsificada.
-
-## Roadmap da versão ampliada
-
-Adaptadores oficiais SIM/SINASC e SIH por município de residência (sem microdados expostos); incidência e mortalidade ajustadas por população/idade; séries longas, cobertura vacinal/APS com definição correta; SIOPS, RAG e PMS com data de referência; territorialização por bairros GeoCanoas, limite municipal e coropletas normalizadas; comparação regional com indicadores padronizados; auditoria CI, snapshots versionados, alertas de falha e testes E2E Playwright em múltiplos breakpoints.
-
-### Licenciamento
-
-Código sob licença MIT (`LICENSE`). Fontes de dados e logomarcas continuam sob os respectivos termos de uso; confira a licença e as atribuições de cada fornecedor.
-
-
-## Revisão técnica e publicação no computador (16/10/2026)
-
-**Use o código deste pacote e não o instalador HTML/YAML que foi enviado anteriormente.**
-O instalador encapsulado era uma solução provisória para o celular; o projeto corrigido contém diretamente
-os diretórios e arquivos, inclusive `.github/workflows/update-data.yml`.
-
-### Atualizar o repositório existente sem sobrescrever o histórico
-
-Execute em um terminal Git Bash, PowerShell ou Linux com Git configurado (adapte o diretório extraído):
-
-```bash
-git clone https://github.com/marcianolima/webgis-saude-canoas.git
-cd webgis-saude-canoas
-# Copie para este diretório TODO o conteúdo da versão revisada,
-# inclusive a pasta oculta .github, preservando o diretório .git.
-python -m unittest discover -s tests -v
-npm install
-npm run build
-git add -A
-git commit -m "fix: revisar coleta CNES, frontend e workflow Pages"
-git push origin main
-```
-
-**Verifique explicitamente** que o arquivo `.github/workflows/update-data.yml` aparece no GitHub.
-O workflow tem três jobs: `verify` (testes Python), `update` (CSV CNES/IBGE por agenda, automaticamente se faltar snapshot, ou disparo manual)
-e `deploy` (build e publicação). Na aba Settings → Pages, selecione GitHub Actions e habilite
-Settings → Actions → General → Workflow permissions → Read and write permissions.
-
-O comando `npm install` criará `package-lock.json`. Inclua-o no commit para builds reproduzíveis.
-Depois do primeiro push, visite **Actions** e execute manualmente o workflow para atualizar as fontes.
-Se o provedor estiver indisponível, ele não substitui um snapshot válido por números fictícios.
-
-### Verificações executadas neste ambiente
-
-- Testes da biblioteca padrão Python, incluindo paginação e cenário de leitos de competência única.
-- Validação da sintaxe e de tipos internos `strict` dos arquivos TypeScript com declarações temporárias para dependências externas. A checagem com tipos reais das bibliotecas permanece pendente de `npm install`.
-- Análise estática do workflow e da estrutura do GitHub Pages.
-
-**Limitação:** sem acesso DNS ao registro npm e às APIs ao vivo no ambiente de testes, o build
-com dependências reais, a coleta real e o teste de navegador/WebGL devem ser feitos
-pelo workflow GitHub Actions (ou em seu computador). Não confunda aprovação de testes
-locais com verificação de funcionamento da implantação publicada.
-
-### Correções principais
-
-1. Leitos CNES: descobrir a competência mais recente publicada e agregar **somente** dados
-   daquele mês, sem multiplicar leitos por vários períodos. `BED_COMPETENCE=AAAAMM` permite
-   fixar o mês para reprodutibilidade.
-2. Para cada fonte, o sucesso limpa notas antigas de erro; falhas preservam dados anteriores.
-3. JSON de entrada da interface é validado; arquivos inválidos mostram mensagens claras em vez de derrubar o dashboard.
-4. Falha ao carregar gráficos ou mapas gera alerta acessível; observers do gráfico são liberados ao navegar.
-5. Workflow confere os testes no `push`, executa coleta apenas quando solicitada/na agenda,
-   e bloqueia nova publicação quando a validação falhar.
-
-**Limites dos dados:** CNES, SIM, SINASC, SIA, SIH e dengue têm regras de competência,
-território de ocorrência/residência e disponibilidade distintas. Nada disso deve ser
-apresentado como contagem de pacientes únicos sem validação metodológica.
+A versão 1.0 é um painel exploratório público; não é produto oficial da SMS e não substitui os sistemas municipais ou nacionais de saúde.
