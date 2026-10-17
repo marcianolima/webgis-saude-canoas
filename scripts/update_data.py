@@ -110,7 +110,10 @@ def write_json(path,obj):
     os.replace(tmp,path)
 
 def mark(s,key,ref,records):
-    s['sourceInfo'][key].update(status='ok',retrievedAt=now(),reference=ref,records=records)
+    info=s['sourceInfo'][key]
+    info.update(status='ok',retrievedAt=now(),reference=ref,records=records)
+    if (info.get('note') or '').startswith('A última tentativa falhou'):
+        info['note']=None
 
 def fail(s,key,exc):
     LOG.warning('%s não foi atualizado: %s',key,exc)
@@ -165,31 +168,71 @@ def build_cnes(rows):
     stats={'total':len(rows),'withCoordinates':len(points),'ubs':ubs,'hospitals':hosp,'byType':[{'name':k,'value':v} for k,v in kinds.most_common(20)],'byNeighborhood':[{'name':k,'value':v} for k,v in bairros.most_common(40)],'asOf':now()[:10]}
     return {'type':'FeatureCollection','features':points},stats
 
+def latest_bed_competence():
+    """Procura a competência mais recente COM registros, evitando varrer anos do CNES.
+
+    A competência é YYYYMM; meses incompletos ou sem publicação são ignorados.
+    A busca é limitada a 18 meses e pode ser controlada em BED_COMPETENCE.
+    """
+    fixed=os.environ.get('BED_COMPETENCE','').strip()
+    if fixed:
+        if not re.fullmatch(r'20\d{4}',fixed) or not 1<=int(fixed[-2:])<=12:
+            raise ValueError('BED_COMPETENCE deve usar AAAAMM')
+        return int(fixed)
+    current=datetime.now(timezone.utc)
+    for delta in range(18):
+        total_months=current.year*12+(current.month-1)-delta
+        comp=(total_months//12)*100+(total_months%12)+1
+        payload=request_json(API+'/assistencia-a-saude/cnes-leitos?'+urlencode(
+            {'co_ibge':int(IBGE_6),'nu_comp':comp,'limit':1,'offset':0}))
+        rows,total=unpack(payload,('leitos',))
+        if rows:
+            # Não confiar num retorno que ignore o filtro de competência.
+            for row in rows:
+                got=parse_number(pick(row,'nu_comp','competencia'))
+                if got is not None and got!=comp:
+                    raise ValueError(f'API ignorou filtro nu_comp={comp}')
+            return comp
+        if total is not None and total>0:
+            raise ValueError('CNES leitos: total positivo sem registros na página inicial')
+    raise ValueError('Nenhuma competência de leitos foi encontrada nos últimos 18 meses')
+
 def update_beds(s):
+    competence=latest_bed_competence()
     data=[]
-    n=paginate('/assistencia-a-saude/cnes-leitos',{'co_ibge':int(IBGE_6)},1000,60,data.append,('leitos',))
-    periods=[parse_number(pick(r,'nu_comp','competencia')) for r in data]
-    latest=max((p for p in periods if p is not None),default=None)
-    if latest:
-        data=[r for r in data if parse_number(pick(r,'nu_comp','competencia'))==latest]
-    uniq={json.dumps(r,ensure_ascii=False,sort_keys=True):r for r in data}
+    n=paginate('/assistencia-a-saude/cnes-leitos',
+        {'co_ibge':int(IBGE_6),'nu_comp':competence},1000,60,data.append,('leitos',))
+    # Nunca misturar períodos: somar vários meses multiplicaria artificialmente os leitos.
+    for r in data:
+        period=parse_number(pick(r,'nu_comp','competencia'))
+        if period is not None and period!=competence:
+            raise ValueError('Leitos com competência divergente da consultada')
+        code=pick(r,'co_ibge','codigo_municipio')
+        if code is not None and not valid_canoas(r):
+            raise ValueError('Consulta de leitos retornou outro município')
     total=sus=recognized=0
     per_cnes=defaultdict(int)
+    # Registros publicados por tipo de leito são somáveis, mas respostas duplicadas não.
+    uniq={json.dumps(r,ensure_ascii=False,sort_keys=True):r for r in data}
     for r in uniq.values():
         a=parse_number(pick(r,'qt_exist','qt_existente','qt_existentes','qt_leitos_existentes','qt_leitos','quantidade_existente'))
         b=parse_number(pick(r,'qt_sus','qt_leitos_sus','quantidade_sus'))
         if a is None and b is None:continue
-        recognized+=1;total+=max(0,a or 0);sus+=max(0,b or 0)
+        if (a is not None and a<0) or (b is not None and b<0):
+            raise ValueError('Quantidades negativas de leitos na fonte')
+        recognized+=1;total+=(a or 0);sus+=(b or 0)
         cn=str(pick(r,'co_cnes','codigo_cnes','cnes') or '')
-        if cn:per_cnes[cn]+=max(0,a or 0)
+        if cn:per_cnes[cn]+=(a or 0)
     if not recognized:raise ValueError('CNES leitos não contém campos de quantidade reconhecidos')
-    s['beds']={'total':total,'sus':sus,'asOf':str(latest or now()[:10])}
-    mark(s,'beds',f'Competência {latest or "não identificada"}',n)
+    if not per_cnes:raise ValueError('CNES leitos não contém códigos CNES reconhecidos; filtro de leitos suspenso')
+    if sus>total:raise ValueError('Leitos SUS superam o total existente; conferir mapeamento')
+    s['beds']={'total':total,'sus':sus,'asOf':str(competence)}
+    mark(s,'beds',f'Competência {competence}',n)
     if GEO.exists():
         geo=json.loads(GEO.read_text('utf8'))
         for f in geo['features']:
             cn=f['properties']['cnes']
-            if cn in per_cnes:f['properties']['hasBeds']=per_cnes[cn]>0
+            f['properties']['hasBeds']=per_cnes.get(cn,0)>0
         write_json(GEO,geo)
 
 def annual(s,key,endpoint,params,fields):

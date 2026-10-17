@@ -2,7 +2,7 @@
 
 **Dashboard territorial de saúde pública de Canoas/RS — código IBGE 4304606.** Aplicação estática, responsiva, com mapas e gráficos interativos, GitHub Pages e atualização programada via GitHub Actions.
 
-> **Versão inicial / experimental, não oficial.** Não substitui os dados primários do Ministério da Saúde ou da Secretaria Municipal de Saúde. Um campo sem coleta válida aparece como **— / indisponível**, nunca como `0` inventado. Os arquivos iniciais contêm apenas valores do IBGE conferidos na fonte e um GeoJSON vazio; as primeiras consultas reais ao CNES e às demais APIs serão feitas **pelo GitHub Actions com acesso à internet**.
+> **Versão revisada / experimental, não oficial.** Não substitui os dados primários do Ministério da Saúde ou da Secretaria Municipal de Saúde. Um campo sem coleta válida aparece como **— / indisponível**, nunca como `0` inventado. Os arquivos iniciais contêm apenas valores do IBGE conferidos na fonte e um GeoJSON vazio; as primeiras consultas reais ao CNES e às demais APIs serão feitas **pelo GitHub Actions com acesso à internet**.
 
 ## O que já está implementado
 
@@ -52,7 +52,7 @@ No Chrome/Firefox do smartphone, entre no repositório no `github.com` → **Add
 3. Abra **Actions → Dados e publicação WebGIS Saúde → Run workflow** para forçar a primeira atualização. Examine os logs da etapa `Coletar snapshots oficiais` e os arquivos `public/data/`.
 4. O mesmo workflow constrói o frontend (`npm run build`) e publica em **`https://SEU_USUARIO.github.io/webgis-saude-canoas/`**. O endereço também aparece no resultado do job `deploy`. O primeiro `push` da `main` já faz uma publicação inicial.
 
-A Action executa às **segundas e quintas, 08:17 UTC (05:17 de Brasília, quando UTC−3)**, além dos disparos manuais e commits na `main`. Atualizações fazem commit na mesma branch antes do deploy. A publicação **não exige PAT ou segredo adicional** quando o GitHub Pages e o `GITHUB_TOKEN` estão habilitados. Como commits feitos com `GITHUB_TOKEN` geralmente não disparam outros workflows de `push`, tudo está reunido em **um único workflow**.
+A Action executa às **segundas e quintas, 08:17 UTC (05:17 de Brasília, quando UTC−3)**, além dos disparos manuais e commits na `main`. Os commits disparam verificação e publicação, enquanto as atualizações públicas são executadas apenas por agenda ou manualmente. Atualizações fazem commit na mesma branch antes do deploy. A publicação **não exige PAT ou segredo adicional** quando o GitHub Pages e o `GITHUB_TOKEN` estão habilitados. Como commits feitos com `GITHUB_TOKEN` geralmente não disparam outros workflows de `push`, tudo está reunido em **um único workflow**.
 
 ## Fontes e dados efetivamente tratados
 
@@ -141,3 +141,62 @@ Adaptadores oficiais SIM/SINASC e SIH por município de residência (sem microda
 ### Licenciamento
 
 Código sob licença MIT (`LICENSE`). Fontes de dados e logomarcas continuam sob os respectivos termos de uso; confira a licença e as atribuições de cada fornecedor.
+
+
+## Revisão técnica e publicação no computador (16/10/2026)
+
+**Use o código deste pacote e não o instalador HTML/YAML que foi enviado anteriormente.**
+O instalador encapsulado era uma solução provisória para o celular; o projeto corrigido contém diretamente
+os diretórios e arquivos, inclusive `.github/workflows/update-data.yml`.
+
+### Atualizar o repositório existente sem sobrescrever o histórico
+
+Execute em um terminal Git Bash, PowerShell ou Linux com Git configurado (adapte o diretório extraído):
+
+```bash
+git clone https://github.com/marcianolima/webgis-saude-canoas.git
+cd webgis-saude-canoas
+# Copie para este diretório TODO o conteúdo da versão revisada,
+# inclusive a pasta oculta .github, preservando o diretório .git.
+python -m unittest discover -s tests -v
+npm install
+npm run build
+git add -A
+git commit -m "fix: revisar coleta CNES, frontend e workflow Pages"
+git push origin main
+```
+
+**Verifique explicitamente** que o arquivo `.github/workflows/update-data.yml` aparece no GitHub.
+O workflow tem três jobs: `verify` (testes Python), `update` (API pública, só manual/agenda)
+e `deploy` (build e publicação). Na aba Settings → Pages, selecione GitHub Actions e habilite
+Settings → Actions → General → Workflow permissions → Read and write permissions.
+
+O comando `npm install` criará `package-lock.json`. Inclua-o no commit para builds reproduzíveis.
+Depois do primeiro push, visite **Actions** e execute manualmente o workflow para atualizar as fontes.
+Se o provedor estiver indisponível, ele não substitui um snapshot válido por números fictícios.
+
+### Verificações executadas neste ambiente
+
+- Testes da biblioteca padrão Python, incluindo paginação e cenário de leitos de competência única.
+- Validação da sintaxe e de tipos internos `strict` dos arquivos TypeScript com declarações temporárias para dependências externas. A checagem com tipos reais das bibliotecas permanece pendente de `npm install`.
+- Análise estática do workflow e da estrutura do GitHub Pages.
+
+**Limitação:** sem acesso DNS ao registro npm e às APIs ao vivo no ambiente de testes, o build
+com dependências reais, a coleta real e o teste de navegador/WebGL devem ser feitos
+pelo workflow GitHub Actions (ou em seu computador). Não confunda aprovação de testes
+locais com verificação de funcionamento da implantação publicada.
+
+### Correções principais
+
+1. Leitos CNES: descobrir a competência mais recente publicada e agregar **somente** dados
+   daquele mês, sem multiplicar leitos por vários períodos. `BED_COMPETENCE=AAAAMM` permite
+   fixar o mês para reprodutibilidade.
+2. Para cada fonte, o sucesso limpa notas antigas de erro; falhas preservam dados anteriores.
+3. JSON de entrada da interface é validado; arquivos inválidos mostram mensagens claras em vez de derrubar o dashboard.
+4. Falha ao carregar gráficos ou mapas gera alerta acessível; observers do gráfico são liberados ao navegar.
+5. Workflow confere os testes no `push`, executa coleta apenas quando solicitada/na agenda,
+   e bloqueia nova publicação quando a validação falhar.
+
+**Limites dos dados:** CNES, SIM, SINASC, SIA, SIH e dengue têm regras de competência,
+território de ocorrência/residência e disponibilidade distintas. Nada disso deve ser
+apresentado como contagem de pacientes únicos sem validação metodológica.
