@@ -73,6 +73,43 @@ class PublishedSnapshotsV1Tests(unittest.TestCase):
         self.assertEqual(data['sources']['sih']['status'],'not_loaded')
         self.assertEqual(data['sources']['sia']['status'],'not_loaded')
 
+    def test_sih_sia_production_snapshots_are_aggregated_and_nonidentifying(self):
+        path=ROOT/'public/data/production.json'
+        if not path.exists():return
+        data=json.loads(path.read_text(encoding='utf8'))
+        self.assertEqual(data['schemaVersion'],'1.0')
+        for system in ('sih','sia'):
+            months=data['sources'].get(system,{}).get('monthsAvailable',[])
+            self.assertEqual(months,sorted(set(months)))
+            for month in months:
+                source=data['periods'][month][system]
+                self.assertGreaterEqual(source['rowsState'],source['rowsCity'])
+                self.assertGreater(source['municipal']['quantity'],0)
+                self.assertGreaterEqual(source['municipal']['valueBRL'],0)
+                self.assertLessEqual(sum(v['quantity'] for v in source['byCnes'].values()),
+                                     source['municipal']['quantity'])
+                for cnes,counts in source['byCnes'].items():
+                    self.assertEqual(len(cnes),7)
+                    self.assertTrue(cnes.isdigit())
+                    self.assertGreaterEqual(counts['quantity'],5)
+                    self.assertGreaterEqual(counts['valueBRL'],0)
+                    self.assertEqual(set(counts),{'quantity','valueBRL'})
+        serialized=json.dumps(data).lower()
+        self.assertFalse(any(sensitive in serialized for sensitive in
+                         ('cpf_aut','gestor_cpf','pa_cnsmed','n_aih','pa_cnpjcpf')))
+    def test_aps_sisab_is_historical_only(self):
+        path=ROOT/'public/data/aps.json'
+        if not path.exists():return
+        data=json.loads(path.read_text(encoding='utf8'))
+        self.assertTrue(data['historicalOnly'])
+        for kind,items in data['series'].items():
+            self.assertTrue(data['sources'][kind]['historicalOnly'])
+            self.assertEqual(data['sources'][kind]['status'],'ok')
+            for row in items:
+                self.assertIn(row['period'],('2024Q1','2024Q2','2024Q3'))
+                self.assertGreaterEqual(row['value'],0)
+                self.assertLessEqual(row['value'],100)
+
     def test_cnes_geojson_and_summary_agree(self):
         summary=json.loads((ROOT/'public/data/summary.json').read_text(encoding='utf8'))
         geo=json.loads((ROOT/'public/data/establishments.geojson').read_text(encoding='utf8'))
