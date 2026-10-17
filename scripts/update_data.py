@@ -556,6 +556,7 @@ def update_beds_archive(s):
                 for key in ('bedsTotal','bedsSus','bedsAsOf','utiTotal','utiSus'):item[key]=None
                 item['hasBeds']=None
         catalog['updatedAt']=now()
+        catalog['facilityMetricsVersion']='leitos-uti-v1'
     geo=json.loads(GEO.read_text('utf8')) if GEO.exists() else None
     if geo is not None:
         for feature in geo.get('features',[]):
