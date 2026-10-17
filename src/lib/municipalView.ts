@@ -65,7 +65,7 @@ export function municipalPage(summary:DataSummary){
 const healthLabels:Record<string,string>={
  dengue:'Dengue · notificações de residentes',chikungunya:'Chikungunya · notificações de residentes',
  zika:'Zika · notificações de residentes',sinasc:'Nascidos vivos',sim:'Óbitos não fetais'};
-const susOrder=['emulti_custeadas','emulti_homologadas','emulti_repasses','citopatologicos','mamografias','consultas_aps_razao','consultas_especializadas_razao'];
+const susOrder=['emulti_custeadas','emulti_homologadas','emulti_repasses','citopatologicos','mamografias','consultas_aps_razao','consultas_especializadas_razao','valor_medio_aih'];
 const sourcePeriod=(row:Month,source?:Origin)=>
  source?.cadence==='annual'?row.period.slice(0,4)+(row.period.slice(4,6)==='12'?'':' · referência '+row.period.slice(4,6)):stamp(row.period);
 function buildMetrics(health:Health|null,sus:SUS|null):Selection[]{
@@ -104,6 +104,7 @@ const stages:{name:string;keys:string[]}[]=[
  {name:'Vigilância epidemiológica',keys:['dengue','chikungunya','zika']},
  {name:'Natalidade e mortalidade',keys:['sinasc','sim']},
  {name:'Atenção Primária e financiamento',keys:['emulti_custeadas','emulti_homologadas','emulti_repasses','consultas_aps_razao','consultas_especializadas_razao']},
+ {name:'Atendimento hospitalar · indicador financeiro',keys:['valor_medio_aih']},
  {name:'Prevenção e rastreamento',keys:['citopatologicos','mamografias']}
 ];
 export async function mountMunicipal(dark:boolean){

@@ -28,6 +28,20 @@ class SusMGDITests(unittest.TestCase):
   rows +=[{'co_ibge':'430460','co_anomes':'202608','vl_indicador_calculado_mun':'8'},
           {'co_ibge':'430460','co_anomes':'202608','vl_indicador_calculado_mun':'9'}]
   with self.assertRaisesRegex(ValueError,'divergência'):m.extract(iter(rows),['co_ibge','co_anomes','vl_indicador_calculado_mun'],'count')
+ def test_new_ripsa_indicators_have_method_and_specific_units(self):
+  self.assertIn('consultas_aps_razao',m.CONFIG)
+  self.assertIn('consultas_especializadas_razao',m.CONFIG)
+  self.assertIn('valor_medio_aih',m.CONFIG)
+  self.assertEqual(m.CONFIG['consultas_aps_razao']['kind'],'rate')
+  self.assertEqual(m.CONFIG['consultas_especializadas_razao']['kind'],'rate')
+  self.assertEqual(m.CONFIG['valor_medio_aih']['kind'],'currency')
+  for key in ('consultas_aps_razao','consultas_especializadas_razao','valor_medio_aih'):
+   self.assertTrue(m.CONFIG[key]['method'])
+   self.assertEqual(m.CONFIG[key]['cadence'],'annual')
+ def test_no_municipal_value_is_not_zero(self):
+  self.assertIsNone(m.decimal_value(None))
+  self.assertIsNone(m.decimal_value('n/d'))
+  self.assertNotEqual(m.decimal_value(None),m.Decimal(0))
  def test_no_patient_identifiers_in_configuration(self):
   for s in m.CONFIG.values():
    self.assertIn(s['kind'],('count','currency','rate'))
