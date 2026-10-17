@@ -1,8 +1,17 @@
 # WebGIS Saúde Canoas
 
-**Dashboard territorial de saúde pública de Canoas/RS — código IBGE 4304606.** Aplicação estática, responsiva, com mapas e gráficos interativos, GitHub Pages e atualização programada via GitHub Actions.
+**Dashboard territorial de saúde pública de Canoas/RS — código IBGE 4304606.**
 
-> **Versão revisada / experimental, não oficial.** Não substitui os dados primários do Ministério da Saúde ou da Secretaria Municipal de Saúde. Um campo sem coleta válida aparece como **— / indisponível**, nunca como `0` inventado. Os arquivos iniciais contêm apenas valores do IBGE conferidos na fonte e um GeoJSON vazio; as primeiras consultas reais ao CNES e às demais APIs serão feitas **pelo GitHub Actions com acesso à internet**.
+### Situação operacional verificada em 17/10/2026
+
+- **GitHub Pages:** deploy concluído; compilação TypeScript e build Vite passaram no GitHub Actions.
+- **CNES:** CSV nacional diário oficial de estabelecimentos; **969 registros ativos únicos de Canoas** na coleta de 17/10/2026, **962 georreferenciados**. Contém estabelecimentos públicos e privados e não equivale somente à rede municipal SUS.
+- **Qualidade:** dados municipais, códigos CNES únicos, classificação por tipo e geometria são validados antes da publicação. O arquivo diário não representa uma competência mensal do CNES.
+- **Leitos SUS/total, dengue, SIA e SIH:** ainda sem extração municipal integral comprovada; não devem ser interpretados como zero. Esses indicadores permanecem indisponíveis até validação da fonte.
+- **Automação:** snapshot CNES/IBGE diariamente às 08:17 UTC (05:17 de Brasília). Coletas exploratórias mais pesadas somente pelo disparo manual do workflow.
+ Aplicação estática, responsiva, com mapas e gráficos interativos, GitHub Pages e atualização programada via GitHub Actions.
+
+> **Versão revisada / experimental, não oficial.** Não substitui os dados primários do Ministério da Saúde ou da Secretaria Municipal de Saúde. Um campo sem coleta válida aparece como **— / indisponível**, nunca como `0` inventado. Os arquivos `public/data/` são snapshots públicos produzidos pelo GitHub Actions; o sistema informa a ausência de coleta validada por fonte.
 
 ## O que já está implementado
 
@@ -49,10 +58,10 @@ No Chrome/Firefox do smartphone, entre no repositório no `github.com` → **Add
 
 1. Abra **Settings → Pages → Build and deployment → Source → GitHub Actions**.
 2. Abra **Settings → Actions → General → Workflow permissions → Read and write permissions** para permitir commits dos JSONs. Em contas/organizações que bloqueiam esta opção, ajuste a política com o administrador.
-3. Abra **Actions → Dados e publicação WebGIS Saúde → Run workflow** para forçar a primeira atualização. Examine os logs da etapa `Coletar snapshots oficiais` e os arquivos `public/data/`.
+3. Abra **Actions → Verificar, atualizar dados e publicar WebGIS Saúde → Run workflow** para forçar atualização e consultar os logs da etapa `Atualizar dados públicos de saúde` e os arquivos `public/data/`.
 4. O mesmo workflow constrói o frontend (`npm run build`) e publica em **`https://SEU_USUARIO.github.io/webgis-saude-canoas/`**. O endereço também aparece no resultado do job `deploy`. O primeiro `push` da `main` já faz uma publicação inicial.
 
-A Action executa às **segundas e quintas, 08:17 UTC (05:17 de Brasília, quando UTC−3)**, além dos disparos manuais e commits na `main`. Os commits disparam verificação e publicação, enquanto as atualizações públicas são executadas apenas por agenda ou manualmente. Atualizações fazem commit na mesma branch antes do deploy. A publicação **não exige PAT ou segredo adicional** quando o GitHub Pages e o `GITHUB_TOKEN` estão habilitados. Como commits feitos com `GITHUB_TOKEN` geralmente não disparam outros workflows de `push`, tudo está reunido em **um único workflow**.
+A Action executa **diariamente, 08:17 UTC (05:17 de Brasília, UTC−3)**, além dos disparos manuais e commits na `main`. Os commits disparam verificação e publicação, enquanto as atualizações públicas são executadas apenas por agenda ou manualmente. Atualizações fazem commit na mesma branch antes do deploy. A publicação **não exige PAT ou segredo adicional** quando o GitHub Pages e o `GITHUB_TOKEN` estão habilitados. Como commits feitos com `GITHUB_TOKEN` geralmente não disparam outros workflows de `push`, tudo está reunido em **um único workflow**.
 
 ## Fontes e dados efetivamente tratados
 
@@ -62,7 +71,7 @@ As URLs e parâmetros abaixo foram estudados em **16/10/2026**; a execução dos
 |---|---|---|---|
 | IBGE Cidades | https://www.ibge.gov.br/cidades-e-estados/rs/canoas.html | Estimativa 2026 (**359.845**), Censo 2022 (**347.657**), área **130,774 km²** e densidade Censo 2022 **2.658,15 hab./km²** | **Valor inicial verificado** |
 | IBGE SIDRA | `https://apisidra.ibge.gov.br/values/t/6579/n6/4304606/v/9324/p/all?formato=json` | Série anual de população; última estimativa se disponível e validada | Coletor implementado, ainda não executado online |
-| CNES — estabelecimentos | `https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=430460&status=1&limit=20&offset=0` | Unidades, coordenadas, tipo, bairro, telefone, contagem e agrupamentos | Coletor implementado, aguardando execução |
+| CNES — estabelecimentos | `https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip` | Extrato nacional diário, filtrado para Canoas, unidades ativas, coordenadas, tipo, bairro e CNES | **Coleta oficial funcionando; 969 ativos e 962 pontos em 17/10/2026** |
 | CNES — leitos | `https://apidadosabertos.saude.gov.br/assistencia-a-saude/cnes-leitos?co_ibge=430460` | Leitos existentes e SUS, conforme campos e competência retornados | Adaptador experimental; somente após validação |
 | DEMAS dengue | `https://apidadosabertos.saude.gov.br/arboviroses/dengue?id_municip=430460&nu_ano=2025` | Número de registros de notificação no município notificante, por ano | Adaptador experimental; somente após validação |
 | SIA produção ambulatorial | `https://apidadosabertos.saude.gov.br/assistencia-a-saude/sia-procedimentos-ambulatoriais?co_ibge=430460&nu_ano=2025` | Quantidade de procedimentos **se a coluna estiver presente** | Adaptador experimental; somente após validação |
@@ -81,7 +90,7 @@ As URLs e parâmetros abaixo foram estudados em **16/10/2026**; a execução dos
 
 - **IBGE:** 4304606 é o código de **sete dígitos**. Algumas APIs federais requerem **430460**, com seis dígitos. O script tenta validar o município em cada registro CNES.
 - **CNES:** cadastro de estabelecimentos não equivale necessariamente a oferta assistencial SUS. Os dados podem conter unidades privadas. O mapa só mostra coordenadas públicas plausíveis para Canoas; a contagem CNES inclui registros sem coordenadas.
-- **Classificação UBS/hospital:** derivação aproximada pelo texto do tipo CNES, não indicador de cobertura da Atenção Primária.
+- **Classificação UBS/hospital:** derivada dos códigos oficiais de tipo de unidade do CNES (TP_UNIDADE). Cadastro de UBS não é indicador de cobertura da Atenção Primária.
 - **CNES leitos:** somatórios por competência devem distinguir total existente e leitos SUS; **não** deduzir leitos pelo nome hospital.
 - **Dengue:** registros do município **notificante** não são taxa de incidência entre residentes nem necessariamente casos confirmados. Não calcular incidência com esses valores sem metodologia.
 - **SIA e SIH:** produção de procedimentos/AIHs não é contagem de pacientes únicos, nem necessariamente de internações de moradores de Canoas. Não rotular esses números como internações únicas.
@@ -167,7 +176,7 @@ git push origin main
 ```
 
 **Verifique explicitamente** que o arquivo `.github/workflows/update-data.yml` aparece no GitHub.
-O workflow tem três jobs: `verify` (testes Python), `update` (API pública, só manual/agenda)
+O workflow tem três jobs: `verify` (testes Python), `update` (CSV CNES/IBGE por agenda, automaticamente se faltar snapshot, ou disparo manual)
 e `deploy` (build e publicação). Na aba Settings → Pages, selecione GitHub Actions e habilite
 Settings → Actions → General → Workflow permissions → Read and write permissions.
 
