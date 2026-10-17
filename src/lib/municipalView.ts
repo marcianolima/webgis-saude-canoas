@@ -6,10 +6,12 @@ type Month={period:string;value:number};
 type Origin={label:string;status:string;url?:string;note?:string;method?:string;unit?:string;kind?:string;cadence?:string;reference?:string};
 type Health={updatedAt:string|null;series:Record<string,Annual[]>;sources:Record<string,Origin>;definitions:Record<string,string>};
 type SUS={updatedAt:string|null;series:Record<string,Month[]>;sources:Record<string,Origin>};
-type Selection={label:string;key:string;section:'health'|'sus';value:number;reference:string;unit:string;kind:string;notes:string;source?:string;series:{period:string;value:number}[];provisional?:boolean};
+type APS={updatedAt:string|null;series:Record<string,Month[]>;sources:Record<string,Origin>};
+type Selection={label:string;key:string;section:'health'|'sus'|'aps';value:number;reference:string;unit:string;kind:string;notes:string;source?:string;series:{period:string;value:number}[];provisional?:boolean};
 const display=(value:number|null|undefined,kind='count')=>{
  if(value===null||value===undefined||!Number.isFinite(value))return '—';
  if(kind==='currency')return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:2}).format(value);
+ if(kind==='rate')return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(value);
  if(kind==='rate')return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(value);
  return nf(value);
 };
@@ -17,7 +19,7 @@ const stamp=(text:string)=>text.length===6?text.slice(4,6)+'/'+text.slice(0,4):t
 let live=0;
 let plot:any=null;
 let obs:ResizeObserver|null=null;
-let stored:{health:Health|null;sus:SUS|null}|null=null;
+let stored:{health:Health|null;sus:SUS|null;aps:APS|null}|null=null;
 export function stopMunicipal(){live++;obs?.disconnect();obs=null;plot?.dispose();plot=null;}
 export function municipalPage(summary:DataSummary){
  const population=summary.municipality;
@@ -56,10 +58,10 @@ export function municipalPage(summary:DataSummary){
  '<p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Pendências de acesso e validação não são escondidas.</p></div>'+
  '<button type="button" data-page="sources" class="text-xs font-bold text-teal-700 dark:text-teal-300 underline">Metodologia →</button></div>'+
  '<div id="municipal-pending" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3"></div></section>'+
- '<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">'+
+ '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">'+
  '<button type="button" data-page="overview" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Analisar o território e CNES →</button>'+
  '<button type="button" data-page="health" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Vigilância e estatísticas vitais →</button>'+
- '<button type="button" data-page="sus" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Assistência e financiamento SUS →</button></div>'+
+ '<button type="button" data-page="sus" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Assistência e financiamento SUS →</button>'+ '<button type="button" data-page="production" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Produção mensal SIH/SIA →</button></div>'+
  '</section>';
 }
 const healthLabels:Record<string,string>={
@@ -68,7 +70,7 @@ const healthLabels:Record<string,string>={
 const susOrder=['emulti_custeadas','emulti_homologadas','emulti_repasses','citopatologicos','mamografias','consultas_aps_razao','consultas_especializadas_razao','sih_internacoes_anuais','valor_medio_aih'];
 const sourcePeriod=(row:Month,source?:Origin)=>
  source?.cadence==='annual'?row.period.slice(0,4)+(row.period.slice(4,6)==='12'?'':' · referência '+row.period.slice(4,6)):stamp(row.period);
-function buildMetrics(health:Health|null,sus:SUS|null):Selection[]{
+function buildMetrics(health:Health|null,sus:SUS|null,aps:APS|null):Selection[]{
  const values:Selection[]=[];
  if(health)for(const id of ['dengue','chikungunya','zika','sinasc','sim']){
   const rows=(health.series[id]||[]).slice().sort((a,b)=>a.year-b.year);
@@ -89,6 +91,14 @@ function buildMetrics(health:Health|null,sus:SUS|null):Selection[]{
    reference:sourcePeriod(last,src),unit:src.unit||'indicador',kind:src.kind||'count',
    notes:src.method||'',source:src.url,series:rows.map(r=>({period:sourcePeriod(r,src),value:r.value}))});
  }
+ if(aps)for(const [id,src] of Object.entries(aps.sources||{})){
+  const rows=(aps.series?.[id]||[]).slice().sort((a,b)=>a.period.localeCompare(b.period));
+  if(src?.status!=='ok'||!rows.length)continue;
+  const last=rows[rows.length-1];
+  values.push({label:src.label,key:id,section:'aps',value:last.value,
+   reference:last.period,unit:src.unit||'%',kind:'rate',notes:src.method||'Indicador histórico Previne Brasil.',
+   source:src.url,series:rows.map(r=>({period:r.period,value:r.value}))});
+ }
  return values;
 }
 function indicatorCard(row:Selection){
@@ -105,7 +115,8 @@ const stages:{name:string;keys:string[]}[]=[
  {name:'Natalidade e mortalidade',keys:['sinasc','sim']},
  {name:'Atenção Primária e financiamento',keys:['emulti_custeadas','emulti_homologadas','emulti_repasses','consultas_aps_razao','consultas_especializadas_razao']},
  {name:'Assistência hospitalar · RIPSA',keys:['sih_internacoes_anuais','valor_medio_aih']},
- {name:'Prevenção e rastreamento',keys:['citopatologicos','mamografias']}
+ {name:'Prevenção e rastreamento',keys:['citopatologicos','mamografias']},
+ {name:'Atenção Primária · Previne Brasil (histórico até 2024)',keys:['aps_prenatal','aps_gestantes_testes','aps_gestantes_odontologia','aps_citopatologico','aps_vacinacao_infantil','aps_hipertensao','aps_diabetes']}
 ];
 export async function mountMunicipal(dark:boolean){
  const nonce=++live;
@@ -119,11 +130,11 @@ export async function mountMunicipal(dark:boolean){
     if(!result.ok)throw new Error(path+' HTTP '+result.status);
     return result.json();
    };
-   const [h,s]=await Promise.allSettled([load('indicators.json'),load('sus.json')]);
-   stored={health:h.status==='fulfilled'?h.value as Health:null,sus:s.status==='fulfilled'?s.value as SUS:null};
+   const [h,s,a]=await Promise.allSettled([load('indicators.json'),load('sus.json'),load('aps.json')]);
+   stored={health:h.status==='fulfilled'?h.value as Health:null,sus:s.status==='fulfilled'?s.value as SUS:null,aps:a.status==='fulfilled'?a.value as APS:null};
   }
   if(nonce!==live||!cards.isConnected)return;
-  const metrics=buildMetrics(stored.health,stored.sus);
+  const metrics=buildMetrics(stored.health,stored.sus,stored.aps);
   status.textContent=metrics.length+' séries municipais com extração validada';
   cards.innerHTML=stages.map(group=>{
    const entries=group.keys.map(key=>metrics.find(m=>m.key===key)).filter((m):m is Selection=>Boolean(m));
@@ -133,7 +144,7 @@ export async function mountMunicipal(dark:boolean){
     '<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">'+entries.map(indicatorCard).join('')+
     (entries.length?'':'<div class="text-sm text-slate-500 dark:text-slate-300">Fonte ainda não validada para Canoas.</div>')+'</div></section>';
   }).join('');
-  const sources=[...(stored.health?Object.entries(stored.health.sources):[]),...(stored.sus?Object.entries(stored.sus.sources):[])]
+  const sources=[...(stored.health?Object.entries(stored.health.sources):[]),...(stored.sus?Object.entries(stored.sus.sources):[]),...(stored.aps?Object.entries(stored.aps.sources):[])]
    .filter(([key,s])=>!metrics.some(m=>m.key===key)&&(s.status==='not_loaded'||s.status==='error'||s.status==='partial'));
   const unique=new Map<string,Origin>();
   for(const [key,s] of sources)if(!unique.has(key))unique.set(key,s);

@@ -48,9 +48,9 @@ export async function mountSources(summary:DataSummary){
    return doc&&typeof doc.sources==='object'?doc:null;
   }catch{return null}
  }
- const [health,sus]=await Promise.all([readOptional('indicators.json'),readOptional('sus.json')]);
+ const [health,sus,aps]=await Promise.all([readOptional('indicators.json'),readOptional('sus.json'),readOptional('aps.json')]);
  if(token!==active||!parent.isConnected)return;
- for(const [group,document] of [['Vigilância e estatísticas vitais',health],['Assistência, APS e financiamento',sus]] as const){
+ for(const [group,document] of [['Vigilância e estatísticas vitais',health],['Assistência, APS e financiamento',sus],['SISAB · indicadores históricos Previne Brasil',aps]] as const){
   if(!document)continue;
   for(const [id,item] of Object.entries(document.sources)){
    const series=document.series?.[id]||[];
@@ -60,7 +60,7 @@ export async function mountSources(summary:DataSummary){
  }
  const duplicates=new Set<string>();
  const list=rows.filter(row=>{const k=row.family+':'+row.id;if(duplicates.has(k))return false;duplicates.add(k);return true});
- const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento'];
+ const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento','SISAB · indicadores históricos Previne Brasil'];
  function render(){
   const filter=(document.querySelector<HTMLSelectElement>('#sources-filter')?.value||'all');
   const q=(document.querySelector<HTMLInputElement>('#sources-search')?.value||'').toLocaleLowerCase('pt-BR');
