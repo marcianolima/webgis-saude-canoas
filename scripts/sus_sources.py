@@ -5,6 +5,7 @@ Processa arquivos CSV nacionais em um diretório temporário; somente dados
 agregados de Canoas são persistidos. Não estima SIA/SIH com amostras de API.
 """
 import csv, io, json, logging, os, re, tempfile, zipfile
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -70,6 +71,7 @@ def period_value(raw):
     if re.fullmatch(r'20\d{2}',raw):return raw
     return None
 
+@contextmanager
 def download_records(config):
     """Leitura de CSV ZIP em streaming, sem gravar linhas individuais no repositório."""
     path=BASE+config['file']+'.csv.zip'
@@ -155,8 +157,8 @@ def run():
                 if (datetime.now(timezone.utc)-cached).days<7:continue
             except (TypeError,ValueError,KeyError):pass
         try:
-            (columns,rows),=tuple(download_records(conf))
-            parsed=extract(rows,columns,conf['kind'])
+            with download_records(conf) as (columns,rows):
+                parsed=extract(rows,columns,conf['kind'])
             source={'label':conf['label'],'unit':conf['unit'],'kind':conf['kind'],'url':conf['url'],
                     'method':conf['method'],'status':'ok','retrievedAt':timestamp(),
                     'reference':parsed['latest'],'start':parsed['earliest'],

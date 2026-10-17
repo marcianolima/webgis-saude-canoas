@@ -10,7 +10,7 @@ class SusMGDITests(unittest.TestCase):
   self.assertEqual(m.decimal_value('234.5'),m.Decimal('234.5'))
   self.assertIsNone(m.decimal_value(''))
  def test_monthly_municipal_source_and_unit(self):
-  rows=iter([{'co_ibge':str(400000+i),'co_anomes':'202607','vl_indicador_calculado_mun':'1'} for i in range(200)]+[
+  rows=iter([{'co_ibge':str(400000+i),'co_anomes':'202607','vl_indicador_calculado_mun':'1'} for i in range(700)]+[
    {'co_ibge':'430460','co_anomes':'202607','vl_indicador_calculado_mun':'7'},
    {'co_ibge':'430460','co_anomes':'202608','vl_indicador_calculado_mun':'8'},
    {'co_ibge':'431490','co_anomes':'202608','vl_indicador_calculado_mun':'999'}])
@@ -24,7 +24,7 @@ class SusMGDITests(unittest.TestCase):
   rows=iter([{'co_ibge':'430460','co_anomes':'202608','vl_indicador_calculado_mun':'8'}])
   with self.assertRaisesRegex(ValueError,'cobertura'):m.extract(rows,['co_ibge','co_anomes','vl_indicador_calculado_mun'],'count')
  def test_reject_duplicate_discrepancy(self):
-  rows=[{'co_ibge':str(400000+i),'co_anomes':'202607','vl_indicador_calculado_mun':'1'} for i in range(200)]
+  rows=[{'co_ibge':str(400000+i),'co_anomes':'202607','vl_indicador_calculado_mun':'1'} for i in range(700)]
   rows +=[{'co_ibge':'430460','co_anomes':'202608','vl_indicador_calculado_mun':'8'},
           {'co_ibge':'430460','co_anomes':'202608','vl_indicador_calculado_mun':'9'}]
   with self.assertRaisesRegex(ValueError,'divergência'):m.extract(iter(rows),['co_ibge','co_anomes','vl_indicador_calculado_mun'],'count')
