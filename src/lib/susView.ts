@@ -4,14 +4,18 @@ import {selectedFacility} from './facilityExplorer';
 type Sample={period:string;value:number};
 type Source={
  label:string;status:string;url:string;method?:string;note?:string;unit?:string;
- kind?:string;reference?:string|null;retrievedAt?:string|null;municipalRecords?:number;
+ kind?:string;cadence?:string;reference?:string|null;retrievedAt?:string|null;municipalRecords?:number;
  totalPeriods?:number
 };
 type Data={schemaVersion:string;updatedAt:string|null;series:Record<string,Sample[]>;sources:Record<string,Source>};
 let active=0;
 let graph:any=null;
 let observer:ResizeObserver|null=null;
-const formatPeriod=(str:string)=>str.length===6?str.slice(4,6)+'/'+str.slice(0,4):str;
+const formatPeriod=(str:string,cadence?:string)=>{
+ if(str.length!==6)return str;
+ if(cadence==='annual')return str.slice(0,4)+(str.slice(4,6)==='12'?'':' · ref. '+str.slice(4,6));
+ return str.slice(4,6)+'/'+str.slice(0,4);
+};
 const num=(n:number,k:string)=>{
  if(k==='currency')return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:2}).format(n);
  if(k==='rate')return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(n);
@@ -45,15 +49,15 @@ function cards(data:Data){
   return '<button type="button" data-sus-metric="'+safe(id)+'" class="panel p-4 sm:p-5 text-left hover:ring-2 hover:ring-teal-400 focus-visible:ring-2 focus-visible:ring-teal-500 w-full" aria-label="Ver evolução de '+safe(label)+'">'+
   '<span class="flex flex-wrap justify-between gap-2 items-start"><strong class="text-sm leading-snug max-w-[200px]">'+safe(label)+'</strong>'+badge(source?.status||'not_loaded')+'</span>'+
   '<span class="block kpi-val mt-3">'+(latest?num(latest.value,typ):'—')+'</span>'+
-  '<span class="block text-xs text-slate-500 dark:text-slate-300 mt-2">'+(latest?formatPeriod(latest.period)+' · '+safe(source?.unit||''):'Sem série municipal validada')+'</span>'+
+  '<span class="block text-xs text-slate-500 dark:text-slate-300 mt-2">'+(latest?formatPeriod(latest.period,source?.cadence)+' · '+safe(source?.unit||''):'Sem série municipal validada')+'</span>'+
   '<span class="block text-xs text-teal-700 dark:text-teal-300 mt-3">Explorar série →</span></button>'
  }).join('');
 }
-function table(rows:Sample[],kind:string,unit:string){
+function table(rows:Sample[],kind:string,unit:string,cadence?:string){
  if(!rows.length)return '<div class="empty p-5">Nenhum dado municipal validado disponível.</div>';
  return '<div class="overflow-x-auto"><table class="w-full text-sm"><caption class="sr-only">Série histórica municipal da fonte selecionada</caption>'+
  '<thead><tr class="text-xs text-slate-500 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700"><th class="py-2 text-left">Competência</th><th class="py-2 text-right">'+safe(unit||'Valor')+'</th></tr></thead><tbody>'+
- rows.slice().reverse().map(v=>'<tr class="border-b border-slate-100 dark:border-slate-700"><td class="py-2">'+formatPeriod(v.period)+'</td><td class="py-2 text-right tabular-nums font-semibold">'+num(v.value,kind)+'</td></tr>').join('')+'</tbody></table></div>';
+ rows.slice().reverse().map(v=>'<tr class="border-b border-slate-100 dark:border-slate-700"><td class="py-2">'+formatPeriod(v.period,cadence)+'</td><td class="py-2 text-right tabular-nums font-semibold">'+num(v.value,kind)+'</td></tr>').join('')+'</tbody></table></div>';
 }
 export async function mountSus(dark:boolean){
  const token=++active;
@@ -100,9 +104,9 @@ export async function mountSus(dark:boolean){
    if(!target||!details||!tableTarget||!link)return;
    graph?.dispose();graph=null;observer?.disconnect();observer=null;
    document.getElementById('sus-chart-title')!.textContent=source?.label||key;
-   details.textContent=(source?.method||source?.note||'')+' · Referência mais recente: '+(source?.reference?formatPeriod(source.reference):'não informada')+'.';
+   details.textContent=(source?.method||source?.note||'')+' · Referência mais recente: '+(source?.reference?formatPeriod(source.reference,source.cadence):'não informada')+'.';
    if(source?.url){link.href=source.url;link.hidden=false}else link.hidden=true;
-   tableTarget.innerHTML=table(rows,source?.kind||'count',source?.unit||'');
+   tableTarget.innerHTML=table(rows,source?.kind||'count',source?.unit||'',source?.cadence);
    document.querySelectorAll<HTMLElement>('[data-sus-metric]').forEach(node=>{
     node.classList.toggle('ring-2',node.dataset.susMetric===key);
     node.classList.toggle('ring-teal-500',node.dataset.susMetric===key);
@@ -113,7 +117,7 @@ export async function mountSus(dark:boolean){
    const color=dark?'#9fb6c6':'#64748b';
    graph.setOption({animationDuration:250,grid:{top:20,left:15,right:14,bottom:55,containLabel:true},
     tooltip:{trigger:'axis',valueFormatter:(v:number)=>num(Number(v),source?.kind||'count')},
-    xAxis:{type:'category',data:rows.map(x=>formatPeriod(x.period)),axisLabel:{color,rotate:40,fontSize:10},axisTick:{show:false}},
+    xAxis:{type:'category',data:rows.map(x=>formatPeriod(x.period,source?.cadence)),axisLabel:{color,rotate:40,fontSize:10},axisTick:{show:false}},
     yAxis:{type:'value',axisLabel:{color,formatter:(value:number)=>new Intl.NumberFormat('pt-BR',{notation:'compact',maximumFractionDigits:1}).format(value)},
            splitLine:{lineStyle:{color:dark?'#30455b':'#edf2f7'}}},
     series:[{type:'line',smooth:true,symbolSize:5,lineStyle:{color:'#0d9488',width:2.5},itemStyle:{color:'#0d9488'},data:rows.map(x=>x.value),areaStyle:{color:'rgba(13,148,136,.09)'}}]});

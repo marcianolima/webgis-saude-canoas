@@ -1,1 +1,491 @@
-{"schemaVersion":"1.0","updatedAt":"2026-10-17T03:48:32+00:00","series":{"emulti_custeadas":[{"period":"202410","value":1},{"period":"202411","value":1},{"period":"202412","value":0},{"period":"202501","value":0},{"period":"202502","value":1},{"period":"202503","value":1},{"period":"202504","value":1},{"period":"202505","value":0},{"period":"202506","value":0},{"period":"202507","value":0},{"period":"202508","value":1},{"period":"202509","value":1},{"period":"202510","value":1},{"period":"202511","value":1},{"period":"202512","value":1},{"period":"202601","value":1},{"period":"202602","value":1},{"period":"202603","value":1},{"period":"202604","value":1},{"period":"202605","value":1},{"period":"202606","value":1},{"period":"202607","value":1},{"period":"202608","value":1},{"period":"202609","value":1}],"emulti_homologadas":[{"period":"202410","value":3},{"period":"202411","value":3},{"period":"202412","value":3},{"period":"202501","value":3},{"period":"202502","value":3},{"period":"202503","value":3},{"period":"202504","value":3},{"period":"202505","value":3},{"period":"202506","value":3},{"period":"202507","value":3},{"period":"202508","value":4},{"period":"202509","value":4},{"period":"202510","value":4},{"period":"202511","value":3},{"period":"202512","value":3},{"period":"202601","value":3},{"period":"202602","value":3},{"period":"202603","value":3},{"period":"202604","value":3},{"period":"202605","value":3},{"period":"202606","value":2},{"period":"202607","value":2},{"period":"202608","value":2},{"period":"202609","value":2}],"emulti_repasses":[{"period":"202410","value":12000.0},{"period":"202411","value":12000.0},{"period":"202412","value":0.0},{"period":"202501","value":0.0},{"period":"202502","value":12000.0},{"period":"202503","value":12000.0},{"period":"202504","value":12000.0},{"period":"202505","value":0.0},{"period":"202506","value":0.0},{"period":"202507","value":0.0},{"period":"202508","value":12000.0},{"period":"202509","value":12000.0},{"period":"202510","value":12000.0},{"period":"202511","value":12000.0},{"period":"202512","value":12000.0},{"period":"202601","value":12000.0},{"period":"202602","value":12000.0},{"period":"202603","value":12000.0},{"period":"202604","value":12000.0},{"period":"202605","value":12000.0},{"period":"202606","value":12000.0},{"period":"202607","value":12000.0},{"period":"202608","value":12000.0},{"period":"202609","value":12000.0}],"citopatologicos":[{"period":"201612","value":6484},{"period":"201712","value":8213},{"period":"201812","value":9581},{"period":"201912","value":33241},{"period":"202012","value":27725},{"period":"202112","value":35211},{"period":"202212","value":44504},{"period":"202312","value":48217},{"period":"202412","value":40368},{"period":"202512","value":30692},{"period":"202607","value":20837}],"mamografias":[{"period":"201612","value":3043},{"period":"201712","value":6074},{"period":"201812","value":6360},{"period":"201912","value":667},{"period":"202012","value":3178},{"period":"202112","value":3597},{"period":"202212","value":6206},{"period":"202312","value":5250},{"period":"202412","value":2957},{"period":"202512","value":3984},{"period":"202607","value":2996}]},"sources":{"emulti_custeadas":{"label":"Equipes eMulti custeadas","unit":"equipes","kind":"count","url":"https://dadosabertos.saude.gov.br/dataset/mgdi-equipes-multiprofissionais-na-aps-emulti/resource/emultcust_csv","method":"Equipes multiprofissionais da APS aptas e contempladas com incentivo de custeio federal; estoque mensal, não somar competências.","status":"ok","retrievedAt":"2026-10-17T03:48:21+00:00","reference":"202609","start":"202405","totalPeriods":29,"municipalRecords":29,"nationalRecords":161559},"emulti_homologadas":{"label":"Equipes eMulti homologadas","unit":"equipes","kind":"count","url":"https://dadosabertos.saude.gov.br/dataset/mgdi-equipes-multiprofissionais-na-aps-emulti/resource/emulthomol_csv","method":"Equipes homologadas no CNES/INE para fins de financiamento. Não indica profissionais individuais nem consultas.","status":"ok","retrievedAt":"2026-10-17T03:48:24+00:00","reference":"202609","start":"202405","totalPeriods":29,"municipalRecords":29,"nationalRecords":161559},"emulti_repasses":{"label":"Repasses federais para eMulti","unit":"R$","kind":"currency","url":"https://dadosabertos.saude.gov.br/dataset/mgdi-equipes-multiprofissionais-na-aps-emulti/resource/emultvlrff_csv","method":"Valor indicado pela fonte para transferências federais eMulti. Não representa toda a despesa municipal em saúde nem produção SIA.","status":"ok","retrievedAt":"2026-10-17T03:48:26+00:00","reference":"202609","start":"202405","totalPeriods":29,"municipalRecords":29,"nationalRecords":161559},"citopatologicos":{"label":"Exames citopatológicos (25–64 anos)","unit":"exames","kind":"count","url":"https://dadosabertos.saude.gov.br/dataset/mgdi-prevencao-do-cancer-de-colo-e-mama/resource/ccmec25a64_csv","method":"Exames citopatológicos de mulheres de 25 a 64 anos por município de realização, conforme a definição MGDI/DATASUS; não equivale a mulheres únicas.","status":"ok","retrievedAt":"2026-10-17T03:48:28+00:00","reference":"202607","start":"201612","totalPeriods":11,"municipalRecords":11,"nationalRecords":61273},"mamografias":{"label":"Mamografias de rastreamento (50–69 anos)","unit":"exames","kind":"count","url":"https://dadosabertos.saude.gov.br/dataset/mgdi-prevencao-do-cancer-de-colo-e-mama/resource/ccmec50a69_csv","method":"Mamografias bilaterais para rastreamento em mulheres de 50 a 69 anos; município de realização do exame, não residência da paciente.","status":"ok","retrievedAt":"2026-10-17T03:48:30+00:00","reference":"202607","start":"201612","totalPeriods":11,"municipalRecords":11,"nationalRecords":61273},"consultas_aps_razao":{"label":"Consultas médicas na APS por 100 habitantes","unit":"por 100 hab.","url":"https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv","status":"error","note":"Falha de validação da fonte: MGDI: arquivo extraído muito grande","method":"Razão de consultas médicas registradas na APS/SUS por 100 habitantes. Taxa, não contagem de consultas ou cobertura individual.","reference":null},"sih":{"label":"Internações hospitalares SIH/SUS","status":"not_loaded","note":"Arquivos DBC mensais oficiais disponíveis, mas a extração completa em nível municipal não está acessível por HTTPS neste runner; API pública devolveu somente amostra. Sem total estimado.","url":"https://datasus.saude.gov.br/assistencia-a-saude/"},"sia":{"label":"Produção ambulatorial SIA/SUS","status":"not_loaded","note":"Arquivos mensais DBC não acessíveis por HTTPS neste runner; API pública parcial. Indicadores citopatológicos, mamografias e consultas APS publicados separadamente não representam o total do SIA.","url":"https://datasus.saude.gov.br/assistencia-a-saude/"},"pni":{"label":"Cobertura vacinal PNI/RNDS","status":"not_loaded","note":"Sem cálculo de cobertura até validar denominadores, coortes e qualidade da base municipal.","url":"https://opendatasus.saude.gov.br/"}}}
+{
+  "schemaVersion": "1.0",
+  "updatedAt": "2026-10-17T03:48:32+00:00",
+  "series": {
+    "emulti_custeadas": [
+      {
+        "period": "202410",
+        "value": 1
+      },
+      {
+        "period": "202411",
+        "value": 1
+      },
+      {
+        "period": "202412",
+        "value": 0
+      },
+      {
+        "period": "202501",
+        "value": 0
+      },
+      {
+        "period": "202502",
+        "value": 1
+      },
+      {
+        "period": "202503",
+        "value": 1
+      },
+      {
+        "period": "202504",
+        "value": 1
+      },
+      {
+        "period": "202505",
+        "value": 0
+      },
+      {
+        "period": "202506",
+        "value": 0
+      },
+      {
+        "period": "202507",
+        "value": 0
+      },
+      {
+        "period": "202508",
+        "value": 1
+      },
+      {
+        "period": "202509",
+        "value": 1
+      },
+      {
+        "period": "202510",
+        "value": 1
+      },
+      {
+        "period": "202511",
+        "value": 1
+      },
+      {
+        "period": "202512",
+        "value": 1
+      },
+      {
+        "period": "202601",
+        "value": 1
+      },
+      {
+        "period": "202602",
+        "value": 1
+      },
+      {
+        "period": "202603",
+        "value": 1
+      },
+      {
+        "period": "202604",
+        "value": 1
+      },
+      {
+        "period": "202605",
+        "value": 1
+      },
+      {
+        "period": "202606",
+        "value": 1
+      },
+      {
+        "period": "202607",
+        "value": 1
+      },
+      {
+        "period": "202608",
+        "value": 1
+      },
+      {
+        "period": "202609",
+        "value": 1
+      }
+    ],
+    "emulti_homologadas": [
+      {
+        "period": "202410",
+        "value": 3
+      },
+      {
+        "period": "202411",
+        "value": 3
+      },
+      {
+        "period": "202412",
+        "value": 3
+      },
+      {
+        "period": "202501",
+        "value": 3
+      },
+      {
+        "period": "202502",
+        "value": 3
+      },
+      {
+        "period": "202503",
+        "value": 3
+      },
+      {
+        "period": "202504",
+        "value": 3
+      },
+      {
+        "period": "202505",
+        "value": 3
+      },
+      {
+        "period": "202506",
+        "value": 3
+      },
+      {
+        "period": "202507",
+        "value": 3
+      },
+      {
+        "period": "202508",
+        "value": 4
+      },
+      {
+        "period": "202509",
+        "value": 4
+      },
+      {
+        "period": "202510",
+        "value": 4
+      },
+      {
+        "period": "202511",
+        "value": 3
+      },
+      {
+        "period": "202512",
+        "value": 3
+      },
+      {
+        "period": "202601",
+        "value": 3
+      },
+      {
+        "period": "202602",
+        "value": 3
+      },
+      {
+        "period": "202603",
+        "value": 3
+      },
+      {
+        "period": "202604",
+        "value": 3
+      },
+      {
+        "period": "202605",
+        "value": 3
+      },
+      {
+        "period": "202606",
+        "value": 2
+      },
+      {
+        "period": "202607",
+        "value": 2
+      },
+      {
+        "period": "202608",
+        "value": 2
+      },
+      {
+        "period": "202609",
+        "value": 2
+      }
+    ],
+    "emulti_repasses": [
+      {
+        "period": "202410",
+        "value": 12000
+      },
+      {
+        "period": "202411",
+        "value": 12000
+      },
+      {
+        "period": "202412",
+        "value": 0
+      },
+      {
+        "period": "202501",
+        "value": 0
+      },
+      {
+        "period": "202502",
+        "value": 12000
+      },
+      {
+        "period": "202503",
+        "value": 12000
+      },
+      {
+        "period": "202504",
+        "value": 12000
+      },
+      {
+        "period": "202505",
+        "value": 0
+      },
+      {
+        "period": "202506",
+        "value": 0
+      },
+      {
+        "period": "202507",
+        "value": 0
+      },
+      {
+        "period": "202508",
+        "value": 12000
+      },
+      {
+        "period": "202509",
+        "value": 12000
+      },
+      {
+        "period": "202510",
+        "value": 12000
+      },
+      {
+        "period": "202511",
+        "value": 12000
+      },
+      {
+        "period": "202512",
+        "value": 12000
+      },
+      {
+        "period": "202601",
+        "value": 12000
+      },
+      {
+        "period": "202602",
+        "value": 12000
+      },
+      {
+        "period": "202603",
+        "value": 12000
+      },
+      {
+        "period": "202604",
+        "value": 12000
+      },
+      {
+        "period": "202605",
+        "value": 12000
+      },
+      {
+        "period": "202606",
+        "value": 12000
+      },
+      {
+        "period": "202607",
+        "value": 12000
+      },
+      {
+        "period": "202608",
+        "value": 12000
+      },
+      {
+        "period": "202609",
+        "value": 12000
+      }
+    ],
+    "citopatologicos": [
+      {
+        "period": "201612",
+        "value": 6484
+      },
+      {
+        "period": "201712",
+        "value": 8213
+      },
+      {
+        "period": "201812",
+        "value": 9581
+      },
+      {
+        "period": "201912",
+        "value": 33241
+      },
+      {
+        "period": "202012",
+        "value": 27725
+      },
+      {
+        "period": "202112",
+        "value": 35211
+      },
+      {
+        "period": "202212",
+        "value": 44504
+      },
+      {
+        "period": "202312",
+        "value": 48217
+      },
+      {
+        "period": "202412",
+        "value": 40368
+      },
+      {
+        "period": "202512",
+        "value": 30692
+      },
+      {
+        "period": "202607",
+        "value": 20837
+      }
+    ],
+    "mamografias": [
+      {
+        "period": "201612",
+        "value": 3043
+      },
+      {
+        "period": "201712",
+        "value": 6074
+      },
+      {
+        "period": "201812",
+        "value": 6360
+      },
+      {
+        "period": "201912",
+        "value": 667
+      },
+      {
+        "period": "202012",
+        "value": 3178
+      },
+      {
+        "period": "202112",
+        "value": 3597
+      },
+      {
+        "period": "202212",
+        "value": 6206
+      },
+      {
+        "period": "202312",
+        "value": 5250
+      },
+      {
+        "period": "202412",
+        "value": 2957
+      },
+      {
+        "period": "202512",
+        "value": 3984
+      },
+      {
+        "period": "202607",
+        "value": 2996
+      }
+    ]
+  },
+  "sources": {
+    "emulti_custeadas": {
+      "label": "Equipes eMulti custeadas",
+      "unit": "equipes",
+      "kind": "count",
+      "url": "https://dadosabertos.saude.gov.br/dataset/mgdi-equipes-multiprofissionais-na-aps-emulti/resource/emultcust_csv",
+      "method": "Equipes multiprofissionais da APS aptas e contempladas com incentivo de custeio federal; estoque mensal, não somar competências.",
+      "status": "ok",
+      "retrievedAt": "2026-10-17T03:48:21+00:00",
+      "reference": "202609",
+      "start": "202405",
+      "totalPeriods": 29,
+      "municipalRecords": 29,
+      "nationalRecords": 161559
+    },
+    "emulti_homologadas": {
+      "label": "Equipes eMulti homologadas",
+      "unit": "equipes",
+      "kind": "count",
+      "url": "https://dadosabertos.saude.gov.br/dataset/mgdi-equipes-multiprofissionais-na-aps-emulti/resource/emulthomol_csv",
+      "method": "Equipes homologadas no CNES/INE para fins de financiamento. Não indica profissionais individuais nem consultas.",
+      "status": "ok",
+      "retrievedAt": "2026-10-17T03:48:24+00:00",
+      "reference": "202609",
+      "start": "202405",
+      "totalPeriods": 29,
+      "municipalRecords": 29,
+      "nationalRecords": 161559
+    },
+    "emulti_repasses": {
+      "label": "Repasses federais para eMulti",
+      "unit": "R$",
+      "kind": "currency",
+      "url": "https://dadosabertos.saude.gov.br/dataset/mgdi-equipes-multiprofissionais-na-aps-emulti/resource/emultvlrff_csv",
+      "method": "Valor indicado pela fonte para transferências federais eMulti. Não representa toda a despesa municipal em saúde nem produção SIA.",
+      "status": "ok",
+      "retrievedAt": "2026-10-17T03:48:26+00:00",
+      "reference": "202609",
+      "start": "202405",
+      "totalPeriods": 29,
+      "municipalRecords": 29,
+      "nationalRecords": 161559
+    },
+    "citopatologicos": {
+      "label": "Exames citopatológicos (25–64 anos)",
+      "unit": "exames",
+      "kind": "count",
+      "url": "https://dadosabertos.saude.gov.br/dataset/mgdi-prevencao-do-cancer-de-colo-e-mama/resource/ccmec25a64_csv",
+      "method": "Exames citopatológicos de mulheres de 25 a 64 anos por município de realização, conforme a definição MGDI/DATASUS; não equivale a mulheres únicas.",
+      "status": "ok",
+      "retrievedAt": "2026-10-17T03:48:28+00:00",
+      "reference": "202607",
+      "start": "201612",
+      "totalPeriods": 11,
+      "municipalRecords": 11,
+      "nationalRecords": 61273,
+      "cadence": "annual"
+    },
+    "mamografias": {
+      "label": "Mamografias de rastreamento (50–69 anos)",
+      "unit": "exames",
+      "kind": "count",
+      "url": "https://dadosabertos.saude.gov.br/dataset/mgdi-prevencao-do-cancer-de-colo-e-mama/resource/ccmec50a69_csv",
+      "method": "Mamografias bilaterais para rastreamento em mulheres de 50 a 69 anos; município de realização do exame, não residência da paciente.",
+      "status": "ok",
+      "retrievedAt": "2026-10-17T03:48:30+00:00",
+      "reference": "202607",
+      "start": "201612",
+      "totalPeriods": 11,
+      "municipalRecords": 11,
+      "nationalRecords": 61273,
+      "cadence": "annual"
+    },
+    "consultas_aps_razao": {
+      "label": "Consultas médicas na APS por 100 habitantes",
+      "unit": "por 100 hab.",
+      "status": "not_loaded",
+      "note": "O recurso municipal oficial excede o limite de segurança da extração integral desta versão. Indicador ainda não validado para Canoas.",
+      "url": "https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv"
+    },
+    "sih": {
+      "label": "Internações hospitalares SIH/SUS",
+      "status": "not_loaded",
+      "note": "Arquivos DBC mensais oficiais disponíveis, mas a extração completa em nível municipal não está acessível por HTTPS neste runner; API pública devolveu somente amostra. Sem total estimado.",
+      "url": "https://datasus.saude.gov.br/assistencia-a-saude/"
+    },
+    "sia": {
+      "label": "Produção ambulatorial SIA/SUS",
+      "status": "not_loaded",
+      "note": "Arquivos mensais DBC não acessíveis por HTTPS neste runner; API pública parcial. Indicadores citopatológicos, mamografias e consultas APS publicados separadamente não representam o total do SIA.",
+      "url": "https://datasus.saude.gov.br/assistencia-a-saude/"
+    },
+    "pni": {
+      "label": "Cobertura vacinal PNI/RNDS",
+      "status": "not_loaded",
+      "note": "Sem cálculo de cobertura até validar denominadores, coortes e qualidade da base municipal.",
+      "url": "https://opendatasus.saude.gov.br/"
+    }
+  }
+}

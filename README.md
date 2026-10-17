@@ -94,3 +94,13 @@ Quando há seleção, o painel geral troca os cartões para dados da unidade e p
 Não são fornecidos prontuários, nome de pacientes, CPF/CNS, atendimentos individuais nem inferência de ocupação de leitos. Alguns campos cadastrais podem vir em branco na fonte e são exibidos como não informados.
 
 Teste técnico: `python -m unittest discover -s tests -v` e `npm run build`; o workflow executa ambos os procedimentos e publica o site.
+
+## Dados oficiais MGDI/DATASUS — assistência, financiamento e rastreamento
+
+A partir da revisão de 17/10/2026, a aplicação oferece **uma seção de Assistência e financiamento** com dados municipais validados de **eMulti custeadas e homologadas, repasses federais para eMulti, exames citopatológicos e mamografias de rastreamento**. O processamento é feito a partir dos arquivos CSV ZIP oficiais do Ministério da Saúde disponíveis no catálogo de dados abertos. Cada indicador apresenta sua própria unidade e competência; não há soma de competências acumuladas.
+
+Os indicadores de exames são apresentados com referência predominantemente **anual** nos recursos consultados (e o ano mais recente pode estar incompleto), não devendo ser confundidos com séries mensais de equipes e repasses. Arquivos individuais não são publicados; o agregado por Canoas está em `public/data/sus.json`.
+
+O arquivo oficial da **razão de consultas APS por 100 habitantes** foi localizado, mas não processado integralmente devido ao tamanho extraído acima do limite seguro da rotina atual; permanece documentado como indisponível. A extração integral de SIH e SIA pelos arquivos mensais DBC ainda depende de uma via de acesso estável — o endereço HTTPS do DATASUS testado apresentou timeout no runner, e a API DEMAS retornou apenas amostras. Portanto, **os cinco indicadores específicos publicados não representam o total de produção hospitalar ou ambulatorial do SUS.**
+
+Recursos utilizados: `emultcust.csv.zip`, `emulthomol.csv.zip`, `emultvlrff.csv.zip`, `ccmec25a64.csv.zip`, `ccmec50a69.csv.zip`, publicados em `https://demas-dados-abertos.s3.amazonaws.com/csv/`. O script `scripts/sus_sources.py` realiza validação de município, período, valor e cobertura antes da publicação.

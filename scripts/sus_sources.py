@@ -32,22 +32,20 @@ CONFIG={
    'method':'Valor indicado pela fonte para transferências federais eMulti. Não representa toda a despesa municipal em saúde nem produção SIA.'
  },
  'citopatologicos':{
-   'file':'ccmec25a64','label':'Exames citopatológicos (25–64 anos)','unit':'exames','kind':'count',
+   'file':'ccmec25a64','label':'Exames citopatológicos (25–64 anos)','unit':'exames','kind':'count','cadence':'annual',
    'url':'https://dadosabertos.saude.gov.br/dataset/mgdi-prevencao-do-cancer-de-colo-e-mama/resource/ccmec25a64_csv',
    'method':'Exames citopatológicos de mulheres de 25 a 64 anos por município de realização, conforme a definição MGDI/DATASUS; não equivale a mulheres únicas.'
  },
  'mamografias':{
-   'file':'ccmec50a69','label':'Mamografias de rastreamento (50–69 anos)','unit':'exames','kind':'count',
+   'file':'ccmec50a69','label':'Mamografias de rastreamento (50–69 anos)','unit':'exames','kind':'count','cadence':'annual',
    'url':'https://dadosabertos.saude.gov.br/dataset/mgdi-prevencao-do-cancer-de-colo-e-mama/resource/ccmec50a69_csv',
    'method':'Mamografias bilaterais para rastreamento em mulheres de 50 a 69 anos; município de realização do exame, não residência da paciente.'
  },
- 'consultas_aps_razao':{
-   'file':'mgdi_ms_4iu','label':'Consultas médicas na APS por 100 habitantes','unit':'por 100 hab.','kind':'rate',
-   'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv',
-   'method':'Razão de consultas médicas registradas na APS/SUS por 100 habitantes. Taxa, não contagem de consultas ou cobertura individual.'
- }
 }
 UNVALIDATED={
+ 'consultas_aps_razao':{'label':'Consultas médicas na APS por 100 habitantes','unit':'por 100 hab.','status':'not_loaded',
+  'note':'O arquivo municipal oficial excede o limite de segurança da extração integral desta versão. Indicador ainda não validado para Canoas.',
+  'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv'},
  'sih':{'label':'Internações hospitalares SIH/SUS','status':'not_loaded','note':'Arquivos DBC mensais oficiais disponíveis, mas a extração completa em nível municipal não está acessível por HTTPS neste runner; API pública devolveu somente amostra. Sem total estimado.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
  'sia':{'label':'Produção ambulatorial SIA/SUS','status':'not_loaded','note':'Arquivos mensais DBC não acessíveis por HTTPS neste runner; API pública parcial. Indicadores citopatológicos, mamografias e consultas APS publicados separadamente não representam o total do SIA.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
  'pni':{'label':'Cobertura vacinal PNI/RNDS','status':'not_loaded','note':'Sem cálculo de cobertura até validar denominadores, coortes e qualidade da base municipal.','url':'https://opendatasus.saude.gov.br/'}
@@ -159,7 +157,8 @@ def run():
         try:
             with download_records(conf) as (columns,rows):
                 parsed=extract(rows,columns,conf['kind'])
-            source={'label':conf['label'],'unit':conf['unit'],'kind':conf['kind'],'url':conf['url'],
+            source={'label':conf['label'],'unit':conf['unit'],'kind':conf['kind'],
+                    'cadence':conf.get('cadence','monthly'),'url':conf['url'],
                     'method':conf['method'],'status':'ok','retrievedAt':timestamp(),
                     'reference':parsed['latest'],'start':parsed['earliest'],
                     'totalPeriods':parsed['totalPeriods'],'municipalRecords':parsed['municipalRecords'],
