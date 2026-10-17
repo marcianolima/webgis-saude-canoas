@@ -88,6 +88,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: python -m pip install --quiet "pysus==2.11.7"
+      - name: Investigar espelho estadual de vacinação PNI (temporário)
+        if: steps.decide.outputs.collect == 'true'
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/probe_pni_parquet.py
       - name: Consolidar produção SIH/SIA por competência e CNES
         if: steps.decide.outputs.collect == 'true'
         continue-on-error: true
