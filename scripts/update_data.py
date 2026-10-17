@@ -531,8 +531,8 @@ def update_beds_archive(s):
     if not latest:raise ValueError('CSV de leitos sem competência municipal válida com múltiplos CNES')
     period=latest[0]
     records=by_month[period]
-    total=sum(e for e,_ in records.values())
-    sus=sum(q for _,q in records.values())
+    total=sum(amount[0] for amount in records.values())
+    sus=sum(amount[1] for amount in records.values())
     if total<=0 or sus>total:raise ValueError('Total municipal de leitos inválido')
     LOG.info('LEITOS CSV: %s linhas nacionais, competência %s, %s CNES, %s existentes, %s SUS',
              read,period,len(records),total,sus)
