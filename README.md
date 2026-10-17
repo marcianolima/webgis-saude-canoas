@@ -1,4 +1,4 @@
-# WebGIS Saúde Canoas — V1.0
+# WebGIS Saúde Canoas — V1.2
 
 Aplicação pública territorial sobre Canoas/RS, código IBGE 4304606.
 

@@ -64,8 +64,8 @@ CONFIG={
  },
 }
 UNVALIDATED={
- 'sih':{'label':'Internações hospitalares SIH/SUS','status':'not_loaded','note':'Arquivos DBC mensais oficiais disponíveis, mas a extração completa em nível municipal não está acessível por HTTPS neste runner; API pública devolveu somente amostra. Sem total estimado.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
- 'sia':{'label':'Produção ambulatorial SIA/SUS','status':'not_loaded','note':'Arquivos mensais DBC não acessíveis por HTTPS neste runner; API pública parcial. Indicadores citopatológicos, mamografias e consultas APS publicados separadamente não representam o total do SIA.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
+ 'sih':{'label':'SIH/SUS detalhado por CNES e competência','status':'not_loaded','note':'A contagem anual agregada de internações e o valor médio por AIH da RIPSA estão publicados. Ainda faltam os DBC mensais para internações por CNES, procedimentos, especialidades e competência; o acesso HTTPS ao FTP oficial apresentou timeout.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
+ 'sia':{'label':'SIA/SUS total detalhado por CNES e procedimento','status':'not_loaded','note':'As razões de consultas APS/especializadas e os exames de rastreamento já estão publicados como indicadores específicos. A produção SIA total por CNES, procedimento e competência depende dos DBC mensais não acessíveis neste runner; a API retornou apenas amostra.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
  'pni':{'label':'Cobertura vacinal PNI/RNDS','status':'not_loaded','note':'Sem cálculo de cobertura até validar denominadores, coortes e qualidade da base municipal.','url':'https://opendatasus.saude.gov.br/'}
 }
 def timestamp():return datetime.now(timezone.utc).isoformat(timespec='seconds')
