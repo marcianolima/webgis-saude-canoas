@@ -1,1 +1,97 @@
+name: Verificar, atualizar dados e publicar WebGIS Saúde
 
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 8 * * 1,4' # segunda e quinta, 05:17 em Brasília (UTC-3)
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: webgis-saude-pages
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar o coletor e validar os arquivos de dados
+        run: python -m unittest discover -s tests -v
+
+  update:
+    # Coleta apenas em agendamentos e disparo manual; evita reiniciar API em cada commit.
+    if: github.event_name != 'push'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Coletar snapshots de fontes oficiais
+        env:
+          DATA_YEARS: '2025,2026'
+          MAX_PAGES_PER_SERIES: '160'
+        run: python scripts/update_data.py
+      - name: Validar os novos dados
+        run: python -m unittest discover -s tests -v
+      - name: Comitar apenas dados públicos processados
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/data/
+          if [ -f public/assets/geocanoas-oficial.webp ]; then
+            git add public/assets/geocanoas-oficial.webp
+          fi
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: atualizar snapshots oficiais de saúde'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+  deploy:
+    needs: [verify, update]
+    if: always() && needs.verify.result == 'success' && (needs.update.result == 'success' || needs.update.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.publication.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependências e gerar o frontend
+        shell: bash
+        run: |
+          if test -f package-lock.json; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+          npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Publicar no GitHub Pages
+        id: publication
+        uses: actions/deploy-pages@v4
