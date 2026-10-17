@@ -4,12 +4,13 @@
 Processa arquivos CSV nacionais em um diretório temporário; somente dados
 agregados de Canoas são persistidos. Não estima SIA/SIH com amostras de API.
 """
-import csv, io, json, logging, os, re, tempfile, zipfile
+import csv, io, json, logging, os, re, tempfile, zipfile, time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from urllib.request import Request,urlopen
+from urllib.error import URLError, HTTPError
 
 ROOT=Path(__file__).resolve().parents[1]
 OUTPUT=ROOT/'public/data/sus.json'
@@ -36,6 +37,21 @@ CONFIG={
    'url':'https://dadosabertos.saude.gov.br/dataset/mgdi-prevencao-do-cancer-de-colo-e-mama/resource/ccmec25a64_csv',
    'method':'Exames citopatológicos de mulheres de 25 a 64 anos por município de realização, conforme a definição MGDI/DATASUS; não equivale a mulheres únicas.'
  },
+ 'consultas_aps_razao':{
+   'file':'mgdi_ms_4iu','label':'Razão de consultas médicas na APS','unit':'por 100 hab.','kind':'rate','cadence':'annual',
+   'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv',
+   'method':'Razão anual de consultas médicas do SUS em estabelecimentos de Atenção Primária por 100 habitantes. Não é contagem total de consultas e não mede consultas individuais.'
+ },
+ 'consultas_especializadas_razao':{
+   'file':'mgdi_ms_0bx','label':'Razão de consultas médicas especializadas','unit':'por habitante','kind':'rate','cadence':'annual',
+   'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_0bx_csv',
+   'method':'Razão de consultas médicas na atenção especializada do SUS por habitante, segundo metodologia RIPSA. Não é total da produção SIA/SUS.'
+ },
+ 'valor_medio_aih':{
+   'file':'ripsa019rc','label':'Valor médio por internação (AIH)','unit':'R$/AIH','kind':'currency','cadence':'annual',
+   'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-recursos-dimensao-3-recursos-financeiros-assistencia-a-saude/resource/ripsa019rc_csv',
+   'method':'Razão entre valores pagos pelo Ministério da Saúde e internações hospitalares SUS autorizadas. Indicador financeiro médio; não é total de internações SIH nem custo clínico real.'
+ },
  'mamografias':{
    'file':'ccmec50a69','label':'Mamografias de rastreamento (50–69 anos)','unit':'exames','kind':'count','cadence':'annual',
    'url':'https://dadosabertos.saude.gov.br/dataset/mgdi-prevencao-do-cancer-de-colo-e-mama/resource/ccmec50a69_csv',
@@ -43,9 +59,6 @@ CONFIG={
  },
 }
 UNVALIDATED={
- 'consultas_aps_razao':{'label':'Consultas médicas na APS por 100 habitantes','unit':'por 100 hab.','status':'not_loaded',
-  'note':'O arquivo municipal oficial excede o limite de segurança da extração integral desta versão. Indicador ainda não validado para Canoas.',
-  'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv'},
  'sih':{'label':'Internações hospitalares SIH/SUS','status':'not_loaded','note':'Arquivos DBC mensais oficiais disponíveis, mas a extração completa em nível municipal não está acessível por HTTPS neste runner; API pública devolveu somente amostra. Sem total estimado.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
  'sia':{'label':'Produção ambulatorial SIA/SUS','status':'not_loaded','note':'Arquivos mensais DBC não acessíveis por HTTPS neste runner; API pública parcial. Indicadores citopatológicos, mamografias e consultas APS publicados separadamente não representam o total do SIA.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
  'pni':{'label':'Cobertura vacinal PNI/RNDS','status':'not_loaded','note':'Sem cálculo de cobertura até validar denominadores, coortes e qualidade da base municipal.','url':'https://opendatasus.saude.gov.br/'}
@@ -75,19 +88,34 @@ def download_records(config):
     path=BASE+config['file']+'.csv.zip'
     with tempfile.TemporaryDirectory(prefix='webgis-mgdi-') as folder:
         target=Path(folder)/'source.zip'
-        with urlopen(Request(path,headers={'User-Agent':'WebGIS-Saude-Canoas/1.2'}),timeout=180) as response,target.open('wb') as stream:
-            size=0
-            while True:
-                chunk=response.read(1024*1024)
-                if not chunk:break
-                size+=len(chunk)
-                if size>35*1024*1024:raise ValueError('ZIP MGDI excede 35 MiB')
-                stream.write(chunk)
+        # Streaming em disco, tentativas com backoff e limites ajustáveis: não carrega ZIP completo na RAM.
+        # Em arquivos de vários anos, 150 MB extraídos era insuficiente, mesmo com origem oficial.
+        max_zip_mb=int(os.getenv('MGDI_MAX_ZIP_MB','350'))
+        last=None
+        for attempt in range(3):
+            try:
+                with urlopen(Request(path,headers={'User-Agent':'WebGIS-Saude-Canoas/1.3','Accept-Encoding':'identity'}),timeout=240) as response,target.open('wb') as stream:
+                    size=0
+                    while True:
+                        chunk=response.read(1024*1024)
+                        if not chunk:break
+                        size+=len(chunk)
+                        if size>max_zip_mb*1024*1024:raise ValueError('ZIP MGDI excede limite configurado')
+                        stream.write(chunk)
+                last=None
+                break
+            except (URLError,TimeoutError,ConnectionError) as exc:
+                last=exc
+                if attempt<2:time.sleep(2**attempt*3)
+        if last is not None:raise last
         if not zipfile.is_zipfile(target):raise ValueError('Recurso MGDI não é ZIP')
         with zipfile.ZipFile(target) as archive:
             items=[m for m in archive.infolist() if m.filename.lower().endswith('.csv')]
             if len(items)!=1:raise ValueError('MGDI: arquivo CSV não único')
-            if items[0].file_size>150*1024*1024:raise ValueError('MGDI: arquivo extraído muito grande')
+            limit_mb=int(os.getenv('MGDI_MAX_CSV_MB','1500'))
+            if items[0].file_size>limit_mb*1024*1024:raise ValueError('MGDI: arquivo CSV acima do limite de '+str(limit_mb)+' MiB')
+            LOG.info('MGDI %s: ZIP validado, CSV de %.1f MiB; leitura incremental em andamento',
+                     config['file'],items[0].file_size/1024/1024)
             with archive.open(items[0]) as raw:
                 preview=raw.peek(16384)[:16384]
                 try:preview.decode('utf-8-sig');codec='utf-8-sig'
@@ -107,6 +135,7 @@ def extract(rows,columns,kind):
     municipalities=set(); scanned=0; cityrows=0; nonempty=0
     for row in rows:
         scanned+=1
+        if scanned>12_000_000:raise ValueError('MGDI: limite de 12 milhões de registros excedido')
         mun=str(row.get('co_ibge') or '').strip()
         if mun:municipalities.add(mun)
         if mun!='430460':continue
