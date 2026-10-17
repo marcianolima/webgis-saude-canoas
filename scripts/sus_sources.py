@@ -66,7 +66,7 @@ CONFIG={
 UNVALIDATED={
  'sih':{'label':'SIH/SUS detalhado por CNES e competência','status':'not_loaded','note':'A contagem anual agregada de internações e o valor médio por AIH da RIPSA estão publicados. Ainda faltam os DBC mensais para internações por CNES, procedimentos, especialidades e competência; o acesso HTTPS ao FTP oficial apresentou timeout.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
  'sia':{'label':'SIA/SUS total detalhado por CNES e procedimento','status':'not_loaded','note':'As razões de consultas APS/especializadas e os exames de rastreamento já estão publicados como indicadores específicos. A produção SIA total por CNES, procedimento e competência depende dos DBC mensais não acessíveis neste runner; a API retornou apenas amostra.','url':'https://datasus.saude.gov.br/assistencia-a-saude/'},
- 'pni':{'label':'Cobertura vacinal PNI/RNDS','status':'not_loaded','note':'Sem cálculo de cobertura até validar denominadores, coortes e qualidade da base municipal.','url':'https://opendatasus.saude.gov.br/'}
+ 'pni':{'label':'Cobertura vacinal PNI/RNDS','status':'not_loaded','note':'Arquivos nacionais mensais oficiais identificados (setembro/2026: cerca de 1,79 GB ZIP), mas o catálogo estadual PySUS consultado não apresentou arquivos RS/2025–2026. Não calcular cobertura sem imunizante, dose, faixa etária e denominador validados.','url':'https://dadosabertos.saude.gov.br/dataset/doses-aplicadas-pelo-programa-de-nacional-de-imunizacoes-pni-2026'}
 }
 def timestamp():return datetime.now(timezone.utc).isoformat(timespec='seconds')
 def decimal_value(raw):
