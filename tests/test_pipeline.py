@@ -95,7 +95,7 @@ class PipelineTests(unittest.TestCase):
             with patch.object(up,'SUMMARY',summary),patch.object(up,'GEO',geo), \
                  patch.object(up,'request_json',side_effect=fake_api),patch.object(up,'get_logo'), \
                  patch.object(up,'latest_bed_competence',return_value=202609), \
-                 patch.object(up,'latest_cnes_competence',return_value=202609), \
+                 patch.object(up,'fetch_cnes_snapshot',return_value=(records,{'national':640000,'municipal':21,'disabled':0,'active':21})), \
                  patch.dict('os.environ',{'SKIP_HEAVY':'true'}):
                 up.run()
             result=json.loads(summary.read_text('utf8'))
@@ -147,6 +147,48 @@ class PipelineTests(unittest.TestCase):
              patch.object(up,'paginate',side_effect=lambda a,b,c,d,consume,e: consume({'co_ibge':430460,'nu_comp':202607,'co_cnes':'101','qt_exist':21,'qt_sus':0}) or 1):
             with self.assertRaisesRegex(ValueError,'somente um estabelecimento'):
                 up.update_beds(s)
+
+    def test_archive_csv_filters_canoas_actives_and_validates_geojson(self):
+        import tempfile,zipfile,csv,io
+        with tempfile.TemporaryDirectory() as folder:
+            dest=Path(folder)/'snapshot.zip'
+            out=io.StringIO()
+            writer=csv.DictWriter(out,fieldnames=['CO_MUNICIPIO_GESTOR','CO_CNES','CO_MOTIVO_DESAB','TP_UNIDADE','TP_UNIDADE_DESC','NO_FANTASIA','NO_BAIRRO','NU_LATITUDE','NU_LONGITUDE'],delimiter=';')
+            writer.writeheader()
+            for i in range(25):
+                writer.writerow({'CO_MUNICIPIO_GESTOR':'430460','CO_CNES':f'{i+100:07d}','CO_MOTIVO_DESAB':'','TP_UNIDADE':'02' if i<20 else '05','NO_FANTASIA':f'Unidade {i}','NO_BAIRRO':'CENTRO','NU_LATITUDE':'-29,92','NU_LONGITUDE':'-51,18'})
+            writer.writerow({'CO_MUNICIPIO_GESTOR':'430460','CO_CNES':'9999999','CO_MOTIVO_DESAB':'08','NO_FANTASIA':'Desabilitado'})
+            writer.writerow({'CO_MUNICIPIO_GESTOR':'431490','CO_CNES':'9999998','CO_MOTIVO_DESAB':'','NO_FANTASIA':'Outro município'})
+            with zipfile.ZipFile(dest,'w') as z:z.writestr('CNES_Estabelecimentos.csv',out.getvalue())
+            rows,q=up.extract_cnes_csv(dest,min_national=20)
+        self.assertEqual(q['municipal'],26)
+        self.assertEqual(q['disabled'],1)
+        self.assertEqual(q['active'],25)
+        self.assertEqual(len(rows),25)
+        geo,stats=up.build_cnes(rows)
+        self.assertEqual(stats['ubs'],20)
+        self.assertEqual(stats['hospitals'],5)
+        self.assertEqual(stats['withCoordinates'],25)
+        self.assertEqual(geo['features'][0]['geometry']['coordinates'],[-51.18,-29.92])
+        self.assertNotIn('9999999',str(geo))
+
+    def test_archive_missing_disable_field_is_rejected(self):
+        import tempfile,zipfile
+        with tempfile.TemporaryDirectory() as folder:
+            z=Path(folder)/'cnes.zip'
+            with zipfile.ZipFile(z,'w') as archive:
+                archive.writestr('estabelecimentos.csv','CO_MUNICIPIO_GESTOR;CO_CNES\n430460;1234567\n')
+            with self.assertRaisesRegex(ValueError,'motivo de desabilitação'):
+                up.extract_cnes_csv(z,min_national=1,min_municipal=1)
+
+    def test_archive_incomplete_cannot_update(self):
+        import tempfile,zipfile
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/'cnes.zip'
+            with zipfile.ZipFile(path,'w') as archive:
+                archive.writestr('estabelecimentos.csv','CO_MUNICIPIO_GESTOR;CO_CNES;CO_MOTIVO_DESAB\n430460;1234567;\n')
+            with self.assertRaisesRegex(ValueError,'incompleto'):
+                up.extract_cnes_csv(path,min_national=2000,min_municipal=1)
 
     def test_source_status_matches_published_indicator(self):
         s=json.loads((ROOT/'public/data/summary.json').read_text())

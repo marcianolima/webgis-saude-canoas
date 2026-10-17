@@ -1,23 +1,51 @@
-# Correção CNES — WebGIS Saúde Canoas
+# WebGIS Saúde Canoas — coleta CNES por arquivo diário (v1.3)
 
-## Diagnóstico confirmado (GitHub Actions)
+## Diagnóstico confirmado no GitHub
 
-- A coleta em `/cnes/estabelecimentos` percorreu 250 páginas de 20 linhas e abortou. O snapshot não foi publicado.
-- A coleta de leitos recebeu um único registro, produzindo 21 leitos e 0 SUS, números que **não são total municipal validado**.
-- O frontend e o deploy foram compilados e publicados corretamente na última Action.
+- A execução **38992904954** terminou com sucesso, mas o **CNES continuou sem estabelecimentos**.
+- O endpoint `/assistencia-a-saude/cnes-estabelecimentos?co_ibge=430460&nu_comp=...` retornou **uma linha por competência**. Essa rota é inadequada para extrair o inventário municipal completo.
+- `public/data/establishments.geojson` permanece como coleção vazia; os dados de leitos atuais não atingiram o limiar de validação e devem permanecer indisponíveis.
 
-## Atualização deste patch
+## O que mudou nesta atualização
 
-- Preferência pela API oficial `/assistencia-a-saude/cnes-estabelecimentos` (até 1000 linhas por página) com `co_ibge=430460` e `nu_comp` (mês de referência), escolhendo a competência recente de estabelecimentos independentemente da competência de leitos.
-- Validação explícita de município, competência, identificador CNES, duplicidade e cobertura geográfica.
-- Rejeita páginas repetidas. Exibe as chaves do primeiro registro no log para diagnosticar divergências de contrato.
-- Revoga automaticamente o agregado anterior de leitos sustentado em apenas um registro; não publica quantidades suspeitas.
-- Novos testes de segurança dos dados (22 testes Python aprovados).
+1. `scripts/update_data.py` passa a baixar o **CSV diário nacional oficial do CNES**, disponível no catálogo [Dados Abertos do SUS](https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude), no job do GitHub Actions. Não é necessário backend próprio.
+2. O arquivo ZIP nacional é processado **localmente no runner**, com leitura gradual das linhas; nenhum arquivo original de âmbito nacional é gravado no repositório.
+3. Seleciona registros com `CO_MUNICIPIO_GESTOR=430460` e `CO_MOTIVO_DESAB` vazio, deduplica por `CO_CNES` e gera apenas os agregados de Canoas.
+4. Classifica estabelecimentos usando `TP_UNIDADE` e nomes de tipo, normaliza coordenadas WGS84 e descarta pontos sem localização plausível. Mantém o total de estabelecimentos mesmo que alguns não tenham coordenadas.
+5. Falha de download, CSV inesperado ou cobertura insuficiente: **não apaga dados anteriores nem inventa quantidades**. Na aba *Actions*, aparecem avisos se CNES ou leitos não tiverem resultado validado.
+6. O frontend e as configurações de mapa não são alterados.
 
-## Publicação
+## Como enviar pelo computador
 
-Substitua apenas os arquivos `scripts/update_data.py` e `tests/test_pipeline.py` dentro da pasta do repositório. NÃO copie a pasta do ZIP por cima da raiz criando uma subpasta extra. Faça commit e push da branch `main`.
+1. Extraia este ZIP **sobre a raiz do repositório**, preservando `.git`, `src/` e `public/data/`.
+2. Confirme a presença destes arquivos:
+   - `scripts/update_data.py`
+   - `tests/test_pipeline.py`
+   - `.github/workflows/update-data.yml`
+3. Execute, se tiver Python 3.12: `python -m unittest discover -s tests -v`.
+4. Commit e push na branch `main`.
+5. O push executará a coleta inicial porque o CNES ainda tem status `error`. No GitHub, verifique `Actions > Verificar, atualizar dados e publicar WebGIS Saúde`.
+6. Se não houver coleta, use **Run workflow**, com a branch `main`.
 
-Execute **Actions → Verificar, atualizar dados e publicar WebGIS Saúde → Run workflow → main**. A execução manual coleta também séries pesadas, portanto pode demorar; use os logs `Atualizar dados públicos de saúde`. Verifique o `sourceInfo.cnes.status`, o `facilities.total` e o número de `features` em `public/data/establishments.geojson`.
+### O que deve aparecer no log, se funcionar
 
-**Limitação**: não foi possível chamar os endpoints reais deste ambiente. É indispensável validar os logs após a primeira execução. Caso a API ignore `nu_comp` ou devolva schema diferente, o sistema interromperá a publicação dos dados em vez de inventar métricas. Envie os primeiros logs para ajustar o adaptador.
+```
+CNES: ZIP nacional baixado, ... MiB
+CNES CSV: codificação detectada ...
+CNES CSV: ... registros nacionais; ... em Canoas; ... desabilitados; ... ativos únicos
+Atualização: ... fonte(s) concluída(s)
+```
+
+Confira os arquivos `public/data/summary.json` (`sourceInfo.cnes.status = ok`, `facilities.total`, `facilities.withCoordinates`) e `public/data/establishments.geojson` (`features` não vazio). Atualize o site com Ctrl+F5.
+
+**Atenção à escala:** o arquivo diário é um retrato, não uma série histórica por competência. Totais de estabelecimentos não equivalem a estabelecimentos do SUS, nem necessariamente a unidades administradas pelo município.
+
+**Fonte principal do ZIP:**
+`https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip`
+
+## Estado de verificação
+
+- 25 testes Python passaram, inclusive processamento de ZIP/CSV sintético e teste ponta a ponta com respostas simuladas.
+- A consulta externa ao ZIP oficial **não foi executada aqui**, por restrição de rede. A primeira Action com este patch confirmará a estrutura efetiva do arquivo, conexão S3, status territorial e números do mapa.
+- **Leitos:** a API de leitos continua retornando amostra insuficiente para uma contagem municipal. Mantemos os quantitativos indisponíveis até integrar fonte completa por competência, sem reaproveitar o número inválido de 21.
+- **Dengue/SIA/SIH:** continuam dependendo de coleta manual/agendada e validação semântica; não devem ser apresentados como zeros enquanto vazios.

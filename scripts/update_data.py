@@ -4,7 +4,7 @@
 Fontes verificadas em https://apidadosabertos.saude.gov.br/static/swagger.json
 Os JSONs só são modificados após extrações completas e validadas.
 """
-import json, os, re, time, logging, math, unicodedata
+import json, os, re, time, logging, math, unicodedata, csv, io, zipfile, tempfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +19,11 @@ GEO = DATA/'establishments.geojson'
 API = 'https://apidadosabertos.saude.gov.br'
 SIDRA = 'https://apisidra.ibge.gov.br/values/t/6579/n6/4304606/v/9324/p/all?formato=json'
 IBGE_6='430460'
+# Fonte oficial: Portal Dados Abertos do SUS, recurso CSV diário do CNES.
+# Um arquivo nacional é processado exclusivamente no GitHub Actions;
+# o site recebe apenas GeoJSON e agregados do município.
+CNES_CSV_URL = 'https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip'
+CNES_CATALOG = 'https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude'
 YEARS = sorted(set(int(x) for x in os.getenv('DATA_YEARS','2025,2026').split(',') if x.strip().isdigit()))
 MAX_PAGES = int(os.getenv('MAX_PAGES_PER_SERIES', '160'))
 LOG=logging.getLogger('webgis')
@@ -211,11 +216,113 @@ def fetch_cnes(competence=None):
         raise ValueError(f'CNES retornou {n} linhas mas só {len(out)} códigos únicos; verifique competências e paginação')
     return list(out.values()),n
 
+def download_cnes_zip(url=CNES_CSV_URL, destination=None, max_bytes=150*1024*1024):
+    """Baixa ZIP oficial para disco temporário, limitando tráfego e sem microdados em Git.
+
+    O tamanho máximo se refere ao ZIP compactado; o CSV é lido linha a linha.
+    """
+    if destination is None:raise ValueError('Caminho de destino obrigatório')
+    request=Request(url,headers={'User-Agent':'WebGISSaudeCanoas/1.2 (dados abertos)', 'Accept':'application/zip,*/*'})
+    with urlopen(request,timeout=240) as r, open(destination,'wb') as out:
+        length=int(r.headers.get('Content-Length','0') or 0)
+        if length>max_bytes:raise ValueError(f'CNES ZIP maior que {max_bytes} bytes')
+        count=0
+        while True:
+            block=r.read(1024*1024)
+            if not block:break
+            count+=len(block)
+            if count>max_bytes:raise ValueError('CNES ZIP excede limite de tamanho permitido')
+            out.write(block)
+    if not zipfile.is_zipfile(destination):raise ValueError('Recurso CNES não retornou um ZIP válido')
+    LOG.info('CNES: ZIP nacional baixado, %.1f MiB',count/1048576)
+    return destination
+
+
+def _choose_csv_member(archive):
+    members=[x for x in archive.infolist() if not x.is_dir() and x.filename.lower().endswith('.csv')]
+    if not members:raise ValueError('ZIP oficial do CNES sem arquivo CSV')
+    candidates=[x for x in members if 'estabelec' in x.filename.lower()]
+    if candidates:members=candidates
+    members.sort(key=lambda x:x.file_size,reverse=True)
+    chosen=members[0]
+    if chosen.file_size>1500*1024*1024:raise ValueError('CSV CNES maior que o limite de segurança')
+    if chosen.file_size<20:raise ValueError('CSV CNES vazio ou suspeito')
+    return chosen
+
+
+def extract_cnes_csv(zip_path, min_municipal=20, min_national=1000):
+    """Varre CSV nacional com memória constante, filtrando Canoas e registros ativos.
+
+    Nunca publica contagens baseadas em amostras ou cabeçalhos incompatíveis.
+    Apenas linhas do município ficam em memória; não publica identificadores pessoais.
+    """
+    with zipfile.ZipFile(zip_path) as archive:
+        item=_choose_csv_member(archive)
+        with archive.open(item) as raw:
+            # Os exports CNES podem usar UTF-8 ou Windows-1252.
+            # detectamos o encoding a partir dos primeiros bytes sem ler o ZIP
+            # inteiro para a memória.
+            preview=raw.peek(16384)[:16384]
+            try:
+                preview.decode('utf-8-sig')
+                charset='utf-8-sig'
+            except UnicodeDecodeError:
+                charset='cp1252'
+            LOG.info('CNES CSV: codificação detectada %s',charset)
+            text=io.TextIOWrapper(raw,encoding=charset,errors='replace',newline='')
+            first=text.readline()
+            if not first:raise ValueError('Arquivo CSV CNES sem cabeçalho')
+            delimiter=';' if first.count(';')>first.count(',') else ','
+            headers=[h.strip().lstrip('\ufeff') for h in next(csv.reader([first],delimiter=delimiter))]
+            canon={h.upper() for h in headers}
+            if not ({'CO_MUNICIPIO_GESTOR','CODIGO_MUNICIPIO'} & canon):
+                raise ValueError('CNES CSV sem campo municipal: '+str(headers[:25]))
+            if not ({'CO_CNES','CODIGO_CNES','CNES'} & canon):
+                raise ValueError('CNES CSV sem código do estabelecimento: '+str(headers[:25]))
+            if 'CO_MOTIVO_DESAB' not in canon:
+                raise ValueError('CNES CSV não informa motivo de desabilitação; não é seguro contar ativos')
+            reader=csv.DictReader(text,fieldnames=headers,delimiter=delimiter)
+            all_rows=0;municipal=0;inactive=0;out={}
+            for original in reader:
+                all_rows+=1
+                row={str(k).strip().upper():v for k,v in original.items() if k is not None}
+                if not valid_canoas(row):continue
+                municipal+=1
+                disabled=str(pick(row,'CO_MOTIVO_DESAB') or '').strip().upper()
+                if disabled not in ('','NULL','NONE','NAN','0','00'):
+                    inactive+=1;continue
+                cn=str(pick(row,'CO_CNES','CODIGO_CNES','CNES') or '').strip()
+                if not cn.isdigit():raise ValueError('CNES: código de estabelecimento inválido em Canoas')
+                # Não duplicar uma unidade se houver linhas repetidas no arquivo.
+                out[cn.zfill(7)]=row
+            LOG.info('CNES CSV: %s registros nacionais; %s em Canoas; %s desabilitados; %s ativos únicos',all_rows,municipal,inactive,len(out))
+            if all_rows<min_national:raise ValueError(f'CNES CSV incompleto: só {all_rows} linhas nacionais')
+            if municipal<min_municipal or len(out)<min_municipal:
+                raise ValueError(f'CNES CSV não confirmou cobertura municipal suficiente: {municipal} linhas, {len(out)} ativos')
+            return list(out.values()),{'national':all_rows,'municipal':municipal,'disabled':inactive,'active':len(out)}
+
+
+def fetch_cnes_snapshot():
+    """Fonte primária para retrato territorial: arquivo CSV diário oficial."""
+    with tempfile.TemporaryDirectory(prefix='webgis-cnes-') as directory:
+        filename=Path(directory)/'cnes.zip'
+        download_cnes_zip(destination=filename)
+        return extract_cnes_csv(filename)
+
+
 def build_cnes(rows):
     points=[];kinds=Counter();bairros=Counter();ubs=hosp=0
     for r in rows:
-        kind=str(pick(r,'descricao_tipo_unidade','tipo_unidade','tipo_estabelecimento','ds_tipo_unidade','estabelecimento_tipo_unidade','ds_tipo_estabelecimento','no_tipo_estabelecimento','ds_tp_unidade') or 'Não informado')
-        cat=normalize_type(kind)
+        kind=str(pick(r,'descricao_tipo_unidade','tipo_unidade','tipo_estabelecimento','ds_tipo_unidade','estabelecimento_tipo_unidade','ds_tipo_estabelecimento','no_tipo_estabelecimento','ds_tp_unidade','tp_unidade_desc') or 'Não informado')
+        type_code=str(pick(r,'tp_unidade','co_tipo_unidade') or '').strip().zfill(2)
+        if kind == 'Não informado':
+            named={'01':'Posto de saúde','02':'Centro de saúde/UBS','05':'Hospital geral',
+                   '07':'Hospital especializado','20':'Pronto-socorro geral','21':'Pronto-socorro especializado',
+                   '73':'Pronto atendimento','36':'Clínica/centro de especialidade'}
+            kind=named.get(type_code,'Tipo CNES '+type_code)
+        cat=('ubs' if type_code in ('01','02') else
+             'hospital' if type_code in ('05','07') else
+             'urgencia' if type_code in ('20','21','73') else normalize_type(kind))
         kinds[kind]+=1
         ubs+=cat=='ubs';hosp+=cat=='hospital'
         bairro=str(pick(r,'bairro_estabelecimento','bairro','no_bairro','no_bairro_estabelecimento') or 'Não informado')
@@ -227,7 +334,7 @@ def build_cnes(rows):
         if not(-30.1<lat<-29.73 and -51.4<lng<-50.99):continue
         number=str(pick(r,'numero_estabelecimento','numero','nu_endereco','nu_numero') or '')
         street=str(pick(r,'endereco_estabelecimento','logradouro','no_logradouro','no_logr') or '')
-        sus=pick(r,'vinculo_sus','estabelecimento_faz_atendimento_sus','atendimento_sus')
+        sus=pick(r,'vinculo_sus','estabelecimento_faz_atendimento_sus','atendimento_sus','co_ambulatorial_sus')
         sus_bool=True if str(sus).lower() in ('1','s','sim','true') else False if str(sus).lower() in ('0','n','nao','não','false') else None
         code=str(pick(r,'codigo_cnes','co_cnes','cnes'))
         points.append({'type':'Feature','id':code,'geometry':{'type':'Point','coordinates':[round(lng,6),round(lat,6)]},'properties':{'cnes':code,'name':str(pick(r,'nome_fantasia','no_fantasia','estabelecimento_nome_fantasia','no_fantasia_estabelecimento') or 'Estabelecimento CNES'),'type':kind,'category':cat,'address':', '.join(x for x in (street,number) if x),'neighborhood':bairro,'phone':str(pick(r,'numero_telefone_estabelecimento','telefone','nu_telefone') or ''),'hasBeds':None,'sus':sus_bool}})
@@ -353,13 +460,18 @@ def run():
         try:call();success+=1
         except Exception as e:fail(s,key,e)
     try:
-        competence=latest_cnes_competence()
-        rows,n=fetch_cnes(competence);geo,stats=build_cnes(rows)
-        if not geo['features']:raise ValueError('CNES sem pontos geográficos válidos')
+        rows,quality=fetch_cnes_snapshot()
+        geo,stats=build_cnes(rows)
         if len(geo['features'])<10:
-            raise ValueError('CNES possui menos de 10 pontos com coordenadas válidas; verificar esquema')
+            raise ValueError('CNES CSV retornou menos de 10 pontos válidos; conferir coordenadas')
+        # Após validação integral, publicamos ambos os arquivos.
         write_json(GEO,geo);s['facilities']=stats
-        mark(s,'cnes',f'Competência {competence} · coleta {now()[:10]}',n);success+=1
+        s['sourceInfo']['cnes']['url']=CNES_CATALOG
+        mark(s,'cnes',f'Retrato diário CNES · captura {now()[:10]} (sem competência mensal)',len(rows))
+        s['sourceInfo']['cnes']['note']=(
+            f"CSV nacional validado: {quality['national']} linhas; {quality['municipal']} em Canoas; "
+            f"{quality['disabled']} desabilitados excluídos; {len(geo['features'])} com localização.")
+        success+=1
     except Exception as e:fail(s,'cnes',e)
     # Revoga o número anteriormente publicado sem validação (uma única linha).
     old=s.get('sourceInfo',{}).get('beds',{})
