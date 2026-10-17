@@ -59,7 +59,7 @@ export async function mountProduction(dark:boolean){
    '<label class="text-xs font-semibold">Medida <select id="production-metric" class="field w-full mt-1"><option value="quantity">Quantidade</option><option value="valueBRL">Valor (R$)</option></select></label>'+
    '<label class="text-xs font-semibold">Abrangência <select id="production-scope" class="field w-full mt-1">'+
     '<option value="municipal">Município de Canoas</option>'+
-    (chosen?'<option value="facility">Estabelecimento · CNES '+safe(chosen.cnes)+'</option>':'')+
+    (chosen?'<option value="facility" selected>Estabelecimento · CNES '+safe(chosen.cnes)+'</option>':'')+
    '</select></label></div>'+
    '<div id="production-chart" role="img" aria-label="Gráfico de produção SUS por mês" style="height:310px;min-height:310px" class="mt-4"></div>'+
    '<div id="production-notes" class="text-xs text-slate-500 dark:text-slate-300 mt-4"></div></section>'+
