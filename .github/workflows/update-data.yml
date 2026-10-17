@@ -39,6 +39,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Diagnosticar dimensões dos novos indicadores RIPSA (temporário)
+        if: github.event_name == 'push'
+        timeout-minutes: 8
+        continue-on-error: true
+        run: python -m scripts.probe_ripsa_dimensions
       - name: Decidir se a coleta é necessária
         id: decide
         shell: bash
