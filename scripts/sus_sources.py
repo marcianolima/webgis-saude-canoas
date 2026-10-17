@@ -4,7 +4,7 @@
 Processa arquivos CSV nacionais em um diretório temporário; somente dados
 agregados de Canoas são persistidos. Não estima SIA/SIH com amostras de API.
 """
-import csv, io, json, logging, os, re, tempfile, zipfile, time
+import csv, io, json, logging, os, re, tempfile, zipfile, time, unicodedata
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
@@ -38,17 +38,22 @@ CONFIG={
    'method':'Exames citopatológicos de mulheres de 25 a 64 anos por município de realização, conforme a definição MGDI/DATASUS; não equivale a mulheres únicas.'
  },
  'consultas_aps_razao':{
-   'file':'mgdi_ms_4iu','label':'Razão de consultas médicas na APS','unit':'por 100 hab.','kind':'rate','cadence':'annual',
+   'file':'mgdi_ms_4iu','label':'Razão de consultas médicas na APS','unit':'por 100 hab.','kind':'rate','cadence':'annual','category':'TC',
    'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv',
    'method':'Razão anual de consultas médicas do SUS em estabelecimentos de Atenção Primária por 100 habitantes. Não é contagem total de consultas e não mede consultas individuais.'
  },
  'consultas_especializadas_razao':{
-   'file':'mgdi_ms_0bx','label':'Razão de consultas médicas especializadas','unit':'por habitante','kind':'rate','cadence':'annual',
+   'file':'mgdi_ms_0bx','label':'Razão de consultas médicas especializadas','unit':'por habitante','kind':'rate','cadence':'annual','category':'TC',
    'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_0bx_csv',
    'method':'Razão de consultas médicas na atenção especializada do SUS por habitante, segundo metodologia RIPSA. Não é total da produção SIA/SUS.'
  },
+ 'sih_internacoes_anuais':{
+   'file':'ripsa019rc','label':'Internações hospitalares SUS (AIHs)','unit':'internações','kind':'count','cadence':'annual','parser':'ripsa_aih',
+   'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-recursos-dimensao-3-recursos-financeiros-assistencia-a-saude/resource/ripsa019rc_csv',
+   'method':'Denominador anual do indicador RIPSA REC.3.02: número de internações hospitalares SUS no município de ocorrência. Contagem de internações autorizadas, não pacientes distintos nem origem residencial.'
+ },
  'valor_medio_aih':{
-   'file':'ripsa019rc','label':'Valor médio por internação (AIH)','unit':'R$/AIH','kind':'currency','cadence':'annual',
+   'file':'ripsa019rc','label':'Valor médio por internação (AIH)','unit':'R$/AIH','kind':'currency','cadence':'annual','parser':'ripsa_aih',
    'url':'https://dadosabertos.saude.gov.br/dataset/ripsa-recursos-dimensao-3-recursos-financeiros-assistencia-a-saude/resource/ripsa019rc_csv',
    'method':'Razão entre valores pagos pelo Ministério da Saúde e internações hospitalares SUS autorizadas. Indicador financeiro médio; não é total de internações SIH nem custo clínico real.'
  },
@@ -127,7 +132,7 @@ def download_records(config):
                 if len(keys)!=len(set(keys)):raise ValueError('MGDI: colunas duplicadas')
                 yield keys,csv.DictReader(stream,fieldnames=keys,delimiter=delim)
 
-def extract(rows,columns,kind):
+def extract(rows,columns,kind,category=None):
     required={'co_ibge','co_anomes','vl_indicador_calculado_mun'}
     if not required.issubset(columns):
         raise ValueError('MGDI sem colunas municipais/temporais: '+str(sorted(required-set(columns))))
@@ -139,6 +144,9 @@ def extract(rows,columns,kind):
         mun=str(row.get('co_ibge') or '').strip()
         if mun:municipalities.add(mun)
         if mun!='430460':continue
+        if category is not None:
+            if 'sg_categoria' not in columns:raise ValueError('MGDI: filtro de categoria solicitado sem coluna sg_categoria')
+            if str(row.get('sg_categoria') or '').strip().upper()!=category:continue
         cityrows+=1
         period=period_value(row.get('co_anomes'))
         if not period:raise ValueError('MGDI: competência inválida em Canoas')
@@ -160,6 +168,47 @@ def extract(rows,columns,kind):
             'totalPeriods':len(periods),'earliest':periods[0],'latest':periods[-1],
             'lastValue':result[periods[-1]],'scanned':scanned,'municipalRecords':cityrows,
             'valuedMunicipalRecords':nonempty}
+
+def extract_ripsa_aih(rows,columns,kind):
+    """Processa a base oficial RIPSA REC.3.02: anual, município de ocorrência.
+    
+    Publica numerador/denominador sem somar subgrupos, nunca microdados.
+    """
+    def unaccent(value):
+        return ''.join(c for c in unicodedata.normalize('NFKD',str(value or '')) if not unicodedata.combining(c)).lower()
+    keys={unaccent(k):k for k in columns}
+    required=('indicador','municipio','ano','denominador - numero de internacoes hospitalares','numerador - valor de internacoes hospitalares','multiplicador')
+    absent=[k for k in required if k not in keys]
+    if absent:raise ValueError('RIPSA AIH: colunas essenciais ausentes: '+str(absent))
+    city={};all_regions=set();count=0;city_count=0
+    for row in rows:
+        count+=1
+        if count>2_000_000:raise ValueError('RIPSA: quantidade de linhas inesperada')
+        municipal=str(row.get(keys['municipio']) or '').strip()
+        if municipal:all_regions.add(municipal)
+        if municipal not in ('430460','4304606'):continue
+        if str(row.get(keys['indicador']) or '').strip().upper()!='REC.3.02':continue
+        city_count+=1
+        year=str(row.get(keys['ano']) or '').strip()
+        if not re.fullmatch(r'(?:19|20)\d{2}',year):raise ValueError('RIPSA: ano municipal inválido')
+        total=decimal_value(row.get(keys['denominador - numero de internacoes hospitalares']))
+        amount=decimal_value(row.get(keys['numerador - valor de internacoes hospitalares']))
+        multiplier=decimal_value(row.get(keys['multiplicador']))
+        if total is None or amount is None or multiplier is None:
+            raise ValueError('RIPSA: numerador, denominador ou multiplicador ausente')
+        if total<=0 or total!=total.to_integral_value() or amount<0 or multiplier<=0:
+            raise ValueError('RIPSA: hospitalizações, pagamentos ou fator inválidos')
+        value=int(total) if kind=='count' else float(round((amount/total)*multiplier,2))
+        old=city.get(year)
+        if old is not None and old!=value:raise ValueError('RIPSA: valores duplicados divergentes para ano municipal '+year)
+        city[year]=value
+    if count<500 or len(all_regions)<100:raise ValueError('RIPSA: cobertura nacional insuficiente')
+    if not city or len(city)<3:raise ValueError('RIPSA: sem histórico anual municipal suficiente')
+    years=sorted(city)
+    return {'series':[{'period':y,'value':city[y]} for y in years[-24:]],
+      'totalPeriods':len(years),'earliest':years[0],'latest':years[-1],
+      'lastValue':city[years[-1]],'scanned':count,'municipalRecords':city_count,
+      'valuedMunicipalRecords':len(city)}
 
 def read_data():
     try:
@@ -185,7 +234,8 @@ def run():
             except (TypeError,ValueError,KeyError):pass
         try:
             with download_records(conf) as (columns,rows):
-                parsed=extract(rows,columns,conf['kind'])
+                parsed=(extract_ripsa_aih(rows,columns,conf['kind']) if conf.get('parser')=='ripsa_aih'
+                        else extract(rows,columns,conf['kind'],category=conf.get('category')))
             source={'label':conf['label'],'unit':conf['unit'],'kind':conf['kind'],
                     'cadence':conf.get('cadence','monthly'),'url':conf['url'],
                     'method':conf['method'],'status':'ok','retrievedAt':timestamp(),
