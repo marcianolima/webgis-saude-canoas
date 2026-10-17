@@ -31,6 +31,17 @@ class HealthSourcesV1Tests(unittest.TestCase):
         rows +=[{'CODMUNRES':'431490','TIPOBITO':'2','CAUSABAS':'I21'}]*10000
         r=h.aggregate(iter(rows),'sim',2024,['CODMUNRES','TIPOBITO','CAUSABAS'])
         self.assertEqual(r['value'],220)
+    def test_chikungunya_residence_filter(self):
+        rows=[{'ID_MN_RESI':'430460','NU_ANO':'2026'}]*11
+        rows += [{'ID_MN_RESI':'431490','NU_ANO':'2026'}]*11000
+        result=h.aggregate(iter(rows),'chikungunya',2026,['ID_MN_RESI','NU_ANO'])
+        self.assertEqual(result['value'],11)
+        h.check_consistency('chikungunya',result)
+    def test_zika_national_dataset_without_municipal_notifications(self):
+        rows=[{'ID_MN_RESI':'431490','NU_ANO':'2026'}]*11000
+        result=h.aggregate(iter(rows),'zika',2026,['ID_MN_RESI','NU_ANO'])
+        self.assertEqual(result['value'],0)
+        h.check_consistency('zika',result)
     def test_missing_required_field(self):
         with self.assertRaisesRegex(ValueError,'obrigatórias'):h.aggregate(iter([]),'dengue',2026,['ID_MN_RESI'])
     def test_inconsistent_total(self):

@@ -4,7 +4,7 @@ import type {DataSummary} from './types';
 type Entry={year:number;value:number;provisional?:boolean;scanned:number;breakdown:Record<string,number>};
 type Source={label:string;url:string;status:string;note:string;retrievedAt:string|null};
 type Snapshot={updatedAt:string|null;series:Record<string,Entry[]>;sources:Record<string,Source>;definitions:Record<string,string>};
-const LABELS:Record<string,string>={dengue:'Notificações de dengue',sinasc:'Nascidos vivos',sim:'Óbitos não fetais',sia:'Produção ambulatorial',sih:'Produção hospitalar'};
+const LABELS:Record<string,string>={dengue:'Notificações de dengue',chikungunya:'Chikungunya',zika:'Zika',sinasc:'Nascidos vivos',sim:'Óbitos não fetais',sia:'Produção ambulatorial',sih:'Produção hospitalar'};
 let active=0;
 let instance:any=null;
 let resize:ResizeObserver|null=null;
@@ -50,9 +50,9 @@ export async function mountHealth(dark:boolean,summary:DataSummary){
   const data=await response.json() as Snapshot;
   if(!data||typeof data.series!=='object'||typeof data.sources!=='object')throw new Error('Estrutura inválida');
   if(token!==active||!panel.isConnected)return;
-  const keys=['dengue','sinasc','sim'];
+  const keys=['dengue','chikungunya','zika','sinasc','sim'];
   const available=keys.filter(k=>(data.series[k]||[]).length>0);
-  status.innerHTML='<div class="flex flex-wrap items-center justify-between gap-3"><strong>'+available.length+' de 3 séries prioritárias disponíveis</strong>'+
+  status.innerHTML='<div class="flex flex-wrap items-center justify-between gap-3"><strong>'+available.length+' de 5 séries monitoradas disponíveis</strong>'+
    '<span class="text-xs text-slate-500 dark:text-slate-300">Extração: '+safe(fmtDate(data.updatedAt))+' · Somente dados agregados</span></div>';
   const other=Object.entries(data.sources).filter(([k])=>!keys.includes(k));
   panel.innerHTML='<section aria-label="Indicadores principais" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">'+keys.map(k=>statCard(k,data)).join('')+'</section>'+

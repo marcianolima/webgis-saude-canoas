@@ -24,6 +24,18 @@ CONFIG={
    'municipality':'ID_MN_RESI','required':('ID_MN_RESI','NU_ANO','CLASSI_FIN'),
    'method':'Notificações registradas no SINAN de residentes de Canoas, independentemente da classificação final. Não equivalem a casos confirmados.'
  },
+ 'chikungunya':{
+   'title':'Notificações de chikungunya (residentes)','catalog':'https://dadosabertos.saude.gov.br/dataset/arboviroses-febre-de-chikungunya',
+   'years':{2025:S3+'/SINAN/Chikungunya/csv/CHIKBR25.csv.zip',2026:S3+'/SINAN/Chikungunya/csv/CHIKBR26.csv.zip'},
+   'municipality':'ID_MN_RESI','required':('ID_MN_RESI','NU_ANO'),
+   'method':'Notificações SINAN de chikungunya em residentes de Canoas, incluindo suspeitas; não equivalem a casos confirmados.'
+ },
+ 'zika':{
+   'title':'Notificações de Zika (residentes)','catalog':'https://dadosabertos.saude.gov.br/dataset/arboviroses-zika-virus',
+   'years':{2025:S3+'/SINAN/Zikavirus/csv/ZIKABR25.csv.zip',2026:S3+'/SINAN/Zikavirus/csv/ZIKABR26.csv.zip'},
+   'municipality':'ID_MN_RESI','required':('ID_MN_RESI','NU_ANO'),
+   'method':'Notificações SINAN de Zika em residentes de Canoas, independentemente da confirmação.'
+ },
  'sinasc':{
    'title':'Nascidos vivos de mães residentes','catalog':'https://dadosabertos.saude.gov.br/dataset/sistema-de-informacao-sobre-nascidos-vivos-sinasc',
    'years':{
@@ -44,8 +56,6 @@ CONFIG={
 ADDITIONAL={
  'sia':('Produção ambulatorial (SIA/SUS)','https://apidadosabertos.saude.gov.br/','API testada: resposta limitada a uma linha por consulta; cobertura municipal não comprovada.'),
  'sih':('Produção hospitalar (SIH/SUS)','https://apidadosabertos.saude.gov.br/','API testada: resposta limitada a uma linha por consulta; cobertura municipal não comprovada.'),
- 'chikungunya':('Febre de chikungunya','https://dadosabertos.saude.gov.br/dataset/arboviroses-febre-de-chikungunya','Fonte anual identificada; conexão municipal ainda não validada nesta versão.'),
- 'zika':('Vírus Zika','https://dadosabertos.saude.gov.br/dataset/arboviroses-zika-virus','Fonte anual identificada; conexão municipal ainda não validada nesta versão.'),
  'pni':('Vacinação (PNI/RNDS)','https://opendatasus.saude.gov.br/','Arquivos mensais volumosos; sem denominador e método municipal validados, nenhuma cobertura é estimada.'),
  'aps':('Atenção Primária (e-SUS APS/PEC)','https://sisab.saude.gov.br/','Dados clínicos locais exigem integração institucional autorizada; não são dados públicos exportáveis automaticamente.')
 }
@@ -96,7 +106,7 @@ def aggregate(rows,kind,year,fields):
     for r in rows:
         scanned+=1
         if not municipal(r.get(spec['municipality'])):continue
-        if kind=='dengue':
+        if kind in ('dengue','chikungunya','zika'):
             observed=str(r.get('NU_ANO') or '').strip()
             if observed and observed!=str(year):continue
         if kind=='sim' and str(r.get('TIPOBITO') or '').strip()!='2':
@@ -110,7 +120,6 @@ def aggregate(rows,kind,year,fields):
             if delivery in ('1','2'):classes['parto_'+('vaginal' if delivery=='1' else 'cesarea')]=classes.get('parto_'+('vaginal' if delivery=='1' else 'cesarea'),0)+1
     if scanned<10000:raise ValueError('Extrato nacional inesperadamente pequeno; rejeitado')
     if kind in ('sinasc','sim') and city_count<100:raise ValueError('Cobertura municipal insuficiente no extrato anual')
-    if kind=='dengue' and city_count<0:raise ValueError('Indicador inválido')
     return {'year':year,'value':city_count,'scanned':scanned,'breakdown':classes,'residence':True,'provisional':year>=2025 if kind in ('sinasc','sim') else year==datetime.now(timezone.utc).year}
 
 def blank():
@@ -142,11 +151,21 @@ def run():
         old={int(r['year']):r for r in data.get('series',{}).get(kind,[]) if isinstance(r,dict) and r.get('year')}
         failures=[]
         for year,url in spec['years'].items():
-            if year in old and not force and year<datetime.now(timezone.utc).year:continue
+            if year in old and not force:
+                # Preliminares e arboviroses atualizam pelo menos semanalmente;
+                # dados consolidados são rechecados mensalmente.
+                refreshed=old[year].get('retrievedAt')
+                try:
+                    last=datetime.fromisoformat(refreshed) if refreshed else None
+                    threshold=7 if (old[year].get('provisional') or kind in ('dengue','chikungunya','zika')) else 30
+                    if last and (datetime.now(timezone.utc)-last).days<threshold:continue
+                except (TypeError,ValueError):
+                    pass
             try:
                 with read_zip_csv(url) as (fields,rows):
                     entry=aggregate(rows,kind,year,fields)
                 check_consistency(kind,entry)
+                entry['retrievedAt']=utcnow()
                 old[year]=entry
                 successes+=1
                 success_this_source+=1
