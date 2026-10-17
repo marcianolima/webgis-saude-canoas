@@ -94,7 +94,12 @@ def fetch_parquet(system,period):
     if len(matching)!=1:raise ValueError("Arquivo mensal RD/PA ausente ou duplicado: "+prefix)
     local=bag.download_one(matching[0])
     paths=[]
-    if isinstance(local,(list,tuple)):paths=[Path(str(getattr(x,"path",x))) for x in local]
+    # PySUS FileBag.download_one retorna objeto Parquet com atributo .path;
+    # esse objeto é iterável, mas a iteração NÃO representa arquivos.
+    single=getattr(local,"path",None)
+    if single is not None and Path(str(single)).exists():
+        paths=[Path(str(single))]
+    elif isinstance(local,(list,tuple)):paths=[Path(str(getattr(x,"path",x))) for x in local]
     elif hasattr(local,"__iter__") and not isinstance(local,(str,bytes)):
         paths=[Path(str(getattr(x,"path",x))) for x in local]
     elif local:paths=[Path(str(getattr(local,"path",local)))]
