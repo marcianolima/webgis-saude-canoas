@@ -1,4 +1,4 @@
-# WebGIS Saúde Canoas — V1.2
+# WebGIS Saúde Canoas — V1.3
 
 Aplicação pública territorial sobre Canoas/RS, código IBGE 4304606.
 
@@ -122,3 +122,31 @@ O recurso oficial RIPSA `ripsa019rc.csv.zip`, indicador REC.3.02, apresenta por 
 Fontes: https://dadosabertos.saude.gov.br/dataset/ripsa-recursos-dimensao-3-recursos-financeiros-assistencia-a-saude/resource/ripsa019rc_csv e https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv.
 
 **Correção de unidade COB.1.02:** o Ministério da Saúde/RIPSA define a razão de consultas na atenção especializada **por 100 habitantes** (não por habitante). O arquivo `sus.json` e o painel exibem esta unidade, preservando a série de 43,18/100 hab. em 2024. Fontes: https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_0bx_json e https://tabnetbd.saude.gov.br/cgi/idb2025/.
+
+## Integrações complementares de saúde — outubro de 2026
+
+### Produção hospitalar e ambulatorial por CNES
+
+A aplicação ganhou a seção **Produção SIH/SIA**, com histórico mensal extraído dos arquivos públicos Parquet do PySUS 2.11.7 (espelho de arquivos originais DATASUS), filtrados por município do estabelecimento **Canoas, 430460**. A atualização é executada no GitHub Actions e o arquivo `public/data/production.json` contém **somente agregados por competência e CNES**; informações pessoais não são persistidas nem publicadas.
+
+- **SIH/SUS, arquivo RD:** quantidade mensal de AIHs reduzidas e soma do campo `VAL_TOT` por município de internação e CNES. Não são pessoas únicas ou internações por município de residência.
+- **SIA/SUS, arquivo PA:** quantidade de procedimentos aprovados `PA_QTDAPR` e valores aprovados `PA_VALAPR`, por município do estabelecimento e CNES. **Não é a produção integral de todos os instrumentos do SIA**, como APAC e BPA, e não são pacientes únicos.
+- Grupos individuais por CNES com menos de cinco unidades de produção não são divulgados. Os agregados municipais incluem todas as linhas elegíveis, inclusive as de grupos suprimidos na comparação individual.
+- São fornecidas lista de competências efetivamente disponíveis, valores em reais, filtros por CNES, gráficos, tabelas e exportação CSV. **Não extrapolar totais anuais de meses parciais.** O workflow continuará tentando competências ainda ausentes, respeitando os limites e as condições do espelho de dados.
+- A análise no **Painel Municipal** é independente da seleção de estabelecimento; a página individual pode adotar o CNES selecionado.
+
+A versão inicial comprovou 15 competências SIH/RD e 13 competências SIA/PA no intervalo iniciado em janeiro de 2025. Lacunas de acesso ou competência não são substituídas por zero. A quantidade de períodos varia com novas coletas e deve ser conferida nos metadados publicados.
+
+### Indicadores históricos SISAB / Previne Brasil
+
+Integração de séries municipais históricas dos arquivos `sisab_indicador_desempenho_2024Q1.csv.zip`, `2024Q2` e `2024Q3`, com visão **geral** do município (sem agregar linhas das visões de equipes válidas ou homologadas). São mantidos os percentuais oficiais de pré-natal, exames de sífilis e HIV em gestantes, odontologia da gestante, exames citopatológicos, vacinação infantil e acompanhamento de diabetes. Essas medidas seguem o modelo **Previne Brasil antigo**, não representam o modelo atual de financiamento da APS e não substituem coberturas vacinais PNI.
+
+Os agregados históricos constam em `public/data/aps.json` e no painel municipal. O script `scripts/aps_sisab.py` verifica município, quadrimestre, visão geral, porcentagem, numerador e denominador.
+
+### Vacinação (PNI/RNDS): limite ainda não resolvido
+
+O recurso nacional de setembro de 2026 está disponível, mas contém aproximadamente 1,79 GB **compactados**. O espelho PNI consultado pelo PySUS não retornou arquivos estaduais para RS/2025 ou RS/2026. Ainda não há uma cobertura vacinal municipal validada. A futura coleta terá de filtrar o conjunto bruto em processamento externo e definir imunizante, dose, faixa etária e denominador apropriados; nenhum valor ausente é publicado como zero.
+
+### Atualização da qualidade das fontes
+
+A área **Sobre os dados** unifica fontes e indicadores CNES, IBGE, SINAN, SIM, SINASC, MGDI/RIPSA, SISAB e produção SIH/SIA, com filtro por estado de coleta, metadados e exportação. O projeto tem testes de regressão para assegurar que o total municipal seja superior ou igual à soma dos grupos CNES divulgados e que não existam identificadores pessoais nos snapshots.
