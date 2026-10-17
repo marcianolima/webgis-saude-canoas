@@ -5,6 +5,7 @@ Utiliza exclusivamente a visão 'geral' de cada indicador; não mistura
 visões de equipes, não produz métricas atuais do novo modelo de financiamento.
 """
 import csv, io, json, logging, os, re, tempfile, urllib.request, zipfile
+from contextlib import contextmanager
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
 from pathlib import Path
@@ -72,6 +73,7 @@ def extract(rows,fields,period):
     if local<6 or len(result)<5:raise ValueError("SISAB: cobertura municipal insuficiente")
     return result,{"scanned":scanned,"municipalRows":local,"municipalIndicators":len(result)}
 
+@contextmanager
 def iter_csv(url):
     """Iterador cujo ZIP permanece aberto durante a leitura."""
     with tempfile.TemporaryDirectory(prefix="sisab-") as d:
@@ -107,8 +109,8 @@ def run():
         if any(any(row.get("period")==period for row in values) for values in doc["series"].values()):
             continue
         try:
-            (fields,rows),=iter_csv(url)
-            amounts,quality=extract(rows,fields,period)
+            with iter_csv(url) as (fields,rows):
+                amounts,quality=extract(rows,fields,period)
             for code,value in amounts.items():
                 key,label,method=DESCRIPTIONS[code]
                 doc["series"].setdefault(key,[]).append({"period":period,"value":value})

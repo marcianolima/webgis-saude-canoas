@@ -12,7 +12,7 @@ class SISABTests(unittest.TestCase):
     def test_quadrimestre_uses_only_general_municipal_percentage(self):
         fields=["ibge","ds_quadrimestre","nu_competencia","co_tipo_indicador",
                 "visao_equipe","vl_perc_quad","numerador","denominador_utilizador"]
-        rows=[self.example(str(400000+i),"40","geral",27) for i in range(450)]
+        rows=[self.example(str(500000+i),"40","geral",27) for i in range(31000)]
         rows +=[self.example("430460",kind,"geral",27) for kind in ("10","20","30","40","50","70")]
         rows +=[self.example("430460",kind,"validas",27) for kind in ("10","20","30","40","50","70")]
         amounts,quality=m.extract(iter(rows),fields,"2024Q3")
