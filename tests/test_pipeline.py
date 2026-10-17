@@ -172,6 +172,28 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(geo['features'][0]['geometry']['coordinates'],[-51.18,-29.92])
         self.assertNotIn('9999999',str(geo))
 
+    def test_archive_real_cnes_municipality_column_co_ibge(self):
+        """O arquivo nacional de outubro/2026 usa CO_IBGE, não CO_MUNICIPIO_GESTOR."""
+        import tempfile,zipfile,csv,io
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/'cnes.zip'
+            out=io.StringIO()
+            header=['CO_CNES','CO_IBGE','CO_MOTIVO_DESAB','TP_UNIDADE','NO_FANTASIA','NO_BAIRRO','NU_LATITUDE','NU_LONGITUDE']
+            writer=csv.DictWriter(out,fieldnames=header,delimiter=';')
+            writer.writeheader()
+            for n in range(25):
+                writer.writerow({'CO_CNES':str(3000000+n),'CO_IBGE':'430460','CO_MOTIVO_DESAB':'',
+                                 'TP_UNIDADE':'02','NO_FANTASIA':f'UBS {n}',
+                                 'NO_BAIRRO':'CENTRO','NU_LATITUDE':'-29.92','NU_LONGITUDE':'-51.18'})
+            writer.writerow({'CO_CNES':'9999999','CO_IBGE':'431490','CO_MOTIVO_DESAB':'','TP_UNIDADE':'05'})
+            with zipfile.ZipFile(path,'w') as archive:archive.writestr('CNES_Estabelecimentos.csv',out.getvalue())
+            rows,quality=up.extract_cnes_csv(path,min_municipal=20,min_national=20)
+        geo,stats=up.build_cnes(rows)
+        self.assertEqual(quality['active'],25)
+        self.assertEqual(stats['ubs'],25)
+        self.assertEqual(len(geo['features']),25)
+        self.assertTrue(all(x['properties']['cnes']!='9999999' for x in geo['features']))
+
     def test_archive_missing_disable_field_is_rejected(self):
         import tempfile,zipfile
         with tempfile.TemporaryDirectory() as folder:

@@ -275,7 +275,7 @@ def extract_cnes_csv(zip_path, min_municipal=20, min_national=1000):
             delimiter=';' if first.count(';')>first.count(',') else ','
             headers=[h.strip().lstrip('\ufeff') for h in next(csv.reader([first],delimiter=delimiter))]
             canon={h.upper() for h in headers}
-            if not ({'CO_MUNICIPIO_GESTOR','CODIGO_MUNICIPIO'} & canon):
+            if not ({'CO_IBGE','CO_MUNICIPIO_GESTOR','CODIGO_MUNICIPIO'} & canon):
                 raise ValueError('CNES CSV sem campo municipal: '+str(headers[:25]))
             if not ({'CO_CNES','CODIGO_CNES','CNES'} & canon):
                 raise ValueError('CNES CSV sem código do estabelecimento: '+str(headers[:25]))
