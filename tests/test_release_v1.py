@@ -70,8 +70,8 @@ class PublishedSnapshotsV1Tests(unittest.TestCase):
                 self.assertEqual(set(row),{'period','value'})
             if entries:
                 self.assertEqual(data['sources'][kind]['status'],'ok')
-        self.assertEqual(data['sources']['sih']['status'],'not_loaded')
-        self.assertEqual(data['sources']['sia']['status'],'not_loaded')
+        self.assertEqual(data['sources']['sih']['status'],'partial')
+        self.assertEqual(data['sources']['sia']['status'],'partial')
 
     def test_sih_sia_production_snapshots_are_aggregated_and_nonidentifying(self):
         path=ROOT/'public/data/production.json'
@@ -86,6 +86,8 @@ class PublishedSnapshotsV1Tests(unittest.TestCase):
                 self.assertGreaterEqual(source['rowsState'],source['rowsCity'])
                 self.assertGreater(source['municipal']['quantity'],0)
                 self.assertGreaterEqual(source['municipal']['valueBRL'],0)
+                if system=='sia':
+                    self.assertGreaterEqual(source['rowsState'],1000000)
                 self.assertLessEqual(sum(v['quantity'] for v in source['byCnes'].values()),
                                      source['municipal']['quantity'])
                 for cnes,counts in source['byCnes'].items():
@@ -94,6 +96,12 @@ class PublishedSnapshotsV1Tests(unittest.TestCase):
                     self.assertGreaterEqual(counts['quantity'],5)
                     self.assertGreaterEqual(counts['valueBRL'],0)
                     self.assertEqual(set(counts),{'quantity','valueBRL'})
+        for system,meta in data['sources'].items():
+            self.assertEqual(meta['monthsAvailable'],sorted(set(meta['monthsAvailable'])))
+            if 'monthsRequestedPeriods' in meta:
+                self.assertEqual(len(meta['monthsRequestedPeriods']),meta['monthsRequested'])
+                self.assertTrue(set(meta['monthsAvailable']).issubset(meta['monthsRequestedPeriods']))
+            self.assertFalse(set(meta.get('rejectedMonths',[])) & set(meta['monthsAvailable']))
         serialized=json.dumps(data).lower()
         self.assertFalse(any(sensitive in serialized for sensitive in
                          ('cpf_aut','gestor_cpf','pa_cnsmed','n_aih','pa_cnpjcpf')))
