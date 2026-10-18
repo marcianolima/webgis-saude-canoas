@@ -21,18 +21,35 @@ const num=(n:number,k:string)=>{
  if(k==='rate')return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(n);
  return nf(n);
 };
-const indicators=['emulti_custeadas','emulti_homologadas','emulti_repasses','citopatologicos','mamografias','consultas_aps_razao','consultas_especializadas_razao','sih_internacoes_anuais','valor_medio_aih'];
+export type SusMode='primary'|'screening'|'finance';
+const groups:Record<SusMode,{title:string;eyebrow:string;intro:string;ids:string[];note:string}>={
+ primary:{title:'Atenção Primária e equipes',eyebrow:'MGDI · APS · eMulti',
+  intro:'Equipes multiprofissionais custeadas e homologadas, além das razões de consultas na APS e na atenção especializada. Equipes não representam quantidade de profissionais, e razões por 100 habitantes não são totais de consultas.',
+  ids:['emulti_custeadas','emulti_homologadas','consultas_aps_razao','consultas_especializadas_razao'],
+  note:'Indicadores por município, sem desagregação por CNES. Razão de consultas: número de consultas para cada 100 habitantes, segundo a metodologia RIPSA.'},
+ screening:{title:'Prevenção e rastreamento',eyebrow:'Rastreamento · Ministério da Saúde',
+  intro:'Séries municipais de exames citopatológicos e mamografias. Os números representam procedimentos registrados, não necessariamente pessoas distintas ou cobertura de rastreamento.',
+  ids:['citopatologicos','mamografias'],
+  note:'Os resultados disponíveis têm referência predominantemente anual; o último ano pode estar incompleto. Não comparar com taxas de cobertura sem população-alvo.'},
+ finance:{title:'Financiamento e indicadores hospitalares',eyebrow:'Repasses federais · RIPSA',
+  intro:'Repasses federais de equipes eMulti e indicadores anuais de internações hospitalares SUS. Valores de repasse, valores médios por AIH e quantidade de internações são grandezas diferentes.',
+  ids:['emulti_repasses','sih_internacoes_anuais','valor_medio_aih'],
+  note:'Repasses eMulti são mensais; valor médio por AIH e internações RIPSA são anuais. Não somar com a série mensal SIH/RD nem tratar valor médio por AIH como despesa hospitalar total.'}
+};
 export function stopSus(){active++;observer?.disconnect();observer=null;graph?.dispose();graph=null;}
-export function susPage(){
+export function susPage(mode:SusMode='primary'){
+ const group=groups[mode];
  const selected=selectedFacility();
  return '<section aria-label="Assistência e financiamento SUS">'+
- '<header class="mb-5"><p class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-300">DATASUS · Atenção Primária · Indicadores MGDI</p>'+
- '<h2 class="subheading text-2xl md:text-3xl mt-1">Assistência e financiamento</h2>'+
- '<p class="mt-2 text-sm max-w-3xl text-slate-500 dark:text-slate-300">Séries oficiais de equipes multiprofissionais, prevenção do câncer, financiamento federal e consultas na APS. Dados agregados por município e competência.</p>'+
+ '<header class="mb-5"><p class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-300">'+group.eyebrow+'</p>'+
+ '<h2 class="subheading text-2xl md:text-3xl mt-1">'+group.title+'</h2>'+
+ '<p class="mt-2 text-sm max-w-3xl text-slate-500 dark:text-slate-300">'+group.intro+'</p>'+
  '</header>'+
  (selected?'<div role="note" class="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-xs text-amber-800 dark:text-amber-200">'+
  'Estabelecimento selecionado: <strong>'+safe(selected.name)+' · CNES '+safe(selected.cnes)+'</strong>. Estes indicadores são municipais e não podem ser atribuídos automaticamente à unidade. Os dados individuais permanecem disponíveis na ficha CNES acima.</div>':'')+
  '<div role="status" aria-live="polite" id="sus-status" class="panel p-4 text-sm text-slate-500 dark:text-slate-300">Carregando indicadores oficiais de assistência…</div>'+
+ '<div class="flex flex-wrap gap-3 mt-4"><button data-page="aps-history" type="button" class="ui-section-link">Indicadores históricos do SISAB →</button><button data-page="production" type="button" class="ui-section-link">Produção SIH/SIA por CNES →</button></div>'+
+ '<div class="ui-context mt-4">'+safe(group.note)+'</div>'+
  '<div id="sus-content" class="space-y-5 mt-5"></div></section>';
 }
 const badge=(s:string)=>{
@@ -40,7 +57,7 @@ const badge=(s:string)=>{
  if(s==='partial')return '<span class="pill bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200">Parcial</span>';
  return '<span class="pill bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200">Não integrado</span>';
 };
-function cards(data:Data){
+function cards(data:Data,indicators:string[]){
  return indicators.map(id=>{
   const source=data.sources[id];
   const records=data.series[id]||[];
@@ -59,7 +76,9 @@ function table(rows:Sample[],kind:string,unit:string,cadence?:string){
  '<thead><tr class="text-xs text-slate-500 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700"><th class="py-2 text-left">Competência</th><th class="py-2 text-right">'+safe(unit||'Valor')+'</th></tr></thead><tbody>'+
  rows.slice().reverse().map(v=>'<tr class="border-b border-slate-100 dark:border-slate-700"><td class="py-2">'+formatPeriod(v.period,cadence)+'</td><td class="py-2 text-right tabular-nums font-semibold">'+num(v.value,kind)+'</td></tr>').join('')+'</tbody></table></div>';
 }
-export async function mountSus(dark:boolean){
+export async function mountSus(dark:boolean,mode:SusMode='primary'){
+ const group=groups[mode];
+ const indicators=group.ids;
  const token=++active;
  const status=document.getElementById('sus-status'),panel=document.getElementById('sus-content');
  if(!status||!panel)return;
@@ -74,7 +93,7 @@ export async function mountSus(dark:boolean){
   status.innerHTML='<div class="flex justify-between items-center gap-3 flex-wrap"><span class="font-semibold">'+available.length+' de '+indicators.length+' fontes municipais com séries validadas</span>'+
    '<span class="text-xs text-slate-500 dark:text-slate-300">Última extração: '+fmtDate(data.updatedAt)+' · Fonte: Ministério da Saúde / MGDI</span></div>';
   const pending=['sih','sia','pni'].map(k=>({key:k,...data.sources[k]})).filter(x=>x.label);
-  panel.innerHTML='<section aria-label="Indicadores municipais" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">'+cards(data)+'</section>'+
+  panel.innerHTML='<section aria-label="Indicadores municipais" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">'+cards(data,indicators)+'</section>'+
    '<section class="grid grid-cols-1 xl:grid-cols-12 gap-4">'+
    '<article class="panel p-5 xl:col-span-8"><div class="flex flex-wrap items-start justify-between gap-3 mb-4"><div><h3 class="subheading text-base">Evolução por competência</h3><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Clique em um cartão para trocar a série; valores com unidades diferentes não são somados.</p></div>'+
    '<button id="sus-export" type="button" class="text-xs px-3 py-2 border border-teal-200 rounded-lg font-bold text-teal-700 dark:text-teal-300">Exportar série CSV</button></div>'+
@@ -83,13 +102,7 @@ export async function mountSus(dark:boolean){
    '<a id="sus-source-link" target="_blank" rel="noopener noreferrer" class="underline text-xs text-teal-700 dark:text-teal-300 mt-2 inline-block">Consultar a fonte oficial</a></article>'+
    '<article class="panel p-5 xl:col-span-4"><h3 class="subheading text-base mb-4">Valores por competência</h3>'+
    '<div id="sus-table"></div></article></section>'+
-   '<section class="panel p-5"><h3 class="subheading text-base">Outras integrações DATASUS</h3>'+
-   '<p class="text-xs text-slate-500 dark:text-slate-300 my-3">Um indicador de produção parcial não é tratado como total municipal. Para SIH e SIA, permanecem necessários os extratos DBC completos ou serviço oficial agregado com cobertura comprovada.</p>'+
-   '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">'+pending.map(s=>'<article class="rounded-xl border border-slate-200 dark:border-slate-700 p-4">'+
-    '<div class="flex justify-between gap-2"><strong class="text-sm">'+safe(s.label)+'</strong>'+badge(s.status)+'</div>'+
-    '<p class="text-xs text-slate-500 dark:text-slate-300 mt-2">'+safe(s.note||'')+'</p>'+
-    '<a class="text-xs underline text-teal-700 dark:text-teal-300 mt-2 inline-block" href="'+safe(s.url||'')+'" target="_blank" rel="noopener noreferrer">Fonte oficial</a></article>').join('')+'</div></section>'+
-   '<div role="note" class="text-xs text-slate-500 dark:text-slate-300">A produção ambulatorial está representada apenas por indicadores específicos e metodologicamente definidos (por exemplo, exames); os números não equivalem à produção total SIA. Equipes custeadas e homologadas são categorias diferentes e podem compartilhar unidades.</div>';
+   '<div role="note" class="ui-context">Cada gráfico apresenta somente uma série e uma unidade de medida. Fontes ainda indisponíveis estão detalhadas no catálogo de fontes; ausência de dado não significa zero.</div>';
   const ec=await import('echarts');
   if(token!==active||!panel.isConnected)return;
   let selected=available[0]||indicators[0];
