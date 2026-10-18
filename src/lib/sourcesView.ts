@@ -16,9 +16,10 @@ export function sourcesPage(){
  '<div class="panel p-4 sm:p-5"><div class="flex gap-3 items-center justify-between flex-wrap"><div><h3 class="subheading text-base">Inventário de fontes</h3><p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Status verificado nos arquivos efetivamente publicados.</p></div>'+
  '<button type="button" id="source-export" class="rounded-lg border border-teal-300 text-teal-700 dark:text-teal-200 text-xs font-bold px-3 py-2" disabled>Exportar catálogo CSV</button></div>'+
  '<div id="source-status" role="status" aria-live="polite" class="mt-3 text-xs text-slate-500">Carregando metadados das fontes…</div>'+
- '<div class="flex flex-wrap items-center gap-3 mt-4 mb-3"><label for="sources-filter" class="text-xs font-bold">Filtrar situação</label>'+
- '<select id="sources-filter" class="field" aria-label="Filtrar fontes por situação"><option value="all">Todas</option><option value="ok">Disponíveis</option><option value="pending">Pendentes ou falhas</option></select>'+
- '<label for="sources-search" class="text-xs font-bold">Pesquisar</label><input type="search" id="sources-search" class="field min-w-[180px]" placeholder="Fonte, tema ou metodologia…"/></div>'+
+ '<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 mb-3">'+
+ '<label for="sources-filter" class="text-xs font-bold flex flex-col gap-1">Filtrar situação'+
+ '<select id="sources-filter" class="field" aria-label="Filtrar fontes por situação"><option value="all">Todas</option><option value="ok">Disponíveis</option><option value="pending">Pendentes ou parciais</option></select></label>'+
+ '<label for="sources-search" class="text-xs font-bold flex flex-col gap-1 sm:col-span-2">Pesquisar fonte ou indicador<input type="search" id="sources-search" class="field w-full" placeholder="Nome, assunto ou metodologia…"/></label></div>'+
  '<div id="source-groups" class="space-y-5"></div></div>'+
  '<p class="mt-4 text-xs text-slate-500 dark:text-slate-300">Fontes classificadas como pendentes não foram utilizadas para compor totais municipais. Indicadores históricos podem ser preliminares ou utilizar métodos atualmente substituídos.</p></section>';
 }
@@ -53,6 +54,7 @@ export async function mountSources(summary:DataSummary){
  for(const [group,document] of [['Vigilância e estatísticas vitais',health],['Assistência, APS e financiamento',sus],['SISAB · indicadores históricos Previne Brasil',aps]] as const){
   if(!document)continue;
   for(const [id,item] of Object.entries(document.sources)){
+   if(group==='Vigilância e estatísticas vitais'&&(id==='sih'||id==='sia'))continue;
    const series=document.series?.[id]||[];
    const reference=String(item.reference|| (series.length?(series[series.length-1].period||series[series.length-1].year||''):''));
    rows.push({id,family:group,...item,reference,years:item.yearsAvailable?.length?item.yearsAvailable.join(', '):undefined});
@@ -72,13 +74,19 @@ export async function mountSources(summary:DataSummary){
   const q=(document.querySelector<HTMLInputElement>('#sources-search')?.value||'').toLocaleLowerCase('pt-BR');
   const display=list.filter(r=>(filter==='all'||filter==='ok'&&r.status==='ok'||filter==='pending'&&r.status!=='ok')&&
    (!q||[r.label,r.id,r.note,r.method,r.family].some(x=>String(x||'').toLocaleLowerCase('pt-BR').includes(q))));
-  parent!.innerHTML=groups.map(name=>{
+  parent!.innerHTML=groups.map((name,index)=>{
    const group=display.filter(r=>r.family===name);
    if(!group.length)return '';
-   return '<section><h3 class="subheading text-base mb-3">'+safe(name)+' <span class="text-xs font-normal text-slate-500">('+group.length+')</span></h3>'+
-    '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">'+group.map(sourceCard).join('')+'</div></section>';
-  }).join('')||'<div class="empty p-4">Nenhuma fonte corresponde ao filtro.</div>';
-  status!.textContent=list.filter(x=>x.status==='ok').length+' fontes/indicadores disponíveis de '+list.length+' cadastrados. '+display.length+' exibidos.';
+   const validated=group.filter(r=>r.status==='ok').length;
+   return '<details class="rounded-xl border border-slate-200 dark:border-slate-700 p-3 sm:p-4" '+(index===0?'open':'')+'>'+
+    '<summary class="cursor-pointer flex flex-wrap justify-between gap-2 items-center">'+
+    '<span class="subheading text-sm">'+safe(name)+'</span><span class="text-xs text-slate-500">'+
+    group.length+' indicadores · '+validated+' validados ⌄</span></summary>'+
+    '<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">'+group.map(sourceCard).join('')+'</div></details>';
+  }).join('')||'<div class="empty p-4">Nenhuma fonte corresponde à pesquisa.</div>';
+  const valid=list.filter(x=>x.status==='ok').length;
+  const partial=list.filter(x=>x.status==='partial').length;
+  status!.textContent=valid+' indicadores validados · '+partial+' integrações parciais · '+(list.length-valid-partial)+' pendentes. '+display.length+' resultados exibidos.';
  }
  render();
  document.getElementById('sources-filter')?.addEventListener('change',render);
