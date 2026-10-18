@@ -76,7 +76,7 @@ export function facilityExplorerMarkup(){
  return '<section id="facility-explorer" class="panel p-4 sm:p-5 mb-5" aria-label="Explorar estabelecimento individual">'+
  '<div class="flex flex-wrap justify-between items-start gap-3 mb-3"><div><p class="text-[11px] uppercase font-bold tracking-wider text-teal-700 dark:text-teal-300">Exploração interativa · CNES</p>'+
  '<h2 class="subheading text-lg mt-1">Selecionar estabelecimento</h2>'+
- '<p class="text-xs text-slate-500 dark:text-slate-300 mt-1">A seleção atualiza o popup, a ficha e os gráficos por unidade em qualquer aba.</p></div>'+
+ '<p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Consulte os dados cadastrais e os leitos da unidade selecionada. A produção SIH/SIA por CNES está disponível em página própria, quando houver dados suficientes.</p></div>'+
  '<span class="pill bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200">Fonte: CNES + Leitos</span></div>'+
  '<div class="relative"><label for="facility-search-global" class="sr-only">Pesquisar estabelecimento por nome, CNES ou bairro</label>'+
  '<input id="facility-search-global" autocomplete="off" type="search" role="combobox" aria-autocomplete="list" aria-controls="facility-suggest" aria-expanded="false" '+
@@ -110,11 +110,12 @@ function scopePanel(item:FacilityRecord){
  (hasBeds?'<div id="facility-beds-chart" role="img" aria-label="Composição de leitos SUS e não SUS" style="height:165px"></div>':
  '<p class="text-sm text-slate-500 dark:text-slate-300 mt-4">Esta unidade não possui contagem individual de leitos validada na competência consultada. Isso não significa zero.</p>')+
  '<p class="text-[11px] text-slate-500 dark:text-slate-300 mt-2">Competência: '+(item.bedsAsOf?safe(item.bedsAsOf.slice(4,6)+'/'+item.bedsAsOf.slice(0,4)):'não disponível')+'. Os dados são cadastrais; não representam ocupação ou vagas livres.</p></div></div>'+
- '<div class="mt-4"><div class="flex items-center justify-between flex-wrap gap-2 mb-2"><h4 class="subheading text-sm">Comparação entre estabelecimentos com leitos informados</h4>'+
+ (hasBeds?'<div class="mt-4"><div class="flex items-center justify-between flex-wrap gap-2 mb-2"><h4 class="subheading text-sm">Comparação cadastral entre unidades com leitos</h4>'+
  '<span class="text-xs text-slate-500">Clique em uma barra para selecionar outra unidade</span></div>'+
- '<div id="facility-peer-chart" role="img" aria-label="Comparativo interativo de leitos por estabelecimento" style="height:210px"></div></div>'+
+ '<div id="facility-peer-chart" role="img" aria-label="Comparativo de estoques de leitos cadastrados; não são vagas disponíveis" style="height:280px;min-height:280px"></div></div>':'')+
  '<div class="flex flex-wrap justify-between items-center mt-3 gap-3"><span class="text-[11px] text-slate-500 dark:text-slate-300">'+(fallbackMode?'Catálogo de contingência · alguns campos podem faltar':'Catálogo individual CNES · atualizado automaticamente')+'</span>'+
- (item.coordinates?'<button type="button" data-facility-map class="rounded-lg bg-[#0d857e] text-white text-xs font-bold px-3 py-2">Localizar no mapa →</button>':'')+'</div></div>';
+ '<div class="flex flex-wrap gap-2"><button type="button" data-page="production" class="rounded-lg border border-teal-300 text-teal-700 dark:text-teal-300 text-xs font-bold px-3 py-2">Produção desta unidade →</button>'+ 
+ (item.coordinates?'<button type="button" data-facility-map class="rounded-lg bg-[#0d857e] text-white text-xs font-bold px-3 py-2">Localizar no mapa →</button>':'')+'</div></div></div>';
 }
 function renderSuggestions(){
  const input=document.querySelector<HTMLInputElement>('#facility-search-global');
