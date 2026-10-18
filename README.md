@@ -158,3 +158,17 @@ A auditoria dos extratos SIH/RD e SIA/PA identificou volume estadual anômalo no
 Quando existem CNES com menos de cinco unidades de produção, aplicamos **supressão primária** e também **supressão complementar** do menor grupo restante. Essa última impede deduzir o valor do CNES ocultado simplesmente subtraindo os demais estabelecimentos do total municipal. Os resultados previamente publicados foram reprocessados para a nova regra. Nenhum limiar agregado é garantia absoluta de anonimização.
 
 O catálogo agora identifica SIH/SIA como **parcialmente integrados**: produção mensal RD e PA agregada por CNES está disponível, mas as desagregações por diagnóstico e procedimento, a cobertura integral do SIA e parte das competências ainda não estão. Os períodos solicitados, períodos aceitos e períodos em revisão constam no JSON; a interface evidencia as competências ausentes. As séries anuais RIPSA não devem ser somadas às competências mensais SIH/RD.
+
+## Versão 1.4 — revisão de frontend orientada a dispositivos móveis
+
+A navegação foi reorganizada por significado dos dados e público de uso. O **Panorama Municipal** continua sendo a primeira página, agora com os indicadores principais e blocos expansíveis por assunto. Novas seções separadas: **Vigilância**, **Nascimentos e óbitos**, **Atenção Primária**, **APS · histórico Previne Brasil**, **Prevenção e exames**, **Financiamento e RIPSA**, **Produção SIH/SIA**, além das páginas territoriais CNES e de **Fontes e metodologia**.
+
+Na visualização móvel, as abas são roláveis horizontalmente. A aba ativa recebe destaque visual e é posicionada à esquerda após a navegação, inclusive para páginas finais do menu. Os links temáticos carregados de forma assíncrona utilizam delegação de eventos.
+
+Os gráficos apresentam uma grandeza por vez, acompanhada da sua referência temporal, unidade e explicação. A série histórica de população IBGE foi mantida na análise territorial; botões antigos de SIH, SIA e dengue ligados ao resumo vazio foram substituídos por navegação às páginas com dados oficiais. Os grupos de indicadores e fontes têm seções expansíveis; a produção SIH/SIA tem zoom/controle temporal móvel e marca competências em revisão, ausentes ou suprimidas. As fichas CNES apresentam leitos como **estoques cadastrais**, e não vagas disponíveis.
+
+Os indicadores do Previne Brasil de 2024 são históricos e não representam o financiamento atual; os dados municipais não são atribuídos automaticamente a CNES individuais. A contagem de procedimentos SIA/PA não representa pacientes únicos nem produção SIA integral. O catálogo informa o status parcial quando necessário.
+
+### Homologação
+
+A publicação automática executa testes de dados Python e build TypeScript/Vite no GitHub Actions. Esses testes não substituem validação visual em celulares Android/iOS reais, testes com leitor de tela ou comparação epidemiológica aprofundada entre fontes. Nenhum dado bruto ou pessoal foi adicionado na revisão de interface.

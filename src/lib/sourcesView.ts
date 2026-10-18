@@ -78,7 +78,7 @@ export async function mountSources(summary:DataSummary){
    const group=display.filter(r=>r.family===name);
    if(!group.length)return '';
    const validated=group.filter(r=>r.status==='ok').length;
-   return '<details class="rounded-xl border border-slate-200 dark:border-slate-700 p-3 sm:p-4" '+(index===0?'open':'')+'>'+
+   return '<details class="rounded-xl border border-slate-200 dark:border-slate-700 p-3 sm:p-4" '+(index===0||filter!=='all'||q?'open':'')+'>'+
     '<summary class="cursor-pointer flex flex-wrap justify-between gap-2 items-center">'+
     '<span class="subheading text-sm">'+safe(name)+'</span><span class="text-xs text-slate-500">'+
     group.length+' indicadores · '+validated+' validados ⌄</span></summary>'+
