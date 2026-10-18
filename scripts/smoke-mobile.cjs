@@ -21,7 +21,7 @@ async function waitForServer(){
 }
 async function main(){
  mkdirSync(snapDir,{recursive:true});
- const server=spawn(process.execPath,[require.resolve('vite/bin/vite.js'),'preview','--host','127.0.0.1','--port','4173','--strictPort'],{stdio:'inherit'});
+ const server=spawn(process.execPath,[path.resolve('node_modules/vite/bin/vite.js'),'preview','--host','127.0.0.1','--port','4173','--strictPort'],{stdio:'inherit'});
  let browser;
  try{
   await waitForServer();
