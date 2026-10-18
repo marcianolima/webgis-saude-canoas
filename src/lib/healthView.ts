@@ -9,13 +9,14 @@ let active=0;
 let instance:any=null;
 let resize:ResizeObserver|null=null;
 export function disposeHealth(){active++;resize?.disconnect();resize=null;instance?.dispose();instance=null;}
-export function healthPage():string{
+export function healthPage(mode:'surveillance'|'vital'='surveillance'):string{
+ const surveillance=mode==='surveillance';
  return '<section aria-label="Indicadores epidemiológicos e vitais">'+
- '<header class="mb-5"><p class="text-xs font-semibold uppercase tracking-wider text-teal-700 dark:text-teal-300">WebGIS Saúde · Versão 1.0</p>'+
- '<h2 class="subheading text-2xl md:text-3xl mt-1">Indicadores de saúde</h2>'+
- '<p class="text-sm text-slate-500 dark:text-slate-300 mt-2 max-w-2xl">Vigilância epidemiológica, natalidade e mortalidade em Canoas. Indicadores por local de residência, com fonte, ano e metodologia visíveis.</p></header>'+
+ '<header class="mb-5"><p class="text-xs font-semibold uppercase tracking-wider text-teal-700 dark:text-teal-300">'+(surveillance?'SINAN · arboviroses':'SIM · SINASC · residentes')+'</p>'+
+ '<h2 class="subheading text-2xl md:text-3xl mt-1">'+(surveillance?'Vigilância epidemiológica':'Nascimentos e mortalidade')+'</h2>'+
+ '<p class="text-sm text-slate-500 dark:text-slate-300 mt-2 max-w-2xl">'+(surveillance?'Notificações de dengue, chikungunya e zika entre residentes. Notificação não é sinônimo de caso confirmado ou de incidência.':'Nascidos vivos e óbitos não fetais de residentes, independentemente de onde ocorreu o atendimento. São contagens anuais, não taxas.')+'</p></header>'+
  '<div role="status" aria-live="polite" id="health-status" class="panel p-4 text-sm">Carregando séries oficiais…</div>'+
- '<div class="mb-4"><button data-page="sus" type="button" class="text-sm font-semibold underline text-teal-700 dark:text-teal-300">Ver assistência e financiamento SUS →</button></div><div id="health-panel" class="mt-5 space-y-5"></div></section>';
+ '<div class="mb-4"><button data-page="'+(surveillance?'vital':'health')+'" type="button" class="text-sm font-semibold underline text-teal-700 dark:text-teal-300">'+(surveillance?'Ver nascimentos e óbitos →':'Ver vigilância epidemiológica →')+'</button></div><div id="health-panel" class="mt-5 space-y-5"></div></section>';
 }
 function stateLabel(value:string){
  return value==='ok'?'<span class="pill bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200">Validado</span>':
@@ -33,13 +34,13 @@ function yearsTable(rows:Entry[]){
 function statCard(key:string,data:Snapshot){
  const rows=data.series[key]||[],last=rows.length?rows[rows.length-1]:null;
  const m=data.sources[key];
- return '<article class="panel p-5 min-w-0"><div class="flex flex-wrap items-start justify-between gap-2"><h3 class="subheading text-base">'+safe(LABELS[key])+'</h3>'+
- stateLabel(m?.status||'not_loaded')+'</div><div class="kpi-val mt-4">'+(last?nf(last.value):'—')+'</div>'+
+ return '<button type="button" data-health-metric="'+safe(key)+'" class="panel p-4 sm:p-5 min-w-0 text-left w-full hover:border-teal-400 focus-visible:ring-2 focus-visible:ring-teal-500"><span class="flex flex-wrap items-start justify-between gap-2"><strong class="subheading text-sm">'+safe(LABELS[key])+'</strong>'+
+ stateLabel(m?.status||'not_loaded')+'</span><div class="kpi-val mt-3">'+(last?nf(last.value):'—')+'</div>'+
  '<p class="text-xs text-slate-500 dark:text-slate-300 mt-1">'+(last?String(last.year)+(last.provisional?' · preliminar':' · referência anual'):'Ainda sem coleta validada')+'</p>'+
  '<p class="text-xs leading-relaxed text-slate-500 dark:text-slate-300 mt-4 min-h-[64px]">'+safe(data.definitions[key]||m?.note||'')+'</p>'+
- (m?.url?'<a class="text-xs underline font-semibold text-teal-700 dark:text-teal-300" target="_blank" rel="noopener noreferrer" href="'+safe(m.url)+'">Fonte e metodologia</a>':'')+'</article>';
+ '<span class="block mt-3 text-xs font-semibold text-teal-700 dark:text-teal-300">Ver evolução anual →</span></button>';
 }
-export async function mountHealth(dark:boolean,summary:DataSummary){
+export async function mountHealth(dark:boolean,summary:DataSummary,mode:'surveillance'|'vital'='surveillance'){
  const token=++active;
  const status=document.getElementById('health-status');
  const panel=document.getElementById('health-panel');
@@ -50,24 +51,19 @@ export async function mountHealth(dark:boolean,summary:DataSummary){
   const data=await response.json() as Snapshot;
   if(!data||typeof data.series!=='object'||typeof data.sources!=='object')throw new Error('Estrutura inválida');
   if(token!==active||!panel.isConnected)return;
-  const keys=['dengue','chikungunya','zika','sinasc','sim'];
+  const keys=mode==='surveillance'?['dengue','chikungunya','zika']:['sinasc','sim'];
   const available=keys.filter(k=>(data.series[k]||[]).length>0);
-  status.innerHTML='<div class="flex flex-wrap items-center justify-between gap-3"><strong>'+available.length+' de 5 séries monitoradas disponíveis</strong>'+
+  status.innerHTML='<div class="flex flex-wrap items-center justify-between gap-3"><strong>'+available.length+' de '+keys.length+' séries disponíveis</strong>'+
    '<span class="text-xs text-slate-500 dark:text-slate-300">Extração: '+safe(fmtDate(data.updatedAt))+' · Somente dados agregados</span></div>';
-  const other=Object.entries(data.sources).filter(([k])=>!keys.includes(k));
   panel.innerHTML='<section aria-label="Indicadores principais" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">'+keys.map(k=>statCard(k,data)).join('')+'</section>'+
   '<section class="grid grid-cols-1 xl:grid-cols-12 gap-4"><article class="panel p-5 xl:col-span-8">'+
   '<div class="flex flex-wrap gap-3 justify-between items-center mb-4"><div><h3 class="subheading text-base">Evolução anual</h3><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Selecione um indicador para comparar anos da mesma fonte.</p></div>'+
-  '<label class="text-xs font-semibold">Indicador <select id="health-series-select" class="field ml-1" aria-label="Indicador a exibir">'+
+  '<label class="text-xs font-semibold">Indicador <select id="health-series-select" class="field mt-1 w-full sm:ml-1 sm:mt-0" aria-label="Indicador a exibir">'+
   keys.map(k=>'<option value="'+k+'" '+(k===(available[0]||'dengue')?'selected':'')+'>'+LABELS[k]+'</option>').join('')+'</select></label></div>'+
   '<div id="health-series-chart" style="height:305px;min-height:305px" role="img" aria-label="Série histórica selecionada"></div>'+
   '<p id="health-method" class="text-xs text-slate-500 dark:text-slate-400 mt-3"></p></article>'+
   '<article class="panel p-5 xl:col-span-4"><h3 class="subheading text-base mb-3">Tabela por ano</h3><div id="health-values"></div></article></section>'+
-  '<section class="panel p-5"><h3 class="subheading text-base">Outras fontes em avaliação</h3>'+
-  '<p class="text-xs text-slate-500 dark:text-slate-300 my-3">Um dado indisponível não deve ser interpretado como zero. A coleta completa é exigida antes da publicação.</p>'+
-  '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">'+other.map(([name,s])=>'<article class="border border-slate-100 dark:border-slate-700 rounded-xl p-4"><div class="flex flex-wrap justify-between gap-2"><h4 class="font-semibold text-sm">'+safe(s.label||name)+'</h4>'+stateLabel(s.status)+'</div><p class="text-xs text-slate-500 dark:text-slate-300 mt-2">'+safe(s.note||'')+'</p>'+
-  (s.url?'<a target="_blank" rel="noopener noreferrer" href="'+safe(s.url)+'" class="text-xs underline text-teal-700 dark:text-teal-300 mt-3 inline-block">Consultar fonte oficial</a>':'')+'</article>').join('')+'</div></section>'+
-  '<section class="panel p-5"><h3 class="subheading text-base">Critérios de interpretação</h3><p class="text-sm text-slate-500 dark:text-slate-300 mt-2">Indicadores extraídos por residência não representam necessariamente ocorrências nos estabelecimentos do município. Dengue representa notificações, não apenas casos confirmados. Dados preliminares estão sujeitos à revisão. População de referência IBGE: '+nf(summary.municipality.population)+' ('+safe(summary.municipality.populationYear)+'). Nunca foram publicados registros individuais.</p></section>';
+  '<section class="panel p-5"><h3 class="subheading text-base">Critérios de interpretação</h3><p class="text-sm text-slate-500 dark:text-slate-300 mt-2">Indicadores por residência não representam necessariamente eventos em estabelecimentos de Canoas. Notificações não equivalem a casos confirmados. Nascimentos e óbitos não medem diretamente o desempenho de hospitais locais. Dados preliminares podem ser revisados. População de referência IBGE: '+nf(summary.municipality.population)+' ('+safe(summary.municipality.populationYear)+'). Nunca foram publicados registros individuais.</p></section>';
   const ec=await import('echarts');
   if(token!==active||!panel.isConnected)return;
   const draw=(key:string)=>{
@@ -76,12 +72,13 @@ export async function mountHealth(dark:boolean,summary:DataSummary){
     const table=document.getElementById('health-values'),method=document.getElementById('health-method');
     if(!target||!table||!method)return;
     const rows=data.series[key]||[];
-    method.textContent=data.definitions[key]||'';
+    method.textContent=(data.definitions[key]||data.sources[key]?.note||'')+' · Contagem anual de residentes, não taxa. '+(rows.some(r=>r.provisional)?'Há dados preliminares sujeitos a revisão.':'');
     table.innerHTML=yearsTable(rows);
     instance?.dispose();instance=null;
     if(!rows.length){target.innerHTML='<div class="empty p-6">A série selecionada ainda não possui dados validados.</div>';return;}
     target.innerHTML='';
     instance=ec.init(target);
+    document.querySelectorAll<HTMLElement>('[data-health-metric]').forEach(el=>el.classList.toggle('ui-metric-selected',el.dataset.healthMetric===key));
     const c=dark?'#9fb6c6':'#68798e';
     instance.setOption({grid:{top:22,left:12,bottom:28,right:16,containLabel:true},
       tooltip:{trigger:'axis'},
@@ -92,6 +89,11 @@ export async function mountHealth(dark:boolean,summary:DataSummary){
   };
   draw(available[0]||'dengue');
   document.querySelector<HTMLSelectElement>('#health-series-select')?.addEventListener('change',e=>draw((e.target as HTMLSelectElement).value));
+  panel.querySelectorAll<HTMLElement>('[data-health-metric]').forEach(el=>el.addEventListener('click',()=>{
+   const metric=el.dataset.healthMetric||available[0]||'dengue';
+   const select=document.querySelector<HTMLSelectElement>('#health-series-select');if(select)select.value=metric;
+   draw(metric);document.getElementById('health-series-chart')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }));
  }catch(error){
   console.warn('Health view:',error);
   if(active===token&&status.isConnected)status.textContent='Indicadores temporariamente indisponíveis. Verifique a conexão e o arquivo indicators.json publicado. Os demais módulos continuam disponíveis.';
