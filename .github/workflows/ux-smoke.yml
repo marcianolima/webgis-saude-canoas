@@ -25,7 +25,12 @@ jobs:
         with:
           node-version: '22'
       - name: Instalar dependências
-        run: npm ci --no-audit --no-fund
+        run: |
+          if test -f package-lock.json; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
       - name: Instalar Chromium de teste (isolado do deploy)
         run: |
           npm install --no-save --no-audit --no-fund playwright@1.56.1
