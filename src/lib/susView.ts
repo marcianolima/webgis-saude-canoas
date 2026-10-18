@@ -104,6 +104,7 @@ export async function mountSus(dark:boolean,mode:SusMode='primary'){
    '<article class="panel p-5 xl:col-span-8"><div class="flex flex-wrap items-start justify-between gap-3 mb-4"><div><h3 class="subheading text-base">Evolução por competência</h3><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Clique em um cartão para trocar a série; valores com unidades diferentes não são somados.</p></div>'+
    '<button id="sus-export" type="button" class="text-xs px-3 py-2 border border-teal-200 rounded-lg font-bold text-teal-700 dark:text-teal-300">Exportar série CSV</button></div>'+
    '<h4 id="sus-chart-title" class="text-sm font-semibold mb-2"></h4><div id="sus-chart" style="height:300px;min-height:300px" role="img" aria-label="Gráfico de indicador SUS por competência"></div>'+
+   '<p class="text-xs text-slate-500 dark:text-slate-300 mt-2">Use a barra inferior para consultar outros períodos. Valores percentuais, taxas e contagens têm unidades distintas.</p>'+
    '<p id="sus-method" class="text-xs leading-relaxed text-slate-500 dark:text-slate-300 mt-4"></p>'+
    '<a id="sus-source-link" target="_blank" rel="noopener noreferrer" class="underline text-xs text-teal-700 dark:text-teal-300 mt-2 inline-block">Consultar a fonte oficial</a></article>'+
    '<article class="panel p-5 xl:col-span-4"><h3 class="subheading text-base mb-4">Valores por competência</h3>'+
@@ -134,12 +135,20 @@ export async function mountSus(dark:boolean,mode:SusMode='primary'){
    target.innerHTML='';
    graph=ec.init(target);
    const color=dark?'#9fb6c6':'#64748b';
-   graph.setOption({animationDuration:250,grid:{top:20,left:15,right:14,bottom:55,containLabel:true},
-    tooltip:{trigger:'axis',valueFormatter:(v:number)=>num(Number(v),source?.kind||'count')},
-    xAxis:{type:'category',data:rows.map(x=>formatPeriod(x.period,source?.cadence)),axisLabel:{color,rotate:40,fontSize:10},axisTick:{show:false}},
+   const mobile=window.matchMedia('(max-width: 640px)').matches;
+   const visible=mobile?6:10;
+   const begin=rows.length>visible?Math.max(0,100-visible*100/rows.length):0;
+   graph.setOption({animationDuration:250,grid:{top:24,left:15,right:14,bottom:76,containLabel:true},
+    tooltip:{trigger:'axis',valueFormatter:(v:number)=>num(Number(v),source?.kind||'count')+
+     ((source?.kind==='rate'||source?.kind==='count')&&source?.unit?' '+source.unit:'')},
+    dataZoom:[{type:'inside',start:begin,end:100},
+     {type:'slider',height:14,bottom:5,start:begin,end:100,textStyle:{color,fontSize:10}}],
+    xAxis:{type:'category',data:rows.map(x=>formatPeriod(x.period,source?.cadence)),
+      axisLabel:{color,rotate:mobile?45:25,fontSize:10,hideOverlap:true},axisTick:{show:false}},
     yAxis:{type:'value',axisLabel:{color,formatter:(value:number)=>new Intl.NumberFormat('pt-BR',{notation:'compact',maximumFractionDigits:1}).format(value)},
-           splitLine:{lineStyle:{color:dark?'#30455b':'#edf2f7'}}},
-    series:[{type:'line',smooth:true,symbolSize:5,lineStyle:{color:'#0d9488',width:2.5},itemStyle:{color:'#0d9488'},data:rows.map(x=>x.value),areaStyle:{color:'rgba(13,148,136,.09)'}}]});
+       splitLine:{lineStyle:{color:dark?'#30455b':'#edf2f7'}}},
+    series:[{type:'line',smooth:true,symbolSize:5,lineStyle:{color:'#0d9488',width:2.5},itemStyle:{color:'#0d9488'},
+      data:rows.map(x=>x.value),areaStyle:{color:'rgba(13,148,136,.09)'}}]});
    observer=new ResizeObserver(()=>graph?.resize());observer.observe(target);
   };
   draw(selected);
