@@ -1,1 +1,2392 @@
-{"schemaVersion":"1.0","generatedAt":"2026-10-17T21:16:06+00:00","geography":"município do estabelecimento/procedimento","periods":{"202501":{"sih":{"rowsState":66998,"rowsCity":2305,"municipal":{"quantity":2305,"valueBRL":5160984.01},"byCnes":{"3508528":{"quantity":1229,"valueBRL":3054233.82},"3626245":{"quantity":386,"valueBRL":653276.92},"2232014":{"quantity":690,"valueBRL":1453473.27}},"suppressedUnits":0},"sia":{"rowsState":302285,"rowsCity":8422,"municipal":{"quantity":9438,"valueBRL":77268.25},"byCnes":{"2231301":{"quantity":2005,"valueBRL":11603.89},"3215792":{"quantity":2144,"valueBRL":12634.45},"0965995":{"quantity":348,"valueBRL":0.0},"4098250":{"quantity":779,"valueBRL":3956.13},"0422525":{"quantity":145,"valueBRL":870.81},"3885046":{"quantity":753,"valueBRL":746.5},"6691757":{"quantity":788,"valueBRL":0.0},"6914853":{"quantity":703,"valueBRL":0.0},"3626245":{"quantity":525,"valueBRL":30799.44},"5028264":{"quantity":142,"valueBRL":9855.17},"7937059":{"quantity":896,"valueBRL":5684.8},"5526418":{"quantity":60,"valueBRL":288.2},"0480444":{"quantity":70,"valueBRL":362.96},"9971386":{"quantity":72,"valueBRL":409.6},"2230224":{"quantity":5,"valueBRL":40.0}},"suppressedUnits":1}},"202502":{"sih":{"rowsState":66262,"rowsCity":2387,"municipal":{"quantity":2387,"valueBRL":5199481.75},"byCnes":{"3508528":{"quantity":1317,"valueBRL":3036310.35},"3626245":{"quantity":393,"valueBRL":495904.79},"2232014":{"quantity":677,"valueBRL":1667266.61}},"suppressedUnits":0},"sia":{"rowsState":4148298,"rowsCity":132261,"municipal":{"quantity":240187,"valueBRL":2811757.43},"byCnes":{"2229129":{"quantity":8889,"valueBRL":52284.61},"2229161":{"quantity":9042,"valueBRL":52173.19},"2231301":{"quantity":8574,"valueBRL":51304.98},"2232014":{"quantity":35254,"valueBRL":642046.63},"0422525":{"quantity":487,"valueBRL":2901.33},"0480444":{"quantity":9198,"valueBRL":53155.38},"0965995":{"quantity":1594,"valueBRL":0.0},"3215792":{"quantity":9092,"valueBRL":52317.31},"3761347":{"quantity":7791,"valueBRL":45738.8},"9971386":{"quantity":8816,"valueBRL":50943.61},"9496637":{"quantity":313,"valueBRL":1430.6},"5414849":{"quantity":9026,"valueBRL":52080.27},"7937059":{"quantity":6580,"valueBRL":41734.8},"5423392":{"quantity":1137,"valueBRL":2773.8},"7401442":{"quantity":8792,"valueBRL":52690.33},"3508528":{"quantity":29958,"valueBRL":429595.84},"9643222":{"quantity":7478,"valueBRL":42406.15},"3626245":{"quantity":45138,"valueBRL":411538.71},"4243439":{"quantity":396,"valueBRL":2490.4},"6729029":{"quantity":1071,"valueBRL":13941.6},"3874281":{"quantity":1853,"valueBRL":5857.09},"3897281":{"quantity":4718,"valueBRL":29937.35},"4860403":{"quantity":9220,"valueBRL":34017.79},"4098250":{"quantity":2901,"valueBRL":14679.28},"5526418":{"quantity":493,"valueBRL":2051.9},"3918327":{"quantity":1134,"valueBRL":6022.01},"2230267":{"quantity":620,"valueBRL":1030.0},"5028264":{"quantity":2121,"valueBRL":168128.73},"3885046":{"quantity":1283,"valueBRL":3099.08},"6914853":{"quantity":989,"valueBRL":633.0},"2230224":{"quantity":347,"valueBRL":2694.28},"5796997":{"quantity":11,"valueBRL":69.3},"6275028":{"quantity":294,"valueBRL":2900.0},"3731278":{"quantity":3548,"valueBRL":49.59},"2700662":{"quantity":2029,"valueBRL":487039.69}},"suppressedUnits":0}},"202503":{"sih":{"rowsState":68915,"rowsCity":2203,"municipal":{"quantity":2203,"valueBRL":4842110.83},"byCnes":{"3508528":{"quantity":1227,"valueBRL":2352373.41},"2232014":{"quantity":523,"valueBRL":1520423.3},"3626245":{"quantity":453,"valueBRL":969314.12}},"suppressedUnits":0},"sia":{"rowsState":4339686,"rowsCity":129765,"municipal":{"quantity":398433,"valueBRL":3445199.98},"byCnes":{"3508528":{"quantity":33255,"valueBRL":574668.98},"5423392":{"quantity":907,"valueBRL":2348.6},"7937059":{"quantity":8165,"valueBRL":51810.0},"2230224":{"quantity":781,"valueBRL":6588.83},"3626245":{"quantity":46766,"valueBRL":416050.12},"0965995":{"quantity":1545,"valueBRL":0.0},"7401442":{"quantity":8807,"valueBRL":52798.55},"3217787":{"quantity":2543,"valueBRL":11972.91},"6691757":{"quantity":1364,"valueBRL":1261.46},"3874281":{"quantity":1744,"valueBRL":7094.57},"2230267":{"quantity":427,"valueBRL":880.0},"6914853":{"quantity":639,"valueBRL":733.4},"7456883":{"quantity":325,"valueBRL":0.0},"9971386":{"quantity":8856,"valueBRL":51362.5},"4098250":{"quantity":2568,"valueBRL":13287.6},"2231301":{"quantity":8714,"valueBRL":50614.93},"3215792":{"quantity":8942,"valueBRL":51767.15},"3731278":{"quantity":2181,"valueBRL":27.72},"3897281":{"quantity":4710,"valueBRL":29887.05},"0480444":{"quantity":8827,"valueBRL":52355.47},"0422525":{"quantity":468,"valueBRL":2835.0},"4243439":{"quantity":201,"valueBRL":1514.9},"3761347":{"quantity":6782,"valueBRL":41580.58},"9643222":{"quantity":7129,"valueBRL":40249.51},"5526418":{"quantity":471,"valueBRL":2165.8},"9496637":{"quantity":356,"valueBRL":1616.9},"3918327":{"quantity":1134,"valueBRL":5986.88},"6275028":{"quantity":324,"valueBRL":3210.0},"6729029":{"quantity":1009,"valueBRL":12701.82},"4860403":{"quantity":10490,"valueBRL":38356.96},"2232014":{"quantity":181337,"valueBRL":1087417.8},"5414849":{"quantity":9072,"valueBRL":53090.16},"2229161":{"quantity":9103,"valueBRL":52959.53},"2229129":{"quantity":8931,"valueBRL":52309.45},"5028264":{"quantity":1861,"valueBRL":156785.42},"7450648":{"quantity":880,"valueBRL":0.0},"7450672":{"quantity":696,"valueBRL":0.0},"7464975":{"quantity":666,"valueBRL":0.0},"3885046":{"quantity":649,"valueBRL":0.0},"2700662":{"quantity":2123,"valueBRL":516909.43},"7450664":{"quantity":868,"valueBRL":0.0},"7456875":{"quantity":325,"valueBRL":0.0},"7450699":{"quantity":788,"valueBRL":0.0},"7450710":{"quantity":704,"valueBRL":0.0}},"suppressedUnits":0}},"202504":{"sih":{"rowsState":70578,"rowsCity":2877,"municipal":{"quantity":2877,"valueBRL":6506559.49},"byCnes":{"3626245":{"quantity":575,"valueBRL":885519.72},"3508528":{"quantity":1559,"valueBRL":4009187.59},"2232014":{"quantity":743,"valueBRL":1611852.18}},"suppressedUnits":0},"sia":{"rowsState":4434104,"rowsCity":140811,"municipal":{"quantity":309296,"valueBRL":3363996.73},"byCnes":{"2232014":{"quantity":78983,"valueBRL":890030.58},"2700662":{"quantity":2192,"valueBRL":528513.82},"3508528":{"quantity":35648,"valueBRL":563585.26},"9971386":{"quantity":9058,"valueBRL":51398.85},"3761347":{"quantity":7419,"valueBRL":44555.13},"2231301":{"quantity":8708,"valueBRL":51935.94},"5414849":{"quantity":9099,"valueBRL":52983.38},"0480444":{"quantity":8787,"valueBRL":53082.57},"2229129":{"quantity":8863,"valueBRL":53060.08},"2229161":{"quantity":8909,"valueBRL":53068.91},"7401442":{"quantity":8453,"valueBRL":50776.49},"3215792":{"quantity":8906,"valueBRL":52424.89},"5526418":{"quantity":505,"valueBRL":2256.4},"0965995":{"quantity":2242,"valueBRL":0.0},"6729029":{"quantity":1227,"valueBRL":15328.0},"9643222":{"quantity":7163,"valueBRL":42436.78},"3626245":{"quantity":54829,"valueBRL":461635.09},"5423392":{"quantity":954,"valueBRL":2725.6},"4243439":{"quantity":393,"valueBRL":2536.5},"3874281":{"quantity":2713,"valueBRL":8905.14},"3217787":{"quantity":2077,"valueBRL":12801.82},"2230224":{"quantity":584,"valueBRL":4381.2},"4098250":{"quantity":3284,"valueBRL":16873.41},"7937059":{"quantity":9331,"valueBRL":62671.9},"3897281":{"quantity":4726,"valueBRL":29988.6},"3918327":{"quantity":1516,"valueBRL":7913.5},"9496637":{"quantity":243,"valueBRL":1084.3},"5028264":{"quantity":2390,"valueBRL":184308.33},"3177106":{"quantity":24,"valueBRL":6450.0},"6914853":{"quantity":897,"valueBRL":1043.75},"6691757":{"quantity":921,"valueBRL":1132.35},"3885046":{"quantity":2251,"valueBRL":6606.04},"3731278":{"quantity":3702,"valueBRL":27.72},"2230267":{"quantity":735,"valueBRL":846.3},"4860403":{"quantity":10205,"valueBRL":35290.3},"5290015":{"quantity":449,"valueBRL":4440.0},"6275028":{"quantity":340,"valueBRL":3390.0},"0422525":{"quantity":570,"valueBRL":3507.8}},"suppressedUnits":0}},"202505":{"sih":{"rowsState":73411,"rowsCity":1382,"municipal":{"quantity":1382,"valueBRL":3518472.63},"byCnes":{"2232014":{"quantity":713,"valueBRL":1783463.23},"3508528":{"quantity":669,"valueBRL":1735009.4}},"suppressedUnits":0},"sia":{"rowsState":4475274,"rowsCity":121077,"municipal":{"quantity":235085,"valueBRL":2538135.02},"byCnes":{"2229161":{"quantity":8719,"valueBRL":52634.09},"2230224":{"quantity":848,"valueBRL":6175.65},"3215792":{"quantity":9078,"valueBRL":52848.26},"3508528":{"quantity":7949,"valueBRL":137891.25},"3761347":{"quantity":7897,"valueBRL":47117.07},"2232014":{"quantity":81964,"valueBRL":911165.3},"2231301":{"quantity":8968,"valueBRL":52547.36},"2229129":{"quantity":9037,"valueBRL":52853.98},"9971386":{"quantity":8962,"valueBRL":52057.35},"5414849":{"quantity":9137,"valueBRL":53138.9},"0480444":{"quantity":8677,"valueBRL":52539.49},"0965995":{"quantity":3015,"valueBRL":0.0},"9643222":{"quantity":7426,"valueBRL":42709.88},"7401442":{"quantity":8396,"valueBRL":50453.0},"3874281":{"quantity":2990,"valueBRL":9073.39},"3217787":{"quantity":2227,"valueBRL":10962.54},"5028264":{"quantity":1916,"valueBRL":187306.66},"5526418":{"quantity":505,"valueBRL":2371.6},"5423392":{"quantity":718,"valueBRL":1625.6},"9496637":{"quantity":398,"valueBRL":1752.7},"7937059":{"quantity":6148,"valueBRL":38959.4},"6729029":{"quantity":1049,"valueBRL":13896.1},"4098250":{"quantity":3406,"valueBRL":17714.91},"6275028":{"quantity":343,"valueBRL":3420.0},"6914853":{"quantity":547,"valueBRL":1153.8},"3918327":{"quantity":1012,"valueBRL":5390.66},"3885046":{"quantity":1616,"valueBRL":3571.86},"3897281":{"quantity":4709,"valueBRL":29880.7},"4243439":{"quantity":294,"valueBRL":2010.6},"2700662":{"quantity":2246,"valueBRL":547310.15},"3731278":{"quantity":3248,"valueBRL":35.28},"2230267":{"quantity":638,"valueBRL":790.0},"3177106":{"quantity":24,"valueBRL":6450.0},"7054254":{"quantity":10562,"valueBRL":47602.91},"0837814":{"quantity":10416,"valueBRL":42724.58}},"suppressedUnits":0}},"202506":{"sih":{"rowsState":71678,"rowsCity":1242,"municipal":{"quantity":1242,"valueBRL":2683883.74},"byCnes":{"2232014":{"quantity":884,"valueBRL":2028046.23},"3508528":{"quantity":358,"valueBRL":655837.51}},"suppressedUnits":0},"sia":{"rowsState":4281017,"rowsCity":119843,"municipal":{"quantity":527474,"valueBRL":4305636.33},"byCnes":{"9643222":{"quantity":7526,"valueBRL":42663.02},"3918327":{"quantity":1032,"valueBRL":5435.29},"2230224":{"quantity":896,"valueBRL":6118.35},"9971386":{"quantity":8777,"valueBRL":51743.04},"5423392":{"quantity":706,"valueBRL":1472.1},"6275028":{"quantity":372,"valueBRL":3700.0},"6729029":{"quantity":1003,"valueBRL":12603.56},"6914853":{"quantity":513,"valueBRL":1212.7},"5526418":{"quantity":463,"valueBRL":1963.3},"6691757":{"quantity":2290,"valueBRL":1577.7},"4098250":{"quantity":2942,"valueBRL":15169.15},"3897281":{"quantity":4686,"valueBRL":29734.8},"0965995":{"quantity":2566,"valueBRL":0.0},"7054254":{"quantity":73512,"valueBRL":379990.6},"2230267":{"quantity":192,"valueBRL":210.0},"3731278":{"quantity":1993,"valueBRL":2.55},"2231301":{"quantity":8904,"valueBRL":52940.85},"7456883":{"quantity":213,"valueBRL":0.0},"7464975":{"quantity":358,"valueBRL":0.0},"7450672":{"quantity":707,"valueBRL":0.0},"0837814":{"quantity":62175,"valueBRL":330426.99},"7937059":{"quantity":8359,"valueBRL":53006.2},"9496637":{"quantity":354,"valueBRL":1646.1},"3177106":{"quantity":26,"valueBRL":6987.5},"2229129":{"quantity":9003,"valueBRL":53106.73},"3508528":{"quantity":26015,"valueBRL":367117.98},"3761347":{"quantity":6584,"valueBRL":39264.33},"2232014":{"quantity":139885,"valueBRL":1367637.18},"0422525":{"quantity":656,"valueBRL":4133.9},"3885046":{"quantity":1571,"valueBRL":3818.66},"7376421":{"quantity":98899,"valueBRL":498193.49},"7450648":{"quantity":1162,"valueBRL":0.0},"7456875":{"quantity":213,"valueBRL":0.0},"2700662":{"quantity":2119,"valueBRL":512357.02},"5028264":{"quantity":2204,"valueBRL":195610.74},"7401442":{"quantity":7765,"valueBRL":46533.33},"3215792":{"quantity":8735,"valueBRL":51612.03},"0480444":{"quantity":8736,"valueBRL":52942.87},"5414849":{"quantity":9309,"valueBRL":53190.22},"2229161":{"quantity":8807,"valueBRL":52637.86},"3874281":{"quantity":2284,"valueBRL":7476.09},"4243439":{"quantity":191,"valueBRL":1400.1},"7450664":{"quantity":1110,"valueBRL":0.0},"7450699":{"quantity":868,"valueBRL":0.0},"7450710":{"quantity":793,"valueBRL":0.0}},"suppressedUnits":0}},"202507":{"sih":{"rowsState":75146,"rowsCity":1140,"municipal":{"quantity":1140,"valueBRL":1911857.02},"byCnes":{"2232014":{"quantity":662,"valueBRL":1127760.19},"3508528":{"quantity":204,"valueBRL":420175.53},"3626245":{"quantity":274,"valueBRL":363921.3}},"suppressedUnits":0},"sia":{"rowsState":4613236,"rowsCity":128036,"municipal":{"quantity":390252,"valueBRL":3934743.04},"byCnes":{"0480444":{"quantity":8847,"valueBRL":53096.87},"3508528":{"quantity":35581,"valueBRL":629807.85},"2232014":{"quantity":107512,"valueBRL":986664.04},"3885046":{"quantity":1664,"valueBRL":3854.15},"2229129":{"quantity":9127,"valueBRL":52947.05},"2229161":{"quantity":8919,"valueBRL":52782.92},"2231301":{"quantity":8787,"valueBRL":52881.84},"9643222":{"quantity":7538,"valueBRL":44489.54},"4098250":{"quantity":3509,"valueBRL":18180.93},"4243439":{"quantity":363,"valueBRL":2276.1},"3215792":{"quantity":9113,"valueBRL":52984.26},"3217787":{"quantity":2939,"valueBRL":11812.46},"2230224":{"quantity":804,"valueBRL":5984.66},"9971386":{"quantity":8651,"valueBRL":51568.51},"3626245":{"quantity":45341,"valueBRL":396057.69},"6729029":{"quantity":1266,"valueBRL":17158.36},"6914853":{"quantity":584,"valueBRL":1497.68},"7401442":{"quantity":7573,"valueBRL":46089.69},"7937059":{"quantity":6914,"valueBRL":43821.8},"5414849":{"quantity":8813,"valueBRL":53150.29},"5526418":{"quantity":487,"valueBRL":2246.8},"5423392":{"quantity":943,"valueBRL":1738.5},"9496637":{"quantity":153,"valueBRL":694.1},"6691757":{"quantity":737,"valueBRL":716.85},"3874281":{"quantity":2897,"valueBRL":8868.21},"6275028":{"quantity":355,"valueBRL":3530.0},"0965995":{"quantity":2504,"valueBRL":0.0},"3761347":{"quantity":7544,"valueBRL":44349.51},"4860403":{"quantity":19877,"valueBRL":94561.74},"0837814":{"quantity":16184,"valueBRL":82406.92},"5028264":{"quantity":1845,"valueBRL":291589.75},"3731278":{"quantity":1370,"valueBRL":133.44},"2230267":{"quantity":63,"valueBRL":0.0},"7054254":{"quantity":17915,"valueBRL":84477.39},"2700662":{"quantity":2226,"valueBRL":539698.06},"7376421":{"quantity":25110,"valueBRL":164494.95},"3897281":{"quantity":4719,"valueBRL":29944.2},"3918327":{"quantity":1466,"valueBRL":7917.18},"2933942":{"quantity":11,"valueBRL":0.0}},"suppressedUnits":1}},"202508":{"sih":{"rowsState":74379,"rowsCity":1852,"municipal":{"quantity":1852,"valueBRL":3825374.98},"byCnes":{"3508528":{"quantity":989,"valueBRL":1741788.49},"2232014":{"quantity":863,"valueBRL":2083586.49}},"suppressedUnits":0},"sia":{"rowsState":4680431,"rowsCity":129065,"municipal":{"quantity":345328,"valueBRL":4060101.13},"byCnes":{"2231301":{"quantity":8813,"valueBRL":49604.25},"2229129":{"quantity":8750,"valueBRL":49229.98},"2229161":{"quantity":8962,"valueBRL":49981.21},"0480444":{"quantity":8773,"valueBRL":49867.77},"9643222":{"quantity":7488,"valueBRL":41332.75},"3215792":{"quantity":8922,"valueBRL":49898.12},"3508528":{"quantity":33895,"valueBRL":516327.07},"5414849":{"quantity":8323,"valueBRL":49728.07},"4098250":{"quantity":3596,"valueBRL":18412.8},"5028264":{"quantity":2463,"valueBRL":273883.29},"7401442":{"quantity":7835,"valueBRL":46283.57},"0965995":{"quantity":3564,"valueBRL":0.0},"3761347":{"quantity":7403,"valueBRL":43199.42},"2232014":{"quantity":101193,"valueBRL":1713535.04},"7937059":{"quantity":11251,"valueBRL":70955.05},"9971386":{"quantity":8329,"valueBRL":47565.43},"6729029":{"quantity":1344,"valueBRL":17893.3},"3897281":{"quantity":4719,"valueBRL":29944.2},"5526418":{"quantity":742,"valueBRL":3268.3},"3217787":{"quantity":2944,"valueBRL":12717.27},"3874281":{"quantity":3070,"valueBRL":8901.74},"3731278":{"quantity":2581,"valueBRL":212.55},"3885046":{"quantity":1495,"valueBRL":3179.1},"4243439":{"quantity":282,"valueBRL":1865.7},"9496637":{"quantity":271,"valueBRL":1268.9},"0422525":{"quantity":677,"valueBRL":4289.4},"7054254":{"quantity":17032,"valueBRL":84157.09},"7376421":{"quantity":31669,"valueBRL":131891.82},"6914853":{"quantity":509,"valueBRL":774.53},"4860403":{"quantity":16589,"valueBRL":55285.42},"0837814":{"quantity":16053,"valueBRL":77120.09},"6691757":{"quantity":143,"valueBRL":364.63},"2230224":{"quantity":884,"valueBRL":7060.11},"3918327":{"quantity":1267,"valueBRL":6848.96},"2933942":{"quantity":97,"valueBRL":0.0},"5423392":{"quantity":884,"valueBRL":3493.7},"6275028":{"quantity":258,"valueBRL":2580.0},"2700662":{"quantity":2258,"valueBRL":537180.5}},"suppressedUnits":0}},"202509":{"sih":{"rowsState":75659,"rowsCity":3807,"municipal":{"quantity":3807,"valueBRL":8442668.5},"byCnes":{"3508528":{"quantity":2752,"valueBRL":6169157.91},"2232014":{"quantity":1055,"valueBRL":2273510.59}},"suppressedUnits":0}},"202510":{"sih":{"rowsState":75980,"rowsCity":1257,"municipal":{"quantity":1257,"valueBRL":2844820.07},"byCnes":{"2232014":{"quantity":890,"valueBRL":2151894.64},"3508528":{"quantity":367,"valueBRL":692925.43}},"suppressedUnits":0}},"202511":{"sih":{"rowsState":73866,"rowsCity":2299,"municipal":{"quantity":2299,"valueBRL":5704764.86},"byCnes":{"3508528":{"quantity":1554,"valueBRL":3892994.07},"2232014":{"quantity":745,"valueBRL":1811770.79}},"suppressedUnits":0},"sia":{"rowsState":4730290,"rowsCity":111324,"municipal":{"quantity":293486,"valueBRL":3115291.41},"byCnes":{"2229129":{"quantity":8679,"valueBRL":49426.69},"2231301":{"quantity":8952,"valueBRL":51598.4},"2232014":{"quantity":84817,"valueBRL":1091634.2},"9643222":{"quantity":8035,"valueBRL":44771.49},"0480444":{"quantity":8657,"valueBRL":51188.76},"5028264":{"quantity":1410,"valueBRL":241186.75},"0965995":{"quantity":2832,"valueBRL":0.0},"9971386":{"quantity":8660,"valueBRL":48638.17},"7401442":{"quantity":8256,"valueBRL":47514.77},"3731278":{"quantity":712,"valueBRL":300.0},"3918327":{"quantity":1163,"valueBRL":6181.16},"3508528":{"quantity":17837,"valueBRL":243914.18},"3215792":{"quantity":8965,"valueBRL":51061.91},"5423392":{"quantity":387,"valueBRL":386.0},"3874281":{"quantity":453,"valueBRL":2071.22},"3885046":{"quantity":828,"valueBRL":2487.6},"7450710":{"quantity":955,"valueBRL":0.0},"0422525":{"quantity":217,"valueBRL":1354.5},"7456875":{"quantity":262,"valueBRL":0.0},"4098250":{"quantity":4108,"valueBRL":20508.77},"7937059":{"quantity":15852,"valueBRL":100100.45},"3897281":{"quantity":4719,"valueBRL":29944.2},"6914853":{"quantity":318,"valueBRL":856.88},"6691757":{"quantity":189,"valueBRL":523.3},"2700662":{"quantity":2077,"valueBRL":500327.76},"2230267":{"quantity":155,"valueBRL":6.15},"9496637":{"quantity":26,"valueBRL":105.3},"0837814":{"quantity":16062,"valueBRL":88845.42},"5414849":{"quantity":8858,"valueBRL":50571.78},"3217787":{"quantity":2146,"valueBRL":15137.17},"3761347":{"quantity":7093,"valueBRL":40884.22},"2229161":{"quantity":9011,"valueBRL":50459.52},"6275028":{"quantity":121,"valueBRL":1210.0},"6729029":{"quantity":2373,"valueBRL":48094.54},"4243439":{"quantity":38,"valueBRL":33.0},"7456883":{"quantity":262,"valueBRL":0.0},"2230224":{"quantity":73,"valueBRL":42.33},"7450699":{"quantity":639,"valueBRL":0.0},"7450672":{"quantity":712,"valueBRL":0.0},"7376421":{"quantity":25165,"valueBRL":132695.77},"7054254":{"quantity":18576,"valueBRL":101229.05},"5796997":{"quantity":14,"valueBRL":0.0},"7464975":{"quantity":522,"valueBRL":0.0},"7450648":{"quantity":1106,"valueBRL":0.0},"7450664":{"quantity":1194,"valueBRL":0.0}},"suppressedUnits":0}},"202512":{"sih":{"rowsState":70967,"rowsCity":1706,"municipal":{"quantity":1706,"valueBRL":4046260.82},"byCnes":{"2232014":{"quantity":793,"valueBRL":1832384.53},"3508528":{"quantity":913,"valueBRL":2213876.29}},"suppressedUnits":0},"sia":{"rowsState":4749688,"rowsCity":110276,"municipal":{"quantity":256094,"valueBRL":2890142.3},"byCnes":{"2229161":{"quantity":8947,"valueBRL":51323.04},"2231301":{"quantity":8953,"valueBRL":51128.33},"2232014":{"quantity":69355,"valueBRL":1065196.07},"2229129":{"quantity":8731,"valueBRL":49856.74},"7401442":{"quantity":8647,"valueBRL":48756.41},"9643222":{"quantity":8555,"valueBRL":47336.95},"5414849":{"quantity":8478,"valueBRL":49637.33},"9971386":{"quantity":8772,"valueBRL":50797.62},"7376421":{"quantity":21332,"valueBRL":104143.16},"0480444":{"quantity":8665,"valueBRL":51570.19},"0837814":{"quantity":13845,"valueBRL":67009.78},"3761347":{"quantity":7968,"valueBRL":45452.53},"3215792":{"quantity":9085,"valueBRL":51614.49},"3508528":{"quantity":20484,"valueBRL":276201.58},"4098250":{"quantity":2742,"valueBRL":13426.1},"3897281":{"quantity":4642,"valueBRL":29455.6},"7937059":{"quantity":15729,"valueBRL":99034.45},"2933942":{"quantity":26,"valueBRL":0.0},"3918327":{"quantity":617,"valueBRL":3365.29},"5028264":{"quantity":541,"valueBRL":112257.98},"3731278":{"quantity":1119,"valueBRL":151.0},"2230267":{"quantity":54,"valueBRL":0.0},"6914853":{"quantity":110,"valueBRL":69.93},"7054254":{"quantity":16504,"valueBRL":88813.93},"2700662":{"quantity":2193,"valueBRL":533543.8}},"suppressedUnits":0}},"202601":{"sih":{"rowsState":70160,"rowsCity":1599,"municipal":{"quantity":1599,"valueBRL":4187774.26},"byCnes":{"2232014":{"quantity":928,"valueBRL":2198644.14},"3508528":{"quantity":671,"valueBRL":1989130.12}},"suppressedUnits":0},"sia":{"rowsState":4674937,"rowsCity":115307,"municipal":{"quantity":229472,"valueBRL":2979920.74},"byCnes":{"2229161":{"quantity":9070,"valueBRL":51275.81},"2231301":{"quantity":8867,"valueBRL":51247.81},"3761347":{"quantity":8097,"valueBRL":45672.32},"3215792":{"quantity":8866,"valueBRL":50686.11},"9971386":{"quantity":8950,"valueBRL":50462.17},"9643222":{"quantity":6409,"valueBRL":34292.53},"2232014":{"quantity":85436,"valueBRL":1149955.38},"5414849":{"quantity":8505,"valueBRL":50775.49},"7401442":{"quantity":8706,"valueBRL":50034.75},"2229129":{"quantity":9176,"valueBRL":51109.1},"0480444":{"quantity":8413,"valueBRL":49929.71},"3217787":{"quantity":4870,"valueBRL":24586.85},"4098250":{"quantity":3404,"valueBRL":16736.82},"3897281":{"quantity":4609,"valueBRL":29246.2},"3508528":{"quantity":22007,"valueBRL":281733.82},"5028264":{"quantity":1303,"valueBRL":301180.79},"3918327":{"quantity":1094,"valueBRL":5942.73},"7937059":{"quantity":14562,"valueBRL":92301.3},"6729029":{"quantity":2815,"valueBRL":61539.16},"2700662":{"quantity":2212,"valueBRL":526634.43},"3874281":{"quantity":313,"valueBRL":0.0},"0422525":{"quantity":258,"valueBRL":1612.8},"0965995":{"quantity":730,"valueBRL":0.0},"4243439":{"quantity":280,"valueBRL":2031.5},"5796997":{"quantity":96,"valueBRL":529.2},"2230224":{"quantity":119,"valueBRL":148.96},"9496637":{"quantity":46,"valueBRL":0.0},"5423392":{"quantity":259,"valueBRL":255.0}},"suppressedUnits":0}},"202602":{"sih":{"rowsState":68329,"rowsCity":1921,"municipal":{"quantity":1921,"valueBRL":4655307.59},"byCnes":{"3508528":{"quantity":934,"valueBRL":2534451.15},"2232014":{"quantity":987,"valueBRL":2120856.44}},"suppressedUnits":0},"sia":{"rowsState":4164757,"rowsCity":115364,"municipal":{"quantity":285969,"valueBRL":2944028.39},"byCnes":{"4098250":{"quantity":2737,"valueBRL":13293.43},"7937059":{"quantity":15165,"valueBRL":95976.0},"9643222":{"quantity":7944,"valueBRL":42038.7},"6729029":{"quantity":1884,"valueBRL":47797.72},"4243439":{"quantity":339,"valueBRL":2759.4},"2231301":{"quantity":8714,"valueBRL":51266.71},"0422525":{"quantity":222,"valueBRL":1379.7},"7450648":{"quantity":1314,"valueBRL":0.0},"6691757":{"quantity":116,"valueBRL":0.0},"7450672":{"quantity":1001,"valueBRL":0.0},"2232014":{"quantity":82470,"valueBRL":1070103.71},"3215792":{"quantity":9034,"valueBRL":50940.03},"7456875":{"quantity":259,"valueBRL":0.0},"6914853":{"quantity":45,"valueBRL":12.6},"7450664":{"quantity":1356,"valueBRL":0.0},"7401442":{"quantity":9096,"valueBRL":50814.6},"3918327":{"quantity":567,"valueBRL":3123.49},"2230267":{"quantity":131,"valueBRL":0.0},"2230224":{"quantity":78,"valueBRL":97.5},"7456883":{"quantity":259,"valueBRL":0.0},"0837814":{"quantity":15142,"valueBRL":85278.59},"3508528":{"quantity":16161,"valueBRL":221974.38},"7450699":{"quantity":1159,"valueBRL":0.0},"7376421":{"quantity":23450,"valueBRL":133521.18},"2229161":{"quantity":9224,"valueBRL":51807.13},"9496637":{"quantity":87,"valueBRL":0.0},"3761347":{"quantity":7730,"valueBRL":45931.47},"0480444":{"quantity":8899,"valueBRL":52057.33},"0965995":{"quantity":2405,"valueBRL":0.0},"3731278":{"quantity":240,"valueBRL":0.0},"5796997":{"quantity":5,"valueBRL":0.0},"7464975":{"quantity":59,"valueBRL":0.0},"3885046":{"quantity":708,"valueBRL":1809.8},"5414849":{"quantity":8474,"valueBRL":50802.18},"3874281":{"quantity":998,"valueBRL":3395.31},"3217787":{"quantity":2039,"valueBRL":9128.63},"2229129":{"quantity":9245,"valueBRL":50573.99},"9971386":{"quantity":8799,"valueBRL":50357.25},"5028264":{"quantity":2539,"valueBRL":164239.13},"7054254":{"quantity":18824,"valueBRL":113078.13},"5423392":{"quantity":257,"valueBRL":252.0},"3897281":{"quantity":4719,"valueBRL":29944.2},"2700662":{"quantity":1890,"valueBRL":450274.1},"7450710":{"quantity":185,"valueBRL":0.0}},"suppressedUnits":0}},"202603":{"sih":{"rowsState":74165,"rowsCity":1998,"municipal":{"quantity":1998,"valueBRL":4955703.95},"byCnes":{"3508528":{"quantity":893,"valueBRL":2256553.39},"2232014":{"quantity":1105,"valueBRL":2699150.56}},"suppressedUnits":0}},"202607":{"sia":{"rowsState":4532294,"rowsCity":151312,"municipal":{"quantity":392856,"valueBRL":4072675.48},"byCnes":{"9643222":{"quantity":8810,"valueBRL":48553.38},"7054254":{"quantity":36245,"valueBRL":130007.87},"4098250":{"quantity":4597,"valueBRL":25570.24},"6691757":{"quantity":3734,"valueBRL":3044.57},"6729029":{"quantity":560,"valueBRL":3697.5},"5423392":{"quantity":1812,"valueBRL":7076.6},"3215792":{"quantity":8872,"valueBRL":50219.49},"3508528":{"quantity":28964,"valueBRL":454677.2},"9971386":{"quantity":8722,"valueBRL":49788.95},"7937059":{"quantity":15724,"valueBRL":98682.75},"3897281":{"quantity":4719,"valueBRL":29944.2},"2230224":{"quantity":665,"valueBRL":4973.97},"4243439":{"quantity":292,"valueBRL":2274.4},"0422525":{"quantity":507,"valueBRL":3892.6},"3217787":{"quantity":2444,"valueBRL":13654.42},"2232014":{"quantity":90034,"valueBRL":1250026.25},"6914853":{"quantity":2579,"valueBRL":2333.04},"7401442":{"quantity":8644,"valueBRL":51506.36},"2229129":{"quantity":9080,"valueBRL":50666.67},"5028264":{"quantity":2042,"valueBRL":287519.74},"3874281":{"quantity":1463,"valueBRL":5312.48},"9186204":{"quantity":19945,"valueBRL":406784.75},"3731278":{"quantity":3788,"valueBRL":5262.56},"0965995":{"quantity":1893,"valueBRL":0.0},"9496637":{"quantity":304,"valueBRL":1728.7},"2231301":{"quantity":8961,"valueBRL":51122.35},"7376421":{"quantity":49160,"valueBRL":179420.87},"3918327":{"quantity":774,"valueBRL":4099.26},"9208925":{"quantity":225,"valueBRL":1417.5},"3761347":{"quantity":8328,"valueBRL":48860.45},"2229161":{"quantity":9158,"valueBRL":51813.85},"5414849":{"quantity":8756,"valueBRL":50472.27},"5796997":{"quantity":264,"valueBRL":863.1},"0480444":{"quantity":8548,"valueBRL":51488.27},"0837814":{"quantity":29891,"valueBRL":117651.71},"3885046":{"quantity":258,"valueBRL":16.2},"2700662":{"quantity":2094,"valueBRL":528250.96}},"suppressedUnits":0}}},"sources":{"sih":{"label":"SIH/SUS — AIHs RD por município de internação","status":"partial","monthsAvailable":["202501","202502","202503","202504","202505","202506","202507","202508","202509","202510","202511","202512","202601","202602","202603"],"monthsRequested":21,"method":"Contagem de registros de AIH reduzida (RD) e soma de VAL_TOT no mês de competência, por município do hospital; não representa pacientes únicos ou internações por residência.","reference":"202603","url":"https://datasus.saude.gov.br/assistencia-a-saude/","access":"PySUS 2.11.7; catálogo público Parquet S3, apenas RD/PA","privacy":"Sem registros individuais; suprimir grupos CNES com menos de 5 unidades de produção"},"sia":{"label":"SIA/SUS — produção aprovada PA por município do estabelecimento","status":"partial","monthsAvailable":["202501","202502","202503","202504","202505","202506","202507","202508","202511","202512","202601","202602","202607"],"monthsRequested":21,"method":"Quantidade de procedimentos aprovados PA_QTDAPR e soma de PA_VALAPR na competência, por município do estabelecimento; não representa pacientes únicos nem produção SIA integral de todos os instrumentos.","reference":"202607","url":"https://datasus.saude.gov.br/assistencia-a-saude/","access":"PySUS 2.11.7; catálogo público Parquet S3, apenas RD/PA","privacy":"Sem registros individuais; suprimir grupos CNES com menos de 5 unidades de produção"}}}
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-10-17T21:16:06+00:00",
+  "geography": "município do estabelecimento/procedimento",
+  "periods": {
+    "202501": {
+      "sih": {
+        "rowsState": 66998,
+        "rowsCity": 2305,
+        "municipal": {
+          "quantity": 2305,
+          "valueBRL": 5160984.01
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 690,
+            "valueBRL": 1453473.27
+          },
+          "3508528": {
+            "quantity": 1229,
+            "valueBRL": 3054233.82
+          },
+          "3626245": {
+            "quantity": 386,
+            "valueBRL": 653276.92
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202502": {
+      "sih": {
+        "rowsState": 66262,
+        "rowsCity": 2387,
+        "municipal": {
+          "quantity": 2387,
+          "valueBRL": 5199481.75
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 677,
+            "valueBRL": 1667266.61
+          },
+          "3508528": {
+            "quantity": 1317,
+            "valueBRL": 3036310.35
+          },
+          "3626245": {
+            "quantity": 393,
+            "valueBRL": 495904.79
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4148298,
+        "rowsCity": 132261,
+        "municipal": {
+          "quantity": 240187,
+          "valueBRL": 2811757.43
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 8889,
+            "valueBRL": 52284.61
+          },
+          "2229161": {
+            "quantity": 9042,
+            "valueBRL": 52173.19
+          },
+          "2230224": {
+            "quantity": 347,
+            "valueBRL": 2694.28
+          },
+          "2230267": {
+            "quantity": 620,
+            "valueBRL": 1030
+          },
+          "2231301": {
+            "quantity": 8574,
+            "valueBRL": 51304.98
+          },
+          "2232014": {
+            "quantity": 35254,
+            "valueBRL": 642046.63
+          },
+          "2700662": {
+            "quantity": 2029,
+            "valueBRL": 487039.69
+          },
+          "3215792": {
+            "quantity": 9092,
+            "valueBRL": 52317.31
+          },
+          "3508528": {
+            "quantity": 29958,
+            "valueBRL": 429595.84
+          },
+          "3626245": {
+            "quantity": 45138,
+            "valueBRL": 411538.71
+          },
+          "3731278": {
+            "quantity": 3548,
+            "valueBRL": 49.59
+          },
+          "3761347": {
+            "quantity": 7791,
+            "valueBRL": 45738.8
+          },
+          "3874281": {
+            "quantity": 1853,
+            "valueBRL": 5857.09
+          },
+          "3885046": {
+            "quantity": 1283,
+            "valueBRL": 3099.08
+          },
+          "3897281": {
+            "quantity": 4718,
+            "valueBRL": 29937.35
+          },
+          "3918327": {
+            "quantity": 1134,
+            "valueBRL": 6022.01
+          },
+          "4098250": {
+            "quantity": 2901,
+            "valueBRL": 14679.28
+          },
+          "4243439": {
+            "quantity": 396,
+            "valueBRL": 2490.4
+          },
+          "4860403": {
+            "quantity": 9220,
+            "valueBRL": 34017.79
+          },
+          "5028264": {
+            "quantity": 2121,
+            "valueBRL": 168128.73
+          },
+          "5414849": {
+            "quantity": 9026,
+            "valueBRL": 52080.27
+          },
+          "5423392": {
+            "quantity": 1137,
+            "valueBRL": 2773.8
+          },
+          "5526418": {
+            "quantity": 493,
+            "valueBRL": 2051.9
+          },
+          "5796997": {
+            "quantity": 11,
+            "valueBRL": 69.3
+          },
+          "6275028": {
+            "quantity": 294,
+            "valueBRL": 2900
+          },
+          "6729029": {
+            "quantity": 1071,
+            "valueBRL": 13941.6
+          },
+          "6914853": {
+            "quantity": 989,
+            "valueBRL": 633
+          },
+          "7401442": {
+            "quantity": 8792,
+            "valueBRL": 52690.33
+          },
+          "7937059": {
+            "quantity": 6580,
+            "valueBRL": 41734.8
+          },
+          "9496637": {
+            "quantity": 313,
+            "valueBRL": 1430.6
+          },
+          "9643222": {
+            "quantity": 7478,
+            "valueBRL": 42406.15
+          },
+          "9971386": {
+            "quantity": 8816,
+            "valueBRL": 50943.61
+          },
+          "0422525": {
+            "quantity": 487,
+            "valueBRL": 2901.33
+          },
+          "0480444": {
+            "quantity": 9198,
+            "valueBRL": 53155.38
+          },
+          "0965995": {
+            "quantity": 1594,
+            "valueBRL": 0
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202503": {
+      "sih": {
+        "rowsState": 68915,
+        "rowsCity": 2203,
+        "municipal": {
+          "quantity": 2203,
+          "valueBRL": 4842110.83
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 523,
+            "valueBRL": 1520423.3
+          },
+          "3508528": {
+            "quantity": 1227,
+            "valueBRL": 2352373.41
+          },
+          "3626245": {
+            "quantity": 453,
+            "valueBRL": 969314.12
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4339686,
+        "rowsCity": 129765,
+        "municipal": {
+          "quantity": 398433,
+          "valueBRL": 3445199.98
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 8931,
+            "valueBRL": 52309.45
+          },
+          "2229161": {
+            "quantity": 9103,
+            "valueBRL": 52959.53
+          },
+          "2230224": {
+            "quantity": 781,
+            "valueBRL": 6588.83
+          },
+          "2230267": {
+            "quantity": 427,
+            "valueBRL": 880
+          },
+          "2231301": {
+            "quantity": 8714,
+            "valueBRL": 50614.93
+          },
+          "2232014": {
+            "quantity": 181337,
+            "valueBRL": 1087417.8
+          },
+          "2700662": {
+            "quantity": 2123,
+            "valueBRL": 516909.43
+          },
+          "3215792": {
+            "quantity": 8942,
+            "valueBRL": 51767.15
+          },
+          "3217787": {
+            "quantity": 2543,
+            "valueBRL": 11972.91
+          },
+          "3508528": {
+            "quantity": 33255,
+            "valueBRL": 574668.98
+          },
+          "3626245": {
+            "quantity": 46766,
+            "valueBRL": 416050.12
+          },
+          "3731278": {
+            "quantity": 2181,
+            "valueBRL": 27.72
+          },
+          "3761347": {
+            "quantity": 6782,
+            "valueBRL": 41580.58
+          },
+          "3874281": {
+            "quantity": 1744,
+            "valueBRL": 7094.57
+          },
+          "3885046": {
+            "quantity": 649,
+            "valueBRL": 0
+          },
+          "3897281": {
+            "quantity": 4710,
+            "valueBRL": 29887.05
+          },
+          "3918327": {
+            "quantity": 1134,
+            "valueBRL": 5986.88
+          },
+          "4098250": {
+            "quantity": 2568,
+            "valueBRL": 13287.6
+          },
+          "4243439": {
+            "quantity": 201,
+            "valueBRL": 1514.9
+          },
+          "4860403": {
+            "quantity": 10490,
+            "valueBRL": 38356.96
+          },
+          "5028264": {
+            "quantity": 1861,
+            "valueBRL": 156785.42
+          },
+          "5414849": {
+            "quantity": 9072,
+            "valueBRL": 53090.16
+          },
+          "5423392": {
+            "quantity": 907,
+            "valueBRL": 2348.6
+          },
+          "5526418": {
+            "quantity": 471,
+            "valueBRL": 2165.8
+          },
+          "6275028": {
+            "quantity": 324,
+            "valueBRL": 3210
+          },
+          "6691757": {
+            "quantity": 1364,
+            "valueBRL": 1261.46
+          },
+          "6729029": {
+            "quantity": 1009,
+            "valueBRL": 12701.82
+          },
+          "6914853": {
+            "quantity": 639,
+            "valueBRL": 733.4
+          },
+          "7401442": {
+            "quantity": 8807,
+            "valueBRL": 52798.55
+          },
+          "7450648": {
+            "quantity": 880,
+            "valueBRL": 0
+          },
+          "7450664": {
+            "quantity": 868,
+            "valueBRL": 0
+          },
+          "7450672": {
+            "quantity": 696,
+            "valueBRL": 0
+          },
+          "7450699": {
+            "quantity": 788,
+            "valueBRL": 0
+          },
+          "7450710": {
+            "quantity": 704,
+            "valueBRL": 0
+          },
+          "7456875": {
+            "quantity": 325,
+            "valueBRL": 0
+          },
+          "7456883": {
+            "quantity": 325,
+            "valueBRL": 0
+          },
+          "7464975": {
+            "quantity": 666,
+            "valueBRL": 0
+          },
+          "7937059": {
+            "quantity": 8165,
+            "valueBRL": 51810
+          },
+          "9496637": {
+            "quantity": 356,
+            "valueBRL": 1616.9
+          },
+          "9643222": {
+            "quantity": 7129,
+            "valueBRL": 40249.51
+          },
+          "9971386": {
+            "quantity": 8856,
+            "valueBRL": 51362.5
+          },
+          "0965995": {
+            "quantity": 1545,
+            "valueBRL": 0
+          },
+          "0480444": {
+            "quantity": 8827,
+            "valueBRL": 52355.47
+          },
+          "0422525": {
+            "quantity": 468,
+            "valueBRL": 2835
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202504": {
+      "sih": {
+        "rowsState": 70578,
+        "rowsCity": 2877,
+        "municipal": {
+          "quantity": 2877,
+          "valueBRL": 6506559.49
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 743,
+            "valueBRL": 1611852.18
+          },
+          "3508528": {
+            "quantity": 1559,
+            "valueBRL": 4009187.59
+          },
+          "3626245": {
+            "quantity": 575,
+            "valueBRL": 885519.72
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4434104,
+        "rowsCity": 140811,
+        "municipal": {
+          "quantity": 309296,
+          "valueBRL": 3363996.73
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 8863,
+            "valueBRL": 53060.08
+          },
+          "2229161": {
+            "quantity": 8909,
+            "valueBRL": 53068.91
+          },
+          "2230224": {
+            "quantity": 584,
+            "valueBRL": 4381.2
+          },
+          "2230267": {
+            "quantity": 735,
+            "valueBRL": 846.3
+          },
+          "2231301": {
+            "quantity": 8708,
+            "valueBRL": 51935.94
+          },
+          "2232014": {
+            "quantity": 78983,
+            "valueBRL": 890030.58
+          },
+          "2700662": {
+            "quantity": 2192,
+            "valueBRL": 528513.82
+          },
+          "3177106": {
+            "quantity": 24,
+            "valueBRL": 6450
+          },
+          "3215792": {
+            "quantity": 8906,
+            "valueBRL": 52424.89
+          },
+          "3217787": {
+            "quantity": 2077,
+            "valueBRL": 12801.82
+          },
+          "3508528": {
+            "quantity": 35648,
+            "valueBRL": 563585.26
+          },
+          "3626245": {
+            "quantity": 54829,
+            "valueBRL": 461635.09
+          },
+          "3731278": {
+            "quantity": 3702,
+            "valueBRL": 27.72
+          },
+          "3761347": {
+            "quantity": 7419,
+            "valueBRL": 44555.13
+          },
+          "3874281": {
+            "quantity": 2713,
+            "valueBRL": 8905.14
+          },
+          "3885046": {
+            "quantity": 2251,
+            "valueBRL": 6606.04
+          },
+          "3897281": {
+            "quantity": 4726,
+            "valueBRL": 29988.6
+          },
+          "3918327": {
+            "quantity": 1516,
+            "valueBRL": 7913.5
+          },
+          "4098250": {
+            "quantity": 3284,
+            "valueBRL": 16873.41
+          },
+          "4243439": {
+            "quantity": 393,
+            "valueBRL": 2536.5
+          },
+          "4860403": {
+            "quantity": 10205,
+            "valueBRL": 35290.3
+          },
+          "5028264": {
+            "quantity": 2390,
+            "valueBRL": 184308.33
+          },
+          "5290015": {
+            "quantity": 449,
+            "valueBRL": 4440
+          },
+          "5414849": {
+            "quantity": 9099,
+            "valueBRL": 52983.38
+          },
+          "5423392": {
+            "quantity": 954,
+            "valueBRL": 2725.6
+          },
+          "5526418": {
+            "quantity": 505,
+            "valueBRL": 2256.4
+          },
+          "6275028": {
+            "quantity": 340,
+            "valueBRL": 3390
+          },
+          "6691757": {
+            "quantity": 921,
+            "valueBRL": 1132.35
+          },
+          "6729029": {
+            "quantity": 1227,
+            "valueBRL": 15328
+          },
+          "6914853": {
+            "quantity": 897,
+            "valueBRL": 1043.75
+          },
+          "7401442": {
+            "quantity": 8453,
+            "valueBRL": 50776.49
+          },
+          "7937059": {
+            "quantity": 9331,
+            "valueBRL": 62671.9
+          },
+          "9496637": {
+            "quantity": 243,
+            "valueBRL": 1084.3
+          },
+          "9643222": {
+            "quantity": 7163,
+            "valueBRL": 42436.78
+          },
+          "9971386": {
+            "quantity": 9058,
+            "valueBRL": 51398.85
+          },
+          "0480444": {
+            "quantity": 8787,
+            "valueBRL": 53082.57
+          },
+          "0965995": {
+            "quantity": 2242,
+            "valueBRL": 0
+          },
+          "0422525": {
+            "quantity": 570,
+            "valueBRL": 3507.8
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202505": {
+      "sih": {
+        "rowsState": 73411,
+        "rowsCity": 1382,
+        "municipal": {
+          "quantity": 1382,
+          "valueBRL": 3518472.63
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 713,
+            "valueBRL": 1783463.23
+          },
+          "3508528": {
+            "quantity": 669,
+            "valueBRL": 1735009.4
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4475274,
+        "rowsCity": 121077,
+        "municipal": {
+          "quantity": 235085,
+          "valueBRL": 2538135.02
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 9037,
+            "valueBRL": 52853.98
+          },
+          "2229161": {
+            "quantity": 8719,
+            "valueBRL": 52634.09
+          },
+          "2230224": {
+            "quantity": 848,
+            "valueBRL": 6175.65
+          },
+          "2230267": {
+            "quantity": 638,
+            "valueBRL": 790
+          },
+          "2231301": {
+            "quantity": 8968,
+            "valueBRL": 52547.36
+          },
+          "2232014": {
+            "quantity": 81964,
+            "valueBRL": 911165.3
+          },
+          "2700662": {
+            "quantity": 2246,
+            "valueBRL": 547310.15
+          },
+          "3177106": {
+            "quantity": 24,
+            "valueBRL": 6450
+          },
+          "3215792": {
+            "quantity": 9078,
+            "valueBRL": 52848.26
+          },
+          "3217787": {
+            "quantity": 2227,
+            "valueBRL": 10962.54
+          },
+          "3508528": {
+            "quantity": 7949,
+            "valueBRL": 137891.25
+          },
+          "3731278": {
+            "quantity": 3248,
+            "valueBRL": 35.28
+          },
+          "3761347": {
+            "quantity": 7897,
+            "valueBRL": 47117.07
+          },
+          "3874281": {
+            "quantity": 2990,
+            "valueBRL": 9073.39
+          },
+          "3885046": {
+            "quantity": 1616,
+            "valueBRL": 3571.86
+          },
+          "3897281": {
+            "quantity": 4709,
+            "valueBRL": 29880.7
+          },
+          "3918327": {
+            "quantity": 1012,
+            "valueBRL": 5390.66
+          },
+          "4098250": {
+            "quantity": 3406,
+            "valueBRL": 17714.91
+          },
+          "4243439": {
+            "quantity": 294,
+            "valueBRL": 2010.6
+          },
+          "5028264": {
+            "quantity": 1916,
+            "valueBRL": 187306.66
+          },
+          "5414849": {
+            "quantity": 9137,
+            "valueBRL": 53138.9
+          },
+          "5423392": {
+            "quantity": 718,
+            "valueBRL": 1625.6
+          },
+          "5526418": {
+            "quantity": 505,
+            "valueBRL": 2371.6
+          },
+          "6275028": {
+            "quantity": 343,
+            "valueBRL": 3420
+          },
+          "6729029": {
+            "quantity": 1049,
+            "valueBRL": 13896.1
+          },
+          "6914853": {
+            "quantity": 547,
+            "valueBRL": 1153.8
+          },
+          "7054254": {
+            "quantity": 10562,
+            "valueBRL": 47602.91
+          },
+          "7401442": {
+            "quantity": 8396,
+            "valueBRL": 50453
+          },
+          "7937059": {
+            "quantity": 6148,
+            "valueBRL": 38959.4
+          },
+          "9496637": {
+            "quantity": 398,
+            "valueBRL": 1752.7
+          },
+          "9643222": {
+            "quantity": 7426,
+            "valueBRL": 42709.88
+          },
+          "9971386": {
+            "quantity": 8962,
+            "valueBRL": 52057.35
+          },
+          "0480444": {
+            "quantity": 8677,
+            "valueBRL": 52539.49
+          },
+          "0965995": {
+            "quantity": 3015,
+            "valueBRL": 0
+          },
+          "0837814": {
+            "quantity": 10416,
+            "valueBRL": 42724.58
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202506": {
+      "sih": {
+        "rowsState": 71678,
+        "rowsCity": 1242,
+        "municipal": {
+          "quantity": 1242,
+          "valueBRL": 2683883.74
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 884,
+            "valueBRL": 2028046.23
+          },
+          "3508528": {
+            "quantity": 358,
+            "valueBRL": 655837.51
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4281017,
+        "rowsCity": 119843,
+        "municipal": {
+          "quantity": 527474,
+          "valueBRL": 4305636.33
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 9003,
+            "valueBRL": 53106.73
+          },
+          "2229161": {
+            "quantity": 8807,
+            "valueBRL": 52637.86
+          },
+          "2230224": {
+            "quantity": 896,
+            "valueBRL": 6118.35
+          },
+          "2230267": {
+            "quantity": 192,
+            "valueBRL": 210
+          },
+          "2231301": {
+            "quantity": 8904,
+            "valueBRL": 52940.85
+          },
+          "2232014": {
+            "quantity": 139885,
+            "valueBRL": 1367637.18
+          },
+          "2700662": {
+            "quantity": 2119,
+            "valueBRL": 512357.02
+          },
+          "3177106": {
+            "quantity": 26,
+            "valueBRL": 6987.5
+          },
+          "3215792": {
+            "quantity": 8735,
+            "valueBRL": 51612.03
+          },
+          "3508528": {
+            "quantity": 26015,
+            "valueBRL": 367117.98
+          },
+          "3731278": {
+            "quantity": 1993,
+            "valueBRL": 2.55
+          },
+          "3761347": {
+            "quantity": 6584,
+            "valueBRL": 39264.33
+          },
+          "3874281": {
+            "quantity": 2284,
+            "valueBRL": 7476.09
+          },
+          "3885046": {
+            "quantity": 1571,
+            "valueBRL": 3818.66
+          },
+          "3897281": {
+            "quantity": 4686,
+            "valueBRL": 29734.8
+          },
+          "3918327": {
+            "quantity": 1032,
+            "valueBRL": 5435.29
+          },
+          "4098250": {
+            "quantity": 2942,
+            "valueBRL": 15169.15
+          },
+          "4243439": {
+            "quantity": 191,
+            "valueBRL": 1400.1
+          },
+          "5028264": {
+            "quantity": 2204,
+            "valueBRL": 195610.74
+          },
+          "5414849": {
+            "quantity": 9309,
+            "valueBRL": 53190.22
+          },
+          "5423392": {
+            "quantity": 706,
+            "valueBRL": 1472.1
+          },
+          "5526418": {
+            "quantity": 463,
+            "valueBRL": 1963.3
+          },
+          "6275028": {
+            "quantity": 372,
+            "valueBRL": 3700
+          },
+          "6691757": {
+            "quantity": 2290,
+            "valueBRL": 1577.7
+          },
+          "6729029": {
+            "quantity": 1003,
+            "valueBRL": 12603.56
+          },
+          "6914853": {
+            "quantity": 513,
+            "valueBRL": 1212.7
+          },
+          "7054254": {
+            "quantity": 73512,
+            "valueBRL": 379990.6
+          },
+          "7376421": {
+            "quantity": 98899,
+            "valueBRL": 498193.49
+          },
+          "7401442": {
+            "quantity": 7765,
+            "valueBRL": 46533.33
+          },
+          "7450648": {
+            "quantity": 1162,
+            "valueBRL": 0
+          },
+          "7450664": {
+            "quantity": 1110,
+            "valueBRL": 0
+          },
+          "7450672": {
+            "quantity": 707,
+            "valueBRL": 0
+          },
+          "7450699": {
+            "quantity": 868,
+            "valueBRL": 0
+          },
+          "7450710": {
+            "quantity": 793,
+            "valueBRL": 0
+          },
+          "7456875": {
+            "quantity": 213,
+            "valueBRL": 0
+          },
+          "7456883": {
+            "quantity": 213,
+            "valueBRL": 0
+          },
+          "7464975": {
+            "quantity": 358,
+            "valueBRL": 0
+          },
+          "7937059": {
+            "quantity": 8359,
+            "valueBRL": 53006.2
+          },
+          "9496637": {
+            "quantity": 354,
+            "valueBRL": 1646.1
+          },
+          "9643222": {
+            "quantity": 7526,
+            "valueBRL": 42663.02
+          },
+          "9971386": {
+            "quantity": 8777,
+            "valueBRL": 51743.04
+          },
+          "0965995": {
+            "quantity": 2566,
+            "valueBRL": 0
+          },
+          "0837814": {
+            "quantity": 62175,
+            "valueBRL": 330426.99
+          },
+          "0422525": {
+            "quantity": 656,
+            "valueBRL": 4133.9
+          },
+          "0480444": {
+            "quantity": 8736,
+            "valueBRL": 52942.87
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202507": {
+      "sih": {
+        "rowsState": 75146,
+        "rowsCity": 1140,
+        "municipal": {
+          "quantity": 1140,
+          "valueBRL": 1911857.02
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 662,
+            "valueBRL": 1127760.19
+          },
+          "3508528": {
+            "quantity": 204,
+            "valueBRL": 420175.53
+          },
+          "3626245": {
+            "quantity": 274,
+            "valueBRL": 363921.3
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4613236,
+        "rowsCity": 128036,
+        "municipal": {
+          "quantity": 390252,
+          "valueBRL": 3934743.04
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 9127,
+            "valueBRL": 52947.05
+          },
+          "2229161": {
+            "quantity": 8919,
+            "valueBRL": 52782.92
+          },
+          "2230224": {
+            "quantity": 804,
+            "valueBRL": 5984.66
+          },
+          "2230267": {
+            "quantity": 63,
+            "valueBRL": 0
+          },
+          "2231301": {
+            "quantity": 8787,
+            "valueBRL": 52881.84
+          },
+          "2232014": {
+            "quantity": 107512,
+            "valueBRL": 986664.04
+          },
+          "2700662": {
+            "quantity": 2226,
+            "valueBRL": 539698.06
+          },
+          "3215792": {
+            "quantity": 9113,
+            "valueBRL": 52984.26
+          },
+          "3217787": {
+            "quantity": 2939,
+            "valueBRL": 11812.46
+          },
+          "3508528": {
+            "quantity": 35581,
+            "valueBRL": 629807.85
+          },
+          "3626245": {
+            "quantity": 45341,
+            "valueBRL": 396057.69
+          },
+          "3731278": {
+            "quantity": 1370,
+            "valueBRL": 133.44
+          },
+          "3761347": {
+            "quantity": 7544,
+            "valueBRL": 44349.51
+          },
+          "3874281": {
+            "quantity": 2897,
+            "valueBRL": 8868.21
+          },
+          "3885046": {
+            "quantity": 1664,
+            "valueBRL": 3854.15
+          },
+          "3897281": {
+            "quantity": 4719,
+            "valueBRL": 29944.2
+          },
+          "3918327": {
+            "quantity": 1466,
+            "valueBRL": 7917.18
+          },
+          "4098250": {
+            "quantity": 3509,
+            "valueBRL": 18180.93
+          },
+          "4243439": {
+            "quantity": 363,
+            "valueBRL": 2276.1
+          },
+          "4860403": {
+            "quantity": 19877,
+            "valueBRL": 94561.74
+          },
+          "5028264": {
+            "quantity": 1845,
+            "valueBRL": 291589.75
+          },
+          "5414849": {
+            "quantity": 8813,
+            "valueBRL": 53150.29
+          },
+          "5423392": {
+            "quantity": 943,
+            "valueBRL": 1738.5
+          },
+          "5526418": {
+            "quantity": 487,
+            "valueBRL": 2246.8
+          },
+          "6275028": {
+            "quantity": 355,
+            "valueBRL": 3530
+          },
+          "6691757": {
+            "quantity": 737,
+            "valueBRL": 716.85
+          },
+          "6729029": {
+            "quantity": 1266,
+            "valueBRL": 17158.36
+          },
+          "6914853": {
+            "quantity": 584,
+            "valueBRL": 1497.68
+          },
+          "7054254": {
+            "quantity": 17915,
+            "valueBRL": 84477.39
+          },
+          "7376421": {
+            "quantity": 25110,
+            "valueBRL": 164494.95
+          },
+          "7401442": {
+            "quantity": 7573,
+            "valueBRL": 46089.69
+          },
+          "7937059": {
+            "quantity": 6914,
+            "valueBRL": 43821.8
+          },
+          "9496637": {
+            "quantity": 153,
+            "valueBRL": 694.1
+          },
+          "9643222": {
+            "quantity": 7538,
+            "valueBRL": 44489.54
+          },
+          "9971386": {
+            "quantity": 8651,
+            "valueBRL": 51568.51
+          },
+          "0480444": {
+            "quantity": 8847,
+            "valueBRL": 53096.87
+          },
+          "0965995": {
+            "quantity": 2504,
+            "valueBRL": 0
+          },
+          "0837814": {
+            "quantity": 16184,
+            "valueBRL": 82406.92
+          }
+        },
+        "suppressedUnits": 2
+      }
+    },
+    "202508": {
+      "sih": {
+        "rowsState": 74379,
+        "rowsCity": 1852,
+        "municipal": {
+          "quantity": 1852,
+          "valueBRL": 3825374.98
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 863,
+            "valueBRL": 2083586.49
+          },
+          "3508528": {
+            "quantity": 989,
+            "valueBRL": 1741788.49
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4680431,
+        "rowsCity": 129065,
+        "municipal": {
+          "quantity": 345328,
+          "valueBRL": 4060101.13
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 8750,
+            "valueBRL": 49229.98
+          },
+          "2229161": {
+            "quantity": 8962,
+            "valueBRL": 49981.21
+          },
+          "2230224": {
+            "quantity": 884,
+            "valueBRL": 7060.11
+          },
+          "2231301": {
+            "quantity": 8813,
+            "valueBRL": 49604.25
+          },
+          "2232014": {
+            "quantity": 101193,
+            "valueBRL": 1713535.04
+          },
+          "2700662": {
+            "quantity": 2258,
+            "valueBRL": 537180.5
+          },
+          "2933942": {
+            "quantity": 97,
+            "valueBRL": 0
+          },
+          "3215792": {
+            "quantity": 8922,
+            "valueBRL": 49898.12
+          },
+          "3217787": {
+            "quantity": 2944,
+            "valueBRL": 12717.27
+          },
+          "3508528": {
+            "quantity": 33895,
+            "valueBRL": 516327.07
+          },
+          "3731278": {
+            "quantity": 2581,
+            "valueBRL": 212.55
+          },
+          "3761347": {
+            "quantity": 7403,
+            "valueBRL": 43199.42
+          },
+          "3874281": {
+            "quantity": 3070,
+            "valueBRL": 8901.74
+          },
+          "3885046": {
+            "quantity": 1495,
+            "valueBRL": 3179.1
+          },
+          "3897281": {
+            "quantity": 4719,
+            "valueBRL": 29944.2
+          },
+          "3918327": {
+            "quantity": 1267,
+            "valueBRL": 6848.96
+          },
+          "4098250": {
+            "quantity": 3596,
+            "valueBRL": 18412.8
+          },
+          "4243439": {
+            "quantity": 282,
+            "valueBRL": 1865.7
+          },
+          "4860403": {
+            "quantity": 16589,
+            "valueBRL": 55285.42
+          },
+          "5028264": {
+            "quantity": 2463,
+            "valueBRL": 273883.29
+          },
+          "5414849": {
+            "quantity": 8323,
+            "valueBRL": 49728.07
+          },
+          "5423392": {
+            "quantity": 884,
+            "valueBRL": 3493.7
+          },
+          "5526418": {
+            "quantity": 742,
+            "valueBRL": 3268.3
+          },
+          "6275028": {
+            "quantity": 258,
+            "valueBRL": 2580
+          },
+          "6691757": {
+            "quantity": 143,
+            "valueBRL": 364.63
+          },
+          "6729029": {
+            "quantity": 1344,
+            "valueBRL": 17893.3
+          },
+          "6914853": {
+            "quantity": 509,
+            "valueBRL": 774.53
+          },
+          "7054254": {
+            "quantity": 17032,
+            "valueBRL": 84157.09
+          },
+          "7376421": {
+            "quantity": 31669,
+            "valueBRL": 131891.82
+          },
+          "7401442": {
+            "quantity": 7835,
+            "valueBRL": 46283.57
+          },
+          "7937059": {
+            "quantity": 11251,
+            "valueBRL": 70955.05
+          },
+          "9496637": {
+            "quantity": 271,
+            "valueBRL": 1268.9
+          },
+          "9643222": {
+            "quantity": 7488,
+            "valueBRL": 41332.75
+          },
+          "9971386": {
+            "quantity": 8329,
+            "valueBRL": 47565.43
+          },
+          "0480444": {
+            "quantity": 8773,
+            "valueBRL": 49867.77
+          },
+          "0965995": {
+            "quantity": 3564,
+            "valueBRL": 0
+          },
+          "0422525": {
+            "quantity": 677,
+            "valueBRL": 4289.4
+          },
+          "0837814": {
+            "quantity": 16053,
+            "valueBRL": 77120.09
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202509": {
+      "sih": {
+        "rowsState": 75659,
+        "rowsCity": 3807,
+        "municipal": {
+          "quantity": 3807,
+          "valueBRL": 8442668.5
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 1055,
+            "valueBRL": 2273510.59
+          },
+          "3508528": {
+            "quantity": 2752,
+            "valueBRL": 6169157.91
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202510": {
+      "sih": {
+        "rowsState": 75980,
+        "rowsCity": 1257,
+        "municipal": {
+          "quantity": 1257,
+          "valueBRL": 2844820.07
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 890,
+            "valueBRL": 2151894.64
+          },
+          "3508528": {
+            "quantity": 367,
+            "valueBRL": 692925.43
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202511": {
+      "sih": {
+        "rowsState": 73866,
+        "rowsCity": 2299,
+        "municipal": {
+          "quantity": 2299,
+          "valueBRL": 5704764.86
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 745,
+            "valueBRL": 1811770.79
+          },
+          "3508528": {
+            "quantity": 1554,
+            "valueBRL": 3892994.07
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4730290,
+        "rowsCity": 111324,
+        "municipal": {
+          "quantity": 293486,
+          "valueBRL": 3115291.41
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 8679,
+            "valueBRL": 49426.69
+          },
+          "2229161": {
+            "quantity": 9011,
+            "valueBRL": 50459.52
+          },
+          "2230224": {
+            "quantity": 73,
+            "valueBRL": 42.33
+          },
+          "2230267": {
+            "quantity": 155,
+            "valueBRL": 6.15
+          },
+          "2231301": {
+            "quantity": 8952,
+            "valueBRL": 51598.4
+          },
+          "2232014": {
+            "quantity": 84817,
+            "valueBRL": 1091634.2
+          },
+          "2700662": {
+            "quantity": 2077,
+            "valueBRL": 500327.76
+          },
+          "3215792": {
+            "quantity": 8965,
+            "valueBRL": 51061.91
+          },
+          "3217787": {
+            "quantity": 2146,
+            "valueBRL": 15137.17
+          },
+          "3508528": {
+            "quantity": 17837,
+            "valueBRL": 243914.18
+          },
+          "3731278": {
+            "quantity": 712,
+            "valueBRL": 300
+          },
+          "3761347": {
+            "quantity": 7093,
+            "valueBRL": 40884.22
+          },
+          "3874281": {
+            "quantity": 453,
+            "valueBRL": 2071.22
+          },
+          "3885046": {
+            "quantity": 828,
+            "valueBRL": 2487.6
+          },
+          "3897281": {
+            "quantity": 4719,
+            "valueBRL": 29944.2
+          },
+          "3918327": {
+            "quantity": 1163,
+            "valueBRL": 6181.16
+          },
+          "4098250": {
+            "quantity": 4108,
+            "valueBRL": 20508.77
+          },
+          "4243439": {
+            "quantity": 38,
+            "valueBRL": 33
+          },
+          "5028264": {
+            "quantity": 1410,
+            "valueBRL": 241186.75
+          },
+          "5414849": {
+            "quantity": 8858,
+            "valueBRL": 50571.78
+          },
+          "5423392": {
+            "quantity": 387,
+            "valueBRL": 386
+          },
+          "5796997": {
+            "quantity": 14,
+            "valueBRL": 0
+          },
+          "6275028": {
+            "quantity": 121,
+            "valueBRL": 1210
+          },
+          "6691757": {
+            "quantity": 189,
+            "valueBRL": 523.3
+          },
+          "6729029": {
+            "quantity": 2373,
+            "valueBRL": 48094.54
+          },
+          "6914853": {
+            "quantity": 318,
+            "valueBRL": 856.88
+          },
+          "7054254": {
+            "quantity": 18576,
+            "valueBRL": 101229.05
+          },
+          "7376421": {
+            "quantity": 25165,
+            "valueBRL": 132695.77
+          },
+          "7401442": {
+            "quantity": 8256,
+            "valueBRL": 47514.77
+          },
+          "7450648": {
+            "quantity": 1106,
+            "valueBRL": 0
+          },
+          "7450664": {
+            "quantity": 1194,
+            "valueBRL": 0
+          },
+          "7450672": {
+            "quantity": 712,
+            "valueBRL": 0
+          },
+          "7450699": {
+            "quantity": 639,
+            "valueBRL": 0
+          },
+          "7450710": {
+            "quantity": 955,
+            "valueBRL": 0
+          },
+          "7456875": {
+            "quantity": 262,
+            "valueBRL": 0
+          },
+          "7456883": {
+            "quantity": 262,
+            "valueBRL": 0
+          },
+          "7464975": {
+            "quantity": 522,
+            "valueBRL": 0
+          },
+          "7937059": {
+            "quantity": 15852,
+            "valueBRL": 100100.45
+          },
+          "9496637": {
+            "quantity": 26,
+            "valueBRL": 105.3
+          },
+          "9643222": {
+            "quantity": 8035,
+            "valueBRL": 44771.49
+          },
+          "9971386": {
+            "quantity": 8660,
+            "valueBRL": 48638.17
+          },
+          "0480444": {
+            "quantity": 8657,
+            "valueBRL": 51188.76
+          },
+          "0965995": {
+            "quantity": 2832,
+            "valueBRL": 0
+          },
+          "0422525": {
+            "quantity": 217,
+            "valueBRL": 1354.5
+          },
+          "0837814": {
+            "quantity": 16062,
+            "valueBRL": 88845.42
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202512": {
+      "sih": {
+        "rowsState": 70967,
+        "rowsCity": 1706,
+        "municipal": {
+          "quantity": 1706,
+          "valueBRL": 4046260.82
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 793,
+            "valueBRL": 1832384.53
+          },
+          "3508528": {
+            "quantity": 913,
+            "valueBRL": 2213876.29
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4749688,
+        "rowsCity": 110276,
+        "municipal": {
+          "quantity": 256094,
+          "valueBRL": 2890142.3
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 8731,
+            "valueBRL": 49856.74
+          },
+          "2229161": {
+            "quantity": 8947,
+            "valueBRL": 51323.04
+          },
+          "2230267": {
+            "quantity": 54,
+            "valueBRL": 0
+          },
+          "2231301": {
+            "quantity": 8953,
+            "valueBRL": 51128.33
+          },
+          "2232014": {
+            "quantity": 69355,
+            "valueBRL": 1065196.07
+          },
+          "2700662": {
+            "quantity": 2193,
+            "valueBRL": 533543.8
+          },
+          "2933942": {
+            "quantity": 26,
+            "valueBRL": 0
+          },
+          "3215792": {
+            "quantity": 9085,
+            "valueBRL": 51614.49
+          },
+          "3508528": {
+            "quantity": 20484,
+            "valueBRL": 276201.58
+          },
+          "3731278": {
+            "quantity": 1119,
+            "valueBRL": 151
+          },
+          "3761347": {
+            "quantity": 7968,
+            "valueBRL": 45452.53
+          },
+          "3897281": {
+            "quantity": 4642,
+            "valueBRL": 29455.6
+          },
+          "3918327": {
+            "quantity": 617,
+            "valueBRL": 3365.29
+          },
+          "4098250": {
+            "quantity": 2742,
+            "valueBRL": 13426.1
+          },
+          "5028264": {
+            "quantity": 541,
+            "valueBRL": 112257.98
+          },
+          "5414849": {
+            "quantity": 8478,
+            "valueBRL": 49637.33
+          },
+          "6914853": {
+            "quantity": 110,
+            "valueBRL": 69.93
+          },
+          "7054254": {
+            "quantity": 16504,
+            "valueBRL": 88813.93
+          },
+          "7376421": {
+            "quantity": 21332,
+            "valueBRL": 104143.16
+          },
+          "7401442": {
+            "quantity": 8647,
+            "valueBRL": 48756.41
+          },
+          "7937059": {
+            "quantity": 15729,
+            "valueBRL": 99034.45
+          },
+          "9643222": {
+            "quantity": 8555,
+            "valueBRL": 47336.95
+          },
+          "9971386": {
+            "quantity": 8772,
+            "valueBRL": 50797.62
+          },
+          "0480444": {
+            "quantity": 8665,
+            "valueBRL": 51570.19
+          },
+          "0837814": {
+            "quantity": 13845,
+            "valueBRL": 67009.78
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202601": {
+      "sih": {
+        "rowsState": 70160,
+        "rowsCity": 1599,
+        "municipal": {
+          "quantity": 1599,
+          "valueBRL": 4187774.26
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 928,
+            "valueBRL": 2198644.14
+          },
+          "3508528": {
+            "quantity": 671,
+            "valueBRL": 1989130.12
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4674937,
+        "rowsCity": 115307,
+        "municipal": {
+          "quantity": 229472,
+          "valueBRL": 2979920.74
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 9176,
+            "valueBRL": 51109.1
+          },
+          "2229161": {
+            "quantity": 9070,
+            "valueBRL": 51275.81
+          },
+          "2230224": {
+            "quantity": 119,
+            "valueBRL": 148.96
+          },
+          "2231301": {
+            "quantity": 8867,
+            "valueBRL": 51247.81
+          },
+          "2232014": {
+            "quantity": 85436,
+            "valueBRL": 1149955.38
+          },
+          "2700662": {
+            "quantity": 2212,
+            "valueBRL": 526634.43
+          },
+          "3215792": {
+            "quantity": 8866,
+            "valueBRL": 50686.11
+          },
+          "3217787": {
+            "quantity": 4870,
+            "valueBRL": 24586.85
+          },
+          "3508528": {
+            "quantity": 22007,
+            "valueBRL": 281733.82
+          },
+          "3761347": {
+            "quantity": 8097,
+            "valueBRL": 45672.32
+          },
+          "3874281": {
+            "quantity": 313,
+            "valueBRL": 0
+          },
+          "3897281": {
+            "quantity": 4609,
+            "valueBRL": 29246.2
+          },
+          "3918327": {
+            "quantity": 1094,
+            "valueBRL": 5942.73
+          },
+          "4098250": {
+            "quantity": 3404,
+            "valueBRL": 16736.82
+          },
+          "4243439": {
+            "quantity": 280,
+            "valueBRL": 2031.5
+          },
+          "5028264": {
+            "quantity": 1303,
+            "valueBRL": 301180.79
+          },
+          "5414849": {
+            "quantity": 8505,
+            "valueBRL": 50775.49
+          },
+          "5423392": {
+            "quantity": 259,
+            "valueBRL": 255
+          },
+          "5796997": {
+            "quantity": 96,
+            "valueBRL": 529.2
+          },
+          "6729029": {
+            "quantity": 2815,
+            "valueBRL": 61539.16
+          },
+          "7401442": {
+            "quantity": 8706,
+            "valueBRL": 50034.75
+          },
+          "7937059": {
+            "quantity": 14562,
+            "valueBRL": 92301.3
+          },
+          "9496637": {
+            "quantity": 46,
+            "valueBRL": 0
+          },
+          "9643222": {
+            "quantity": 6409,
+            "valueBRL": 34292.53
+          },
+          "9971386": {
+            "quantity": 8950,
+            "valueBRL": 50462.17
+          },
+          "0480444": {
+            "quantity": 8413,
+            "valueBRL": 49929.71
+          },
+          "0422525": {
+            "quantity": 258,
+            "valueBRL": 1612.8
+          },
+          "0965995": {
+            "quantity": 730,
+            "valueBRL": 0
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202602": {
+      "sih": {
+        "rowsState": 68329,
+        "rowsCity": 1921,
+        "municipal": {
+          "quantity": 1921,
+          "valueBRL": 4655307.59
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 987,
+            "valueBRL": 2120856.44
+          },
+          "3508528": {
+            "quantity": 934,
+            "valueBRL": 2534451.15
+          }
+        },
+        "suppressedUnits": 0
+      },
+      "sia": {
+        "rowsState": 4164757,
+        "rowsCity": 115364,
+        "municipal": {
+          "quantity": 285969,
+          "valueBRL": 2944028.39
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 9245,
+            "valueBRL": 50573.99
+          },
+          "2229161": {
+            "quantity": 9224,
+            "valueBRL": 51807.13
+          },
+          "2230224": {
+            "quantity": 78,
+            "valueBRL": 97.5
+          },
+          "2230267": {
+            "quantity": 131,
+            "valueBRL": 0
+          },
+          "2231301": {
+            "quantity": 8714,
+            "valueBRL": 51266.71
+          },
+          "2232014": {
+            "quantity": 82470,
+            "valueBRL": 1070103.71
+          },
+          "2700662": {
+            "quantity": 1890,
+            "valueBRL": 450274.1
+          },
+          "3215792": {
+            "quantity": 9034,
+            "valueBRL": 50940.03
+          },
+          "3217787": {
+            "quantity": 2039,
+            "valueBRL": 9128.63
+          },
+          "3508528": {
+            "quantity": 16161,
+            "valueBRL": 221974.38
+          },
+          "3731278": {
+            "quantity": 240,
+            "valueBRL": 0
+          },
+          "3761347": {
+            "quantity": 7730,
+            "valueBRL": 45931.47
+          },
+          "3874281": {
+            "quantity": 998,
+            "valueBRL": 3395.31
+          },
+          "3885046": {
+            "quantity": 708,
+            "valueBRL": 1809.8
+          },
+          "3897281": {
+            "quantity": 4719,
+            "valueBRL": 29944.2
+          },
+          "3918327": {
+            "quantity": 567,
+            "valueBRL": 3123.49
+          },
+          "4098250": {
+            "quantity": 2737,
+            "valueBRL": 13293.43
+          },
+          "4243439": {
+            "quantity": 339,
+            "valueBRL": 2759.4
+          },
+          "5028264": {
+            "quantity": 2539,
+            "valueBRL": 164239.13
+          },
+          "5414849": {
+            "quantity": 8474,
+            "valueBRL": 50802.18
+          },
+          "5423392": {
+            "quantity": 257,
+            "valueBRL": 252
+          },
+          "5796997": {
+            "quantity": 5,
+            "valueBRL": 0
+          },
+          "6691757": {
+            "quantity": 116,
+            "valueBRL": 0
+          },
+          "6729029": {
+            "quantity": 1884,
+            "valueBRL": 47797.72
+          },
+          "6914853": {
+            "quantity": 45,
+            "valueBRL": 12.6
+          },
+          "7054254": {
+            "quantity": 18824,
+            "valueBRL": 113078.13
+          },
+          "7376421": {
+            "quantity": 23450,
+            "valueBRL": 133521.18
+          },
+          "7401442": {
+            "quantity": 9096,
+            "valueBRL": 50814.6
+          },
+          "7450648": {
+            "quantity": 1314,
+            "valueBRL": 0
+          },
+          "7450664": {
+            "quantity": 1356,
+            "valueBRL": 0
+          },
+          "7450672": {
+            "quantity": 1001,
+            "valueBRL": 0
+          },
+          "7450699": {
+            "quantity": 1159,
+            "valueBRL": 0
+          },
+          "7450710": {
+            "quantity": 185,
+            "valueBRL": 0
+          },
+          "7456875": {
+            "quantity": 259,
+            "valueBRL": 0
+          },
+          "7456883": {
+            "quantity": 259,
+            "valueBRL": 0
+          },
+          "7464975": {
+            "quantity": 59,
+            "valueBRL": 0
+          },
+          "7937059": {
+            "quantity": 15165,
+            "valueBRL": 95976
+          },
+          "9496637": {
+            "quantity": 87,
+            "valueBRL": 0
+          },
+          "9643222": {
+            "quantity": 7944,
+            "valueBRL": 42038.7
+          },
+          "9971386": {
+            "quantity": 8799,
+            "valueBRL": 50357.25
+          },
+          "0422525": {
+            "quantity": 222,
+            "valueBRL": 1379.7
+          },
+          "0837814": {
+            "quantity": 15142,
+            "valueBRL": 85278.59
+          },
+          "0480444": {
+            "quantity": 8899,
+            "valueBRL": 52057.33
+          },
+          "0965995": {
+            "quantity": 2405,
+            "valueBRL": 0
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202603": {
+      "sih": {
+        "rowsState": 74165,
+        "rowsCity": 1998,
+        "municipal": {
+          "quantity": 1998,
+          "valueBRL": 4955703.95
+        },
+        "byCnes": {
+          "2232014": {
+            "quantity": 1105,
+            "valueBRL": 2699150.56
+          },
+          "3508528": {
+            "quantity": 893,
+            "valueBRL": 2256553.39
+          }
+        },
+        "suppressedUnits": 0
+      }
+    },
+    "202607": {
+      "sia": {
+        "rowsState": 4532294,
+        "rowsCity": 151312,
+        "municipal": {
+          "quantity": 392856,
+          "valueBRL": 4072675.48
+        },
+        "byCnes": {
+          "2229129": {
+            "quantity": 9080,
+            "valueBRL": 50666.67
+          },
+          "2229161": {
+            "quantity": 9158,
+            "valueBRL": 51813.85
+          },
+          "2230224": {
+            "quantity": 665,
+            "valueBRL": 4973.97
+          },
+          "2231301": {
+            "quantity": 8961,
+            "valueBRL": 51122.35
+          },
+          "2232014": {
+            "quantity": 90034,
+            "valueBRL": 1250026.25
+          },
+          "2700662": {
+            "quantity": 2094,
+            "valueBRL": 528250.96
+          },
+          "3215792": {
+            "quantity": 8872,
+            "valueBRL": 50219.49
+          },
+          "3217787": {
+            "quantity": 2444,
+            "valueBRL": 13654.42
+          },
+          "3508528": {
+            "quantity": 28964,
+            "valueBRL": 454677.2
+          },
+          "3731278": {
+            "quantity": 3788,
+            "valueBRL": 5262.56
+          },
+          "3761347": {
+            "quantity": 8328,
+            "valueBRL": 48860.45
+          },
+          "3874281": {
+            "quantity": 1463,
+            "valueBRL": 5312.48
+          },
+          "3885046": {
+            "quantity": 258,
+            "valueBRL": 16.2
+          },
+          "3897281": {
+            "quantity": 4719,
+            "valueBRL": 29944.2
+          },
+          "3918327": {
+            "quantity": 774,
+            "valueBRL": 4099.26
+          },
+          "4098250": {
+            "quantity": 4597,
+            "valueBRL": 25570.24
+          },
+          "4243439": {
+            "quantity": 292,
+            "valueBRL": 2274.4
+          },
+          "5028264": {
+            "quantity": 2042,
+            "valueBRL": 287519.74
+          },
+          "5414849": {
+            "quantity": 8756,
+            "valueBRL": 50472.27
+          },
+          "5423392": {
+            "quantity": 1812,
+            "valueBRL": 7076.6
+          },
+          "5796997": {
+            "quantity": 264,
+            "valueBRL": 863.1
+          },
+          "6691757": {
+            "quantity": 3734,
+            "valueBRL": 3044.57
+          },
+          "6729029": {
+            "quantity": 560,
+            "valueBRL": 3697.5
+          },
+          "6914853": {
+            "quantity": 2579,
+            "valueBRL": 2333.04
+          },
+          "7054254": {
+            "quantity": 36245,
+            "valueBRL": 130007.87
+          },
+          "7376421": {
+            "quantity": 49160,
+            "valueBRL": 179420.87
+          },
+          "7401442": {
+            "quantity": 8644,
+            "valueBRL": 51506.36
+          },
+          "7937059": {
+            "quantity": 15724,
+            "valueBRL": 98682.75
+          },
+          "9186204": {
+            "quantity": 19945,
+            "valueBRL": 406784.75
+          },
+          "9208925": {
+            "quantity": 225,
+            "valueBRL": 1417.5
+          },
+          "9496637": {
+            "quantity": 304,
+            "valueBRL": 1728.7
+          },
+          "9643222": {
+            "quantity": 8810,
+            "valueBRL": 48553.38
+          },
+          "9971386": {
+            "quantity": 8722,
+            "valueBRL": 49788.95
+          },
+          "0422525": {
+            "quantity": 507,
+            "valueBRL": 3892.6
+          },
+          "0965995": {
+            "quantity": 1893,
+            "valueBRL": 0
+          },
+          "0480444": {
+            "quantity": 8548,
+            "valueBRL": 51488.27
+          },
+          "0837814": {
+            "quantity": 29891,
+            "valueBRL": 117651.71
+          }
+        },
+        "suppressedUnits": 0
+      }
+    }
+  },
+  "sources": {
+    "sih": {
+      "label": "SIH/SUS — AIHs RD por município de internação",
+      "status": "partial",
+      "monthsAvailable": [
+        "202501",
+        "202502",
+        "202503",
+        "202504",
+        "202505",
+        "202506",
+        "202507",
+        "202508",
+        "202509",
+        "202510",
+        "202511",
+        "202512",
+        "202601",
+        "202602",
+        "202603"
+      ],
+      "monthsRequested": 21,
+      "method": "Contagem de registros de AIH reduzida (RD) e soma de VAL_TOT no mês de competência, por município do hospital; não representa pacientes únicos ou internações por residência.",
+      "reference": "202603",
+      "url": "https://datasus.saude.gov.br/assistencia-a-saude/",
+      "access": "PySUS 2.11.7; catálogo público Parquet S3, apenas RD/PA",
+      "privacy": "Sem registros individuais; suprimir grupos CNES com menos de 5 unidades de produção",
+      "monthsRequestedPeriods": [
+        "202501",
+        "202502",
+        "202503",
+        "202504",
+        "202505",
+        "202506",
+        "202507",
+        "202508",
+        "202509",
+        "202510",
+        "202511",
+        "202512",
+        "202601",
+        "202602",
+        "202603",
+        "202604",
+        "202605",
+        "202606",
+        "202607",
+        "202608",
+        "202609"
+      ],
+      "rejectedMonths": []
+    },
+    "sia": {
+      "label": "SIA/SUS — produção aprovada PA por município do estabelecimento",
+      "status": "partial",
+      "monthsAvailable": [
+        "202502",
+        "202503",
+        "202504",
+        "202505",
+        "202506",
+        "202507",
+        "202508",
+        "202511",
+        "202512",
+        "202601",
+        "202602",
+        "202607"
+      ],
+      "monthsRequested": 21,
+      "method": "Quantidade de procedimentos aprovados PA_QTDAPR e soma de PA_VALAPR na competência, por município do estabelecimento; não representa pacientes únicos nem produção SIA integral de todos os instrumentos.",
+      "reference": "202607",
+      "url": "https://datasus.saude.gov.br/assistencia-a-saude/",
+      "access": "PySUS 2.11.7; catálogo público Parquet S3, apenas RD/PA",
+      "privacy": "Sem registros individuais; suprimir grupos CNES com menos de 5 unidades de produção",
+      "monthsRequestedPeriods": [
+        "202501",
+        "202502",
+        "202503",
+        "202504",
+        "202505",
+        "202506",
+        "202507",
+        "202508",
+        "202509",
+        "202510",
+        "202511",
+        "202512",
+        "202601",
+        "202602",
+        "202603",
+        "202604",
+        "202605",
+        "202606",
+        "202607",
+        "202608",
+        "202609"
+      ],
+      "rejectedMonths": [
+        "202501"
+      ]
+    }
+  },
+  "qualityFlags": {
+    "sia": {
+      "202501": "Arquivo estadual com 302285 registros, volume suspeito de incompletude"
+    }
+  }
+}

@@ -14,6 +14,7 @@ LOG=logging.getLogger("webgis.production")
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/"public/data/production.json"
 MIN_UNIT_COUNT=5
+MIN_SIA_RS_ROWS=1_000_000 # limiar de plausibilidade estadual; não garantia oficial de completude
 COLUMNS={
  "sih":("MUNIC_MOV","CNES","VAL_TOT","MORTE"),
  "sia":("PA_UFMUN","PA_CODUNI","PA_QTDAPR","PA_VALAPR")
@@ -73,9 +74,15 @@ def aggregate_rows(rows,system):
     if total_qty<1:raise ValueError("Produção aprovada sem quantidades positivas")
     # Evita publicar grupos de produção individual potencialmente reidentificáveis.
     units={c:{"quantity":n,"valueBRL":float(v)} for c,(n,v) in by_code.items() if n>=MIN_UNIT_COUNT}
+    hidden=sum(n<MIN_UNIT_COUNT for n,_ in by_code.values())
+    if hidden and units:
+        # Oculta outro CNES para impedir deduzir grupo pequeno pelo residual municipal.
+        secondary=min(units,key=lambda c:(units[c]["quantity"],c))
+        del units[secondary]
+        hidden+=1
     return {"rowsState":read,"rowsCity":city_records,
             "municipal":{"quantity":total_qty,"valueBRL":float(total_brl)},
-            "byCnes":units,"suppressedUnits":sum(n<MIN_UNIT_COUNT for n,_ in by_code.values())}
+            "byCnes":units,"suppressedUnits":hidden}
 
 def batch_rows(parquet,columns):
     for batch in parquet.iter_batches(batch_size=20000,columns=list(columns)):
@@ -115,15 +122,34 @@ def fetch_parquet(system,period):
     if not required.issubset(parquet.schema.names):
         raise ValueError("Colunas necessárias ausentes: "+str(sorted(required-set(parquet.schema.names))))
     if parquet.metadata.num_rows<500:raise ValueError("Arquivo estadual muito pequeno")
+    if system=="sia" and parquet.metadata.num_rows<MIN_SIA_RS_ROWS:
+        raise ValueError("SIA/PA: extrato estadual suspeito de incompletude, "+str(parquet.metadata.num_rows)+" registros")
     return aggregate_rows(batch_rows(parquet,COLUMNS[system]),system)
 
+def sanitize_snapshot(state):
+    """Quarentena de arquivos parciais e supressão adicional em snapshots legados."""
+    flags=state.setdefault("qualityFlags",{})
+    for period,monthly in state.get("periods",{}).items():
+        sia=monthly.get("sia")
+        if sia and sia.get("rowsState",0)<MIN_SIA_RS_ROWS:
+            flags.setdefault("sia",{})[period]=("Arquivo estadual com "+str(sia.get("rowsState",0))+
+                                                " registros, volume suspeito de incompletude")
+            del monthly["sia"]
+        for source,item in monthly.items():
+            if source not in ("sih","sia"):continue
+            groups=item.get("byCnes",{})
+            if item.get("suppressedUnits")==1 and groups:
+                secondary=min(groups,key=lambda c:(groups[c]["quantity"],c))
+                del groups[secondary]
+                item["suppressedUnits"]=2
+    return state
 def load():
     try:
         state=json.loads(OUT.read_text(encoding="utf8"))
-        if state.get("schemaVersion")=="1.0":return state
+        if state.get("schemaVersion")=="1.0":return sanitize_snapshot(state)
     except (OSError,ValueError):pass
     return {"schemaVersion":"1.0","generatedAt":None,"geography":"município do estabelecimento/procedimento",
-            "periods":{},"sources":{}}
+            "periods":{},"sources":{},"qualityFlags":{}}
 def periods():
     raw=os.getenv("PRODUCTION_PERIODS","").strip()
     if raw:
@@ -175,7 +201,10 @@ def run():
         state["sources"][system]={
             "label":SOURCE_LABELS[system],
             "status":"ok" if len(available)==len(wanted) else "partial" if available else "not_loaded",
-            "monthsAvailable":available,"monthsRequested":len(wanted),"method":METHODS[system],
+            "monthsAvailable":available,"monthsRequested":len(wanted),
+            "monthsRequestedPeriods":wanted,
+            "rejectedMonths":sorted(state.get("qualityFlags",{}).get(system,{})),
+            "method":METHODS[system],
             "reference":available[-1] if available else None,
             "url":"https://datasus.saude.gov.br/assistencia-a-saude/",
             "access":"PySUS 2.11.7; catálogo público Parquet S3, apenas RD/PA",
