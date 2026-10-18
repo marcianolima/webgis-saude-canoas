@@ -127,14 +127,14 @@ function indicatorCard(row:Selection){
  '<span class="block mt-1 text-xs text-slate-500 dark:text-slate-300">'+safe(row.unit)+' · '+safe(row.reference+state)+'</span>'+
  '<span class="block mt-2 text-[11px] font-semibold text-teal-700 dark:text-teal-300">Ver evolução →</span></button>';
 }
-const stages:{name:string;keys:string[]}[]=[
- {name:'Vigilância epidemiológica',keys:['dengue','chikungunya','zika']},
- {name:'Natalidade e mortalidade',keys:['sinasc','sim']},
- {name:'Atenção Primária e financiamento',keys:['emulti_custeadas','emulti_homologadas','emulti_repasses','consultas_aps_razao','consultas_especializadas_razao']},
- {name:'Assistência hospitalar · RIPSA',keys:['sih_internacoes_anuais','valor_medio_aih']},
- {name:'Produção mensal · SIH/SIA (meses validados)',keys:['production_sih_quantity','production_sih_valueBRL','production_sia_quantity','production_sia_valueBRL']},
- {name:'Prevenção e rastreamento',keys:['citopatologicos','mamografias']},
- {name:'Atenção Primária · Previne Brasil (histórico até 2024)',keys:['aps_prenatal','aps_gestantes_testes','aps_gestantes_odontologia','aps_citopatologico','aps_vacinacao_infantil','aps_hipertensao','aps_diabetes']}
+const stages:{name:string;keys:string[];page:string;description:string}[]=[
+ {name:'Vigilância epidemiológica',keys:['dengue','chikungunya','zika'],page:'health',description:'Notificações entre residentes, não casos confirmados'},
+ {name:'Nascimentos e mortalidade',keys:['sinasc','sim'],page:'vital',description:'Eventos de residentes, não apenas dos hospitais locais'},
+ {name:'Atenção Primária',keys:['emulti_custeadas','consultas_aps_razao','emulti_homologadas','consultas_especializadas_razao'],page:'sus',description:'Equipes e razões de consultas por 100 habitantes'},
+ {name:'Prevenção e exames',keys:['citopatologicos','mamografias'],page:'screening',description:'Exames registrados, não pacientes distintos'},
+ {name:'Financiamento e RIPSA',keys:['emulti_repasses','sih_internacoes_anuais','valor_medio_aih'],page:'finance',description:'Repasses mensais e indicadores hospitalares anuais'},
+ {name:'Produção mensal SIH/SIA',keys:['production_sih_quantity','production_sia_quantity','production_sih_valueBRL','production_sia_valueBRL'],page:'production',description:'Registros por local do estabelecimento; cobertura mensal parcial'},
+ {name:'Previne Brasil · histórico 2024',keys:['aps_prenatal','aps_vacinacao_infantil','aps_gestantes_testes','aps_gestantes_odontologia','aps_citopatologico','aps_diabetes'],page:'aps-history',description:'Indicadores históricos de modelo de financiamento anterior'}
 ];
 export async function mountMunicipal(dark:boolean){
  const nonce=++live;
@@ -155,12 +155,18 @@ export async function mountMunicipal(dark:boolean){
   const metrics=buildMetrics(stored.health,stored.sus,stored.aps,stored.production);
   status.textContent=metrics.length+' séries municipais com extração validada';
   cards.innerHTML=stages.map(group=>{
-   const entries=group.keys.map(key=>metrics.find(m=>m.key===key)).filter((m):m is Selection=>Boolean(m));
-   const missing=group.keys.filter(k=>!metrics.some(m=>m.key===k)).length;
-   return '<section><h4 class="subheading text-sm mb-3">'+group.name+
-    '<span class="text-xs ml-2 text-slate-400 font-normal">'+entries.length+' disponíveis'+(missing?' · '+missing+' pendente(s)':'')+'</span></h4>'+
-    '<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">'+entries.map(indicatorCard).join('')+
-    (entries.length?'':'<div class="text-sm text-slate-500 dark:text-slate-300">Fonte ainda não validada para Canoas.</div>')+'</div></section>';
+   const entries=group.keys.map(k=>metrics.find(m=>m.key===k)).filter((m):m is Selection=>Boolean(m));
+   const preview=entries.slice(0,2),extra=entries.slice(2);
+   const absent=group.keys.length-entries.length;
+   return '<section class="border-t border-slate-100 dark:border-slate-700 pt-4 first:border-t-0 first:pt-0">'+
+    '<div class="flex items-start justify-between gap-3 mb-3"><div><h4 class="subheading text-sm">'+group.name+'</h4>'+
+    '<p class="text-xs text-slate-500 dark:text-slate-300 mt-1">'+group.description+'</p>'+
+    '<p class="text-[11px] text-slate-400 mt-1">'+entries.length+' disponíveis'+(absent?' · '+absent+' pendentes':'')+'</p></div>'+
+    '<button type="button" data-page="'+group.page+'" class="ui-section-link shrink-0">Abrir →</button></div>'+
+    '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">'+preview.map(indicatorCard).join('')+
+    (entries.length?'':'<p class="text-xs text-slate-500">Ainda sem série municipal validada.</p>')+'</div>'+
+    (extra.length?'<details class="mt-2 rounded-xl border border-slate-200 dark:border-slate-700 p-3"><summary class="cursor-pointer text-xs font-semibold text-teal-700 dark:text-teal-300">Ver mais '+extra.length+' indicadores ⌄</summary><div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">'+extra.map(indicatorCard).join('')+'</div></details>':'')+
+    '</section>';
   }).join('');
   const sources=[...(stored.health?Object.entries(stored.health.sources):[]),...(stored.sus?Object.entries(stored.sus.sources):[]),...(stored.aps?Object.entries(stored.aps.sources):[]),...(stored.production?Object.entries(stored.production.sources).map(([k,v]):[string,Origin]=>['production_'+k,{label:v.label,status:v.status,method:v.method,reference:v.reference||undefined}]):[])]
    .filter(([key,s])=>!metrics.some(m=>m.key===key)&&(s.status==='not_loaded'||s.status==='error'||s.status==='partial'));
