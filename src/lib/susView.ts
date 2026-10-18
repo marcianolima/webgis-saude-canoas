@@ -12,6 +12,7 @@ let active=0;
 let graph:any=null;
 let observer:ResizeObserver|null=null;
 const formatPeriod=(str:string,cadence?:string)=>{
+ const q=str.match(/^(\d{4})Q([1-3])$/);if(q)return q[2]+'º quadrimestre de '+q[1];
  if(str.length!==6)return str;
  if(cadence==='annual')return str.slice(0,4)+(str.slice(4,6)==='12'?'':' · ref. '+str.slice(4,6));
  return str.slice(4,6)+'/'+str.slice(0,4);
@@ -21,7 +22,7 @@ const num=(n:number,k:string)=>{
  if(k==='rate')return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(n);
  return nf(n);
 };
-export type SusMode='primary'|'screening'|'finance';
+export type SusMode='primary'|'screening'|'finance'|'historic';
 const groups:Record<SusMode,{title:string;eyebrow:string;intro:string;ids:string[];note:string}>={
  primary:{title:'Atenção Primária e equipes',eyebrow:'MGDI · APS · eMulti',
   intro:'Equipes multiprofissionais custeadas e homologadas, além das razões de consultas na APS e na atenção especializada. Equipes não representam quantidade de profissionais, e razões por 100 habitantes não são totais de consultas.',
@@ -31,6 +32,10 @@ const groups:Record<SusMode,{title:string;eyebrow:string;intro:string;ids:string
   intro:'Séries municipais de exames citopatológicos e mamografias. Os números representam procedimentos registrados, não necessariamente pessoas distintas ou cobertura de rastreamento.',
   ids:['citopatologicos','mamografias'],
   note:'Os resultados disponíveis têm referência predominantemente anual; o último ano pode estar incompleto. Não comparar com taxas de cobertura sem população-alvo.'},
+ historic:{title:'Atenção Primária · série histórica',eyebrow:'SISAB · Previne Brasil · 2024',
+  intro:'Indicadores históricos por quadrimestre de Canoas. O Previne Brasil foi substituído em 2024: estes percentuais não medem o desempenho atual da APS nem a cobertura vacinal municipal do PNI.',
+  ids:['aps_prenatal','aps_gestantes_testes','aps_gestantes_odontologia','aps_citopatologico','aps_vacinacao_infantil','aps_diabetes'],
+  note:'Os percentuais utilizam numeradores e denominadores próprios do Previne Brasil. Não somar indicadores nem tratar seus registros como totais de atendimentos.'},
  finance:{title:'Financiamento e indicadores hospitalares',eyebrow:'Repasses federais · RIPSA',
   intro:'Repasses federais de equipes eMulti e indicadores anuais de internações hospitalares SUS. Valores de repasse, valores médios por AIH e quantidade de internações são grandezas diferentes.',
   ids:['emulti_repasses','sih_internacoes_anuais','valor_medio_aih'],
@@ -48,7 +53,7 @@ export function susPage(mode:SusMode='primary'){
  (selected?'<div role="note" class="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-xs text-amber-800 dark:text-amber-200">'+
  'Estabelecimento selecionado: <strong>'+safe(selected.name)+' · CNES '+safe(selected.cnes)+'</strong>. Estes indicadores são municipais e não podem ser atribuídos automaticamente à unidade. Os dados individuais permanecem disponíveis na ficha CNES acima.</div>':'')+
  '<div role="status" aria-live="polite" id="sus-status" class="panel p-4 text-sm text-slate-500 dark:text-slate-300">Carregando indicadores oficiais de assistência…</div>'+
- '<div class="flex flex-wrap gap-3 mt-4"><button data-page="aps-history" type="button" class="ui-section-link">Indicadores históricos do SISAB →</button><button data-page="production" type="button" class="ui-section-link">Produção SIH/SIA por CNES →</button></div>'+
+ '<div class="flex flex-wrap gap-3 mt-4">'+(mode==='historic'?'<button data-page="sus" type="button" class="ui-section-link">APS e equipes atuais →</button>':'<button data-page="aps-history" type="button" class="ui-section-link">Indicadores históricos do SISAB →</button>')+'<button data-page="production" type="button" class="ui-section-link">Produção SIH/SIA por CNES →</button></div>'+
  '<div class="ui-context mt-4">'+safe(group.note)+'</div>'+
  '<div id="sus-content" class="space-y-5 mt-5"></div></section>';
 }
@@ -83,7 +88,7 @@ export async function mountSus(dark:boolean,mode:SusMode='primary'){
  const status=document.getElementById('sus-status'),panel=document.getElementById('sus-content');
  if(!status||!panel)return;
  try{
-  const response=await fetch(urlAsset('data/sus.json'),{cache:'no-cache'});
+  const response=await fetch(urlAsset(mode==='historic'?'data/aps.json':'data/sus.json'),{cache:'no-cache'});
   if(!response.ok)throw new Error('Erro HTTP '+response.status);
   const data=await response.json() as Data;
   if(!data||data.schemaVersion!=='1.0'||typeof data.sources!=='object'||typeof data.series!=='object')
@@ -91,7 +96,7 @@ export async function mountSus(dark:boolean,mode:SusMode='primary'){
   if(token!==active||!panel.isConnected)return;
   const available=indicators.filter(k=>data.sources[k]?.status==='ok'&&(data.series[k]||[]).length);
   status.innerHTML='<div class="flex justify-between items-center gap-3 flex-wrap"><span class="font-semibold">'+available.length+' de '+indicators.length+' fontes municipais com séries validadas</span>'+
-   '<span class="text-xs text-slate-500 dark:text-slate-300">Última extração: '+fmtDate(data.updatedAt)+' · Fonte: Ministério da Saúde / MGDI</span></div>';
+   '<span class="text-xs text-slate-500 dark:text-slate-300">Última extração: '+fmtDate(data.updatedAt)+' · Fonte: '+(mode==='historic'?'SISAB · Previne Brasil (histórico)':'Ministério da Saúde · MGDI/RIPSA')+'</span></div>';
   const pending=['sih','sia','pni'].map(k=>({key:k,...data.sources[k]})).filter(x=>x.label);
   panel.innerHTML='<section aria-label="Indicadores municipais" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">'+cards(data,indicators)+'</section>'+
    '<section class="grid grid-cols-1 xl:grid-cols-12 gap-4">'+
