@@ -61,7 +61,7 @@ export async function mountSources(summary:DataSummary){
  if(production)for(const [id,meta] of Object.entries(production.sources)){
   const months=Array.isArray((meta as any).monthsAvailable)?(meta as any).monthsAvailable as string[]:[];
   rows.push({id,family:'Produção mensal SIH/SIA · Parquet',label:meta.label,status:meta.status,
-   reference:meta.reference,method:(meta.method||'')+' · '+months.length+'/'+((meta as any).monthsRequested||'?')+' meses processados.',
+   reference:meta.reference,method:(meta.method||'')+' · '+months.length+'/'+((meta as any).monthsRequested||'?')+' meses processados. Em revisão de qualidade: '+(((meta as any).rejectedMonths||[]) as string[]).join(', ')+'.',
    url:meta.url,retrievedAt:undefined,unit:'registros e valores R$',years:months.length+' competências'});
  }
  const duplicates=new Set<string>();

@@ -4,7 +4,7 @@ import {selectedFacility} from './facilityExplorer';
 type Count={quantity:number;valueBRL:number};
 type MonthSource={rowsState:number;rowsCity:number;municipal:Count;byCnes:Record<string,Count>;suppressedUnits:number};
 type Month={sih?:MonthSource;sia?:MonthSource};
-type Source={label:string;status:string;monthsAvailable:string[];monthsRequested:number;reference:string|null;method:string;url:string;access:string;privacy:string};
+type Source={label:string;status:string;monthsAvailable:string[];monthsRequested:number;monthsRequestedPeriods?:string[];rejectedMonths?:string[];reference:string|null;method:string;url:string;access:string;privacy:string};
 type Snapshot={schemaVersion:string;generatedAt:string|null;periods:Record<string,Month>;sources:Record<string,Source>;geography:string};
 let active=0;
 let chart:any=null;
@@ -74,11 +74,11 @@ export async function mountProduction(dark:boolean){
    const system=(document.querySelector<HTMLSelectElement>('#production-system')?.value||'sih') as 'sih'|'sia';
    const kind=document.querySelector<HTMLSelectElement>('#production-metric')?.value||'quantity';
    const scope=document.querySelector<HTMLSelectElement>('#production-scope')?.value||'municipal';
-   const periods=[...new Set([...Object.keys(data.periods),...(data.sources[system]?.monthsAvailable||[])])].sort();
+   const periods=[...new Set([...(data.sources[system]?.monthsRequestedPeriods||[]),...Object.keys(data.periods),...(data.sources[system]?.monthsAvailable||[])])].sort();
    const records=periods.map(period=>{
     const doc=data.periods[period]?.[system];
     const value=doc?(scope==='facility'&&chosen?doc.byCnes?.[chosen.cnes]?.[kind as keyof Count]:doc.municipal[kind as keyof Count]):null;
-    return {period,value:typeof value==='number'?value:null,hasSystem:Boolean(doc)};
+    return {period,value:typeof value==='number'?value:null,hasSystem:Boolean(doc),quarantined:Boolean(data.sources[system]?.rejectedMonths?.includes(period))};
    });
    return {system,kind,scope,records};
   }
@@ -99,9 +99,10 @@ export async function mountProduction(dark:boolean){
    ro=new ResizeObserver(()=>chart?.resize());ro.observe(target);
    const table=document.querySelector<HTMLElement>('#production-table');
    if(table)table.innerHTML='<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-xs text-slate-500 border-b border-slate-200 dark:border-slate-700"><th class="text-left py-2">Competência</th><th class="text-right py-2">Valor</th><th class="text-right py-2">Qualidade</th></tr></thead><tbody>'+
-    records.map(r=>'<tr class="border-b border-slate-100 dark:border-slate-700"><td class="py-2">'+pretty(r.period)+'</td><td class="py-2 text-right font-semibold tabular-nums">'+number(r.value,kind)+'</td><td class="py-2 text-right text-xs text-slate-500">'+(r.value!==null?'Agregado validado':r.hasSystem?'Não divulgado por CNES':'Mês não processado')+'</td></tr>').join('')+'</tbody></table></div>';
+    records.map(r=>'<tr class="border-b border-slate-100 dark:border-slate-700"><td class="py-2">'+pretty(r.period)+'</td><td class="py-2 text-right font-semibold tabular-nums">'+number(r.value,kind)+'</td><td class="py-2 text-right text-xs text-slate-500">'+(r.value!==null?'Agregado validado':r.quarantined?'Arquivo em revisão de qualidade':r.hasSystem?'Não divulgado por CNES':'Mês não processado')+'</td></tr>').join('')+'</tbody></table></div>';
    const note=document.querySelector<HTMLElement>('#production-notes');
    if(note)note.textContent=(data.sources[system]?.method||'')+' · '+(scope==='municipal'?'Município de produção':'CNES '+chosen?.cnes)+
+     ' · Meses em revisão de qualidade: '+(data.sources[system]?.rejectedMonths?.map(pretty).join(', ')||'nenhum')+
      ' · Unidade: '+(kind==='quantity'?(system==='sih'?'registros de AIH RD':'procedimentos aprovados PA'):'R$ aprovados/pagos')+'. Ausência de dado não representa zero.';
   }
   for(const id of ('#production-system,#production-metric,#production-scope').split(','))
