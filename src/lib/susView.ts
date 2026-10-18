@@ -72,7 +72,8 @@ function cards(data:Data,indicators:string[]){
   '<span class="flex flex-wrap justify-between gap-2 items-start"><strong class="text-sm leading-snug max-w-[200px]">'+safe(label)+'</strong>'+badge(source?.status||'not_loaded')+'</span>'+
   '<span class="block kpi-val mt-3">'+(latest?num(latest.value,typ):'—')+'</span>'+
   '<span class="block text-xs text-slate-500 dark:text-slate-300 mt-2">'+(latest?formatPeriod(latest.period,source?.cadence)+' · '+safe(source?.unit||''):'Sem série municipal validada')+'</span>'+
-  '<span class="block text-xs text-teal-700 dark:text-teal-300 mt-3">Explorar série →</span></button>'
+  '<span class="ui-card-summary mt-2">'+safe(source?.method||source?.note||'Consulte a definição detalhada ao selecionar este indicador.')+'</span>'+
+  '<span class="block text-xs font-bold text-teal-700 dark:text-teal-300 mt-3">Explorar série →</span></button>'
  }).join('');
 }
 function table(rows:Sample[],kind:string,unit:string,cadence?:string){
@@ -107,7 +108,7 @@ export async function mountSus(dark:boolean,mode:SusMode='primary'){
    '<a id="sus-source-link" target="_blank" rel="noopener noreferrer" class="underline text-xs text-teal-700 dark:text-teal-300 mt-2 inline-block">Consultar a fonte oficial</a></article>'+
    '<article class="panel p-5 xl:col-span-4"><h3 class="subheading text-base mb-4">Valores por competência</h3>'+
    '<div id="sus-table"></div></article></section>'+
-   '<div role="note" class="ui-context">Cada gráfico apresenta somente uma série e uma unidade de medida. Fontes ainda indisponíveis estão detalhadas no catálogo de fontes; ausência de dado não significa zero.</div>';
+   '<div role="note" class="ui-context">Cada gráfico apresenta uma grandeza e sua respectiva unidade. Consulte a definição abaixo do gráfico; ausência de dado não significa zero. Fontes pendentes estão no catálogo.</div>';
   const ec=await import('echarts');
   if(token!==active||!panel.isConnected)return;
   let selected=available[0]||indicators[0];
