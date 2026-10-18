@@ -15,7 +15,7 @@ const display=(value:number|null|undefined,kind='count')=>{
  if(kind==='rate')return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(value);
  return nf(value);
 };
-const stamp=(text:string)=>text.length===6?text.slice(4,6)+'/'+text.slice(0,4):text;
+const stamp=(text:string)=>{const q=text.match(/^(\d{4})Q([1-3])$/);return q?q[2]+'º quadrimestre/'+q[1]:/^\d{6}$/.test(text)?text.slice(4,6)+'/'+text.slice(0,4):text;};
 let live=0;
 let plot:any=null;
 let obs:ResizeObserver|null=null;
@@ -35,15 +35,18 @@ export function municipalPage(summary:DataSummary){
  kpi('População',display(population.population??population.censusPopulation),'habitantes · '+(population.populationYear||population.censusYear||'—'),'IBGE · estimativa populacional')+
  kpi('Estabelecimentos de saúde',display(summary.facilities.total),'inclui prestadores públicos e privados','CNES · '+(summary.facilities.asOf||'sem data'))+
  kpi('Unidades básicas',display(summary.facilities.ubs),'classificadas pelo tipo CNES','CNES · retrato cadastral')+
- kpi('Hospitais',display(summary.facilities.hospitals),'inclui hospital-dia','CNES · retrato cadastral')+
- kpi('Leitos existentes',display(summary.beds.total),'estoque cadastral','CNES · competência '+stamp(summary.beds.asOf||'—'))+
- kpi('Leitos SUS',display(summary.beds.sus),'parcela do estoque existente','CNES · competência '+stamp(summary.beds.asOf||'—'))+
- kpi('Com geolocalização',display(summary.facilities.withCoordinates),'estabelecimentos com coordenadas','CNES · não é cobertura territorial')+
- kpi('Área territorial',display(population.areaKm2,'rate'),'km²','IBGE · área municipal')+
+ kpi('Leitos existentes',display(summary.beds.total),'estoque cadastral, não vagas livres','CNES · '+stamp(summary.beds.asOf||'—'))+
  '</div>'+
+ '<details class="panel px-4 py-3 mb-5"><summary class="cursor-pointer text-xs font-bold text-teal-700 dark:text-teal-300">Outros dados gerais: hospitais, leitos SUS, localização e área ⌄</summary>'+
+ '<div class="grid grid-cols-2 xl:grid-cols-4 gap-3 mt-3">'+
+ kpi('Hospitais',display(summary.facilities.hospitals),'inclui hospital-dia','CNES · cadastro')+
+ kpi('Leitos SUS',display(summary.beds.sus),'subconjunto dos leitos existentes','CNES · '+stamp(summary.beds.asOf||'—'))+
+ kpi('No mapa',display(summary.facilities.withCoordinates),'unidades com coordenadas','CNES · geolocalização')+
+ kpi('Área',display(population.areaKm2,'rate'),'km²','IBGE · território')+'</div></details>'+
+ '<p class="ui-context mb-5">O CNES inclui unidades públicas e privadas. Leitos cadastrados não significam vagas disponíveis nem ocupação. Os indicadores podem ter competências distintas.</p>'+
  '<section class="panel p-4 sm:p-5 mb-5" aria-label="Indicadores por área"><div class="flex flex-wrap justify-between items-start gap-3"><div>'+
- '<h3 class="subheading text-lg">Indicadores municipais por tema</h3>'+
- '<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Cada número informa período, unidade e origem. Ausência de dados não representa zero.</p></div>'+
+ '<h3 class="subheading text-lg">Resumo municipal por tema</h3>'+
+ '<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Os dois principais indicadores de cada área aparecem primeiro. Expanda os temas para ver os demais. Clique em um cartão para explorar os gráficos. “—” significa informação não disponível, não zero.</p></div>'+
  '<div id="municipal-status" role="status" aria-live="polite" class="text-xs text-slate-500 dark:text-slate-300">Carregando bases oficiais…</div></div>'+
  '<div id="municipal-indicator-list" class="mt-4 space-y-5"></div></section>'+
  '<section class="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-5" aria-label="Evolução do indicador municipal">'+
@@ -54,14 +57,14 @@ export function municipalPage(summary:DataSummary){
  '<div id="municipal-chart" role="img" aria-label="Série temporal municipal" style="height:310px;min-height:310px"></div>'+
  '<p id="municipal-method" class="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-300"></p></article>'+
  '<article class="panel p-5 xl:col-span-4"><h3 class="subheading text-base mb-3">Valores por referência</h3><div id="municipal-table"></div></article></section>'+
- '<section class="panel p-5 mb-5"><div class="flex justify-between gap-3 items-start flex-wrap"><div><h3 class="subheading text-base">Fontes ainda em integração</h3>'+
+ '<details class="panel p-4 sm:p-5 mb-5"><summary class="ui-section-heading cursor-pointer">Fontes ainda em integração <span class="text-xs font-normal">Ver limitações ⌄</span></summary><div class="flex justify-between gap-3 items-start flex-wrap"><div><h3 class="subheading text-base">Situação das fontes</h3>'+
  '<p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Pendências de acesso e validação não são escondidas.</p></div>'+
  '<button type="button" data-page="sources" class="text-xs font-bold text-teal-700 dark:text-teal-300 underline">Metodologia →</button></div>'+
- '<div id="municipal-pending" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3"></div></section>'+
+ '<div id="municipal-pending" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3"></div></details>'+
  '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">'+
  '<button type="button" data-page="overview" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Analisar o território e CNES →</button>'+
- '<button type="button" data-page="health" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Vigilância e estatísticas vitais →</button>'+
- '<button type="button" data-page="sus" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Assistência e financiamento SUS →</button>'+ '<button type="button" data-page="production" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Produção mensal SIH/SIA →</button></div>'+
+ '<button type="button" data-page="health" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Vigilância epidemiológica →</button>'+
+ '<button type="button" data-page="sus" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Atenção Primária →</button>'+ '<button type="button" data-page="production" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Produção mensal SIH/SIA →</button></div>'+
  '</section>';
 }
 const healthLabels:Record<string,string>={
@@ -96,8 +99,8 @@ function buildMetrics(health:Health|null,sus:SUS|null,aps:APS|null,production:Pr
   if(src?.status!=='ok'||!rows.length)continue;
   const last=rows[rows.length-1];
   values.push({label:src.label,key:id,section:'aps',value:last.value,
-   reference:last.period,unit:src.unit||'%',kind:'rate',notes:src.method||'Indicador histórico Previne Brasil.',
-   source:src.url,series:rows.map(r=>({period:r.period,value:r.value}))});
+   reference:stamp(last.period),unit:src.unit||'%',kind:'rate',notes:src.method||'Indicador histórico Previne Brasil.',
+   source:src.url,series:rows.map(r=>({period:stamp(r.period),value:r.value}))});
  }
  if(production)for(const system of ['sih','sia'] as const){
   const source=production.sources[system];
@@ -190,13 +193,13 @@ export async function mountMunicipal(dark:boolean){
    const table=document.getElementById('municipal-table');
    if(table)table.innerHTML='<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-xs text-slate-500 border-b border-slate-200 dark:border-slate-700"><th class="text-left py-2">Período</th><th class="text-right py-2">Valor</th></tr></thead><tbody>'+
     record.series.slice().reverse().map(v=>'<tr class="border-b border-slate-100 dark:border-slate-700"><td class="py-2">'+safe(v.period)+'</td><td class="py-2 text-right font-semibold tabular-nums">'+display(v.value,record.kind)+'</td></tr>').join('')+'</tbody></table></div>';
-   document.querySelectorAll<HTMLElement>('[data-municipal-metric]').forEach(e=>e.classList.toggle('ring-2',e.dataset.municipalMetric===record.key));
+   document.querySelectorAll<HTMLElement>('[data-municipal-metric]').forEach(e=>e.classList.toggle('ui-metric-selected',e.dataset.municipalMetric===record.key));
    if(!record.series.length){target.innerHTML='Sem dados por período.';return}
    plot=ec.init(target);
    const muted=dark?'#9db3c5':'#64748b';
    plot.setOption({animationDuration:280,grid:{top:18,left:12,right:16,bottom:50,containLabel:true},
     tooltip:{trigger:'axis',valueFormatter:(value:number)=>display(Number(value),record.kind)},
-    xAxis:{type:'category',data:record.series.map(x=>x.period),axisLabel:{color:muted,rotate:35},axisTick:{show:false}},
+    xAxis:{type:'category',data:record.series.map(x=>x.period),axisLabel:{color:muted,rotate:record.series.length>6?45:25,hideOverlap:true,fontSize:10},axisTick:{show:false}},
     yAxis:{type:'value',axisLabel:{color:muted},splitLine:{lineStyle:{color:dark?'#32475a':'#edf2f6'}}},
     series:[{type:record.series.length<=3?'bar':'line',smooth:true,barMaxWidth:72,
       lineStyle:{color:'#0d9488',width:3},itemStyle:{color:'#0d9488'},data:record.series.map(x=>x.value)}]});
