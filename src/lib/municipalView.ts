@@ -55,7 +55,7 @@ export function municipalPage(summary:DataSummary){
  '<span id="municipal-plot-source" class="text-xs text-teal-700 dark:text-teal-300"></span></div>'+
  '<h4 id="municipal-plot-title" class="font-semibold text-sm my-3">Selecione um indicador para explorar</h4>'+
  '<div id="municipal-chart" role="img" aria-label="Série temporal municipal" style="height:310px;min-height:310px"></div>'+
- '<p id="municipal-method" class="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-300"></p></article>'+
+ '<p class="text-xs text-slate-500 dark:text-slate-300 mt-2">Use a barra inferior para consultar outros períodos.</p><p id="municipal-method" class="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-300"></p></article>'+
  '<article class="panel p-5 xl:col-span-4"><h3 class="subheading text-base mb-3">Valores por referência</h3><div id="municipal-table"></div></article></section>'+
  '<details class="panel p-4 sm:p-5 mb-5"><summary class="ui-section-heading cursor-pointer">Fontes ainda em integração <span class="text-xs font-normal">Ver limitações ⌄</span></summary><div class="flex justify-between gap-3 items-start flex-wrap"><div><h3 class="subheading text-base">Situação das fontes</h3>'+
  '<p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Pendências de acesso e validação não são escondidas.</p></div>'+
@@ -197,10 +197,17 @@ export async function mountMunicipal(dark:boolean){
    if(!record.series.length){target.innerHTML='Sem dados por período.';return}
    plot=ec.init(target);
    const muted=dark?'#9db3c5':'#64748b';
-   plot.setOption({animationDuration:280,grid:{top:18,left:12,right:16,bottom:50,containLabel:true},
-    tooltip:{trigger:'axis',valueFormatter:(value:number)=>display(Number(value),record.kind)},
-    xAxis:{type:'category',data:record.series.map(x=>x.period),axisLabel:{color:muted,rotate:record.series.length>6?45:25,hideOverlap:true,fontSize:10},axisTick:{show:false}},
-    yAxis:{type:'value',axisLabel:{color:muted},splitLine:{lineStyle:{color:dark?'#32475a':'#edf2f6'}}},
+   const narrow=window.matchMedia('(max-width: 640px)').matches;
+   const limit=narrow?6:10;
+   const start=record.series.length>limit?Math.max(0,100-limit*100/record.series.length):0;
+   plot.setOption({animationDuration:280,grid:{top:18,left:12,right:16,bottom:76,containLabel:true},
+    tooltip:{trigger:'axis',valueFormatter:(value:number)=>display(Number(value),record.kind)+
+      ((record.kind==='rate'||record.kind==='count')&&record.unit?' '+record.unit:'')},
+    dataZoom:[{type:'inside',start,end:100},
+      {type:'slider',height:14,bottom:5,start,end:100,textStyle:{color:muted,fontSize:10}}],
+    xAxis:{type:'category',data:record.series.map(x=>x.period),
+      axisLabel:{color:muted,rotate:narrow?45:25,hideOverlap:true,fontSize:10},axisTick:{show:false}},
+    yAxis:{type:'value',axisLabel:{color:muted,formatter:(v:number)=>new Intl.NumberFormat('pt-BR',{notation:'compact',maximumFractionDigits:1}).format(v)},splitLine:{lineStyle:{color:dark?'#32475a':'#edf2f6'}}},
     series:[{type:record.series.length<=3?'bar':'line',smooth:true,barMaxWidth:72,
       lineStyle:{color:'#0d9488',width:3},itemStyle:{color:'#0d9488'},data:record.series.map(x=>x.value)}]});
    obs=new ResizeObserver(()=>plot?.resize());obs.observe(target);
