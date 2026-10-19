@@ -107,9 +107,9 @@ async function initMap(id:string,compact:boolean){
   if(!document.createElement('canvas').getContext('webgl2'))throw new Error('WebGL 2 não é suportado neste navegador');
   map=new maplibregl.Map({
    container:target,
-   style:{version:8,glyphs:'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
-    sources:{carto:{type:'raster',tiles:['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png','https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],tileSize:256,attribution:'© OpenStreetMap contributors · © CARTO'}},
-    layers:[{id:'basemap',type:'raster',source:'carto'}]},
+   // CartoCDN now watermarks unauthenticated tiles: use OpenFreeMap
+   // Positron vector basemap, which does not require an API key.
+   style:'https://tiles.openfreemap.org/styles/positron',
    center:[-51.182,-29.918],zoom:compact?10.8:11.3,attributionControl:false
   });
   state.map=map;
@@ -125,7 +125,7 @@ async function initMap(id:string,compact:boolean){
    try{
     map.addSource('facilities',{type:'geojson',data:{type:'FeatureCollection',features:[]},cluster:true,clusterMaxZoom:14,clusterRadius:45});
     map.addLayer({id:'clusters',type:'circle',source:'facilities',filter:['has','point_count'],paint:{'circle-color':['step',['get','point_count'],'#087e81',30,'#126b9e',90,'#244c82'],'circle-radius':['step',['get','point_count'],19,30,25,90,32],'circle-stroke-width':3,'circle-stroke-color':'#fff'}});
-    map.addLayer({id:'count',type:'symbol',source:'facilities',filter:['has','point_count'],layout:{'text-field':['get','point_count_abbreviated'],'text-font':['Open Sans Semibold'],'text-size':12},paint:{'text-color':'#fff'}});
+    map.addLayer({id:'count',type:'symbol',source:'facilities',filter:['has','point_count'],layout:{'text-field':['get','point_count_abbreviated'],'text-font':['Noto Sans Bold'],'text-size':12},paint:{'text-color':'#fff'}});
     map.addLayer({id:'points',type:'circle',source:'facilities',filter:['!',['has','point_count']],paint:{'circle-radius':7,'circle-color':['match',['get','category'],'ubs','#10a978','hospital','#2563eb','urgencia','#f59e0b','clinica','#8b5cf6','#64748b'],'circle-stroke-color':'white','circle-stroke-width':2}});
     map.addLayer({id:'selected-point',type:'circle',source:'facilities',filter:['all',['!',['has','point_count']],['==',['get','cnes'],selectedCnes()||'']],paint:{'circle-radius':13,'circle-color':'rgba(0,0,0,0)','circle-stroke-color':'#ef4444','circle-stroke-width':4}});
     map.on('click','points',(e:any)=>{
