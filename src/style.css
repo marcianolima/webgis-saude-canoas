@@ -92,3 +92,47 @@ summary:focus-visible{outline:3px solid #4bd6a8;outline-offset:4px;border-radius
  .nav-mobile .sidebar-link{padding-inline:10px}
  .kpi-val{font-size:1.15rem!important}
 }
+
+/* Navegação agrupada — equivalente funcional ao WebGIS Empreender. */
+body.nav-lock{overflow:hidden}
+.sidebar{overflow-y:auto;overscroll-behavior:contain;padding-bottom:18px}
+.health-desktop-nav,.drawer-nav{min-height:0;flex:1}
+.nav-caption{margin:18px 12px 8px;color:#8caabd;text-transform:uppercase;font-size:10px;letter-spacing:.13em;font-weight:800}
+.nav-caption-support{margin-top:14px}
+.nav-group{min-width:0}
+.nav-group-toggle{min-height:40px}
+.nav-group-toggle>span{min-width:0;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.nav-group-toggle>svg:last-child{flex:0 0 15px;transition:transform .15s ease}
+.nav-group-toggle[aria-expanded="true"]>svg:last-child{transform:rotate(90deg)}
+.nav-group-toggle.group-selected{color:#fff}
+.nav-group-items{display:grid;gap:2px;padding:2px 0 4px 18px}
+.nav-group-items[hidden]{display:none!important}
+.nav-group-items .sidebar-link{font-size:12px;min-height:38px;padding:9px 10px;border-radius:9px}
+.nav-group-items .sidebar-link.active{background:#14685f;box-shadow:inset 3px 0 0 #4bd6a8}
+.health-topbar{height:58px;min-height:58px;box-shadow:0 2px 9px #102d4308}
+.header-shortcut{height:36px;padding:0 10px;display:flex;align-items:center;gap:6px;border-radius:9px;background:#e4f7f2;color:#0c746b;font-size:12px;font-weight:800;white-space:nowrap}
+.header-shortcut:hover{background:#c9efe5}
+.dark .header-shortcut{background:#1b4849;color:#8ee6cf}
+.mobile-menu-trigger{height:36px;width:36px;flex:0 0 36px;align-items:center;justify-content:center;border:1px solid #d6e2e9;border-radius:9px;background:transparent;color:#163448}
+.dark .mobile-menu-trigger{border-color:#365060;color:#e5f2f6}
+.health-drawer[hidden]{display:none!important}
+@media(max-width:1023px){
+ .mobile-menu-trigger{display:flex}
+ .health-drawer{position:fixed;inset:0;z-index:90}
+ .drawer-backdrop{position:absolute;inset:0;width:100%;background:#020d18aa;border:0}
+ .drawer-panel{position:absolute;inset:0 auto 0 0;width:min(88vw,340px);height:100dvh;padding:16px 12px;background:#10293d;display:flex;flex-direction:column;color:#c8d9e4;box-shadow:10px 0 35px #06172666}
+ .drawer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #315062;padding:0 4px 13px;margin-bottom:10px}
+ .drawer-close{width:36px;height:36px;display:grid;place-items:center;border:0;color:white;background:transparent;border-radius:9px}
+ .drawer-close:hover{background:#20435a}
+ .drawer-nav{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:0 0 25px}
+ .drawer-nav .sidebar-link{min-height:40px;padding:9px 11px}
+ .drawer-nav .sidebar-link.active{background:#14685f;box-shadow:inset 3px 0 0 #4bd6a8;color:#fff}
+ .drawer-nav .nav-group-items .sidebar-link{padding:8px 10px}
+ .nav-mobile{display:none!important}
+}
+@media(max-width:560px){
+ .health-topbar{padding-inline:11px}
+ .health-topbar .heading{font-size:14px;max-width:48vw}
+ .header-shortcut{padding:0 9px}
+ .header-shortcut span{display:none}
+}
