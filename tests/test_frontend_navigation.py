@@ -43,7 +43,7 @@ class FrontendNavigationTests(unittest.TestCase):
         self.assertNotIn('data-series="sih"',app)
         self.assertNotIn('data-series="sia"',app)
         self.assertNotIn('data-series="dengue"',app)
-        self.assertIn('data-page="production"',app)
+        self.assertIn("page:'production'",app)
     def test_sources_and_production_explain_partial_coverage(self):
         prod=contents("src/lib/productionView.ts")
         sources=contents("src/lib/sourcesView.ts")
