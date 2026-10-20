@@ -136,3 +136,9 @@ body.nav-lock{overflow:hidden}
  .header-shortcut{padding:0 9px}
  .header-shortcut span{display:none}
 }
+
+
+@media(max-width:1023px){.mobile-brand-mark{height:30px;width:30px;flex:0 0 30px;display:grid;place-items:center;border-radius:9px;color:#fff;background:#0d857e}}
+@media(min-width:1024px){.mobile-brand-mark{display:none}}
+
+@media(max-width:1023px){.drawer-foot{border-top:1px solid #315062;padding:14px 12px 4px;font-size:12px;font-weight:700;color:#64d2bd}}
