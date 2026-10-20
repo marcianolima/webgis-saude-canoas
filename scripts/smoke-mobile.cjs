@@ -31,31 +31,37 @@ async function main(){
    const errors=[];
    page.on('pageerror',err=>errors.push(err.message));
    await page.goto(origin,{waitUntil:'domcontentloaded',timeout:20000});
-   await page.locator('#nav-mobile .sidebar-link.active').waitFor({timeout:20000});
-   await check((await page.locator('#nav-mobile .sidebar-link.active').getAttribute('data-page'))==='municipal','Página inicial não é municipal');
+   await page.locator('[data-open-nav]').waitFor({timeout:20000});
+   await page.locator('[data-open-nav]').click();
+   await check((await page.locator('#mobile-drawer .sidebar-link.active').getAttribute('data-page'))==='municipal','Página inicial não é municipal');
+   await page.locator('#close-nav').click();
    const activePages=[];
    for(const route of routes){
-    const selector=page.locator('#nav-mobile [data-page="'+route+'"]');
+    await page.locator('[data-open-nav]').click();
+    const selector=page.locator('#mobile-drawer [data-page="'+route+'"]');
+    const group=selector.locator('xpath=ancestor::section[contains(@class,"nav-group")]');
+    if(await group.count()){
+      const toggle=group.locator('[data-nav-group]');
+      if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
+    }
     await selector.click({timeout:20000});
-    const active=page.locator('#nav-mobile .sidebar-link.active');
-    await active.waitFor({timeout:10000});
-    await check((await active.getAttribute('data-page'))===route,'Aba ativa incorreta em '+route);
-    await page.waitForTimeout(100);
-    const rect=await page.evaluate(()=>{
-      const nav=document.querySelector('#nav-mobile');
-      const tab=nav?.querySelector('.sidebar-link.active');
-      return {tabX:tab?.getBoundingClientRect().left,navX:nav?.getBoundingClientRect().left,
-       docW:document.documentElement.scrollWidth,screenW:window.innerWidth}
-    });
-    await check(rect.tabX!==undefined&&Math.abs(rect.tabX-rect.navX-12)<35,
-      'Aba ativa não alinhada à esquerda em '+route+': '+JSON.stringify(rect));
-    await check(rect.docW<=rect.screenW+4,'Overflow horizontal em '+route+': '+JSON.stringify(rect));
+    await check((await page.locator('#mobile-drawer .sidebar-link.active').getAttribute('data-page'))===route,'Página ativa incorreta em '+route);
+    await check(await page.locator('#mobile-drawer').isHidden(),'Menu lateral não fechou em '+route);
+    await page.locator('[data-open-nav]').click();
+    const active=page.locator('#mobile-drawer .sidebar-link.active');
+    const rect=await active.boundingBox();
+    const panel=await page.locator('.drawer-panel').boundingBox();
+    await check(!!rect&&!!panel&&rect.x>=panel.x&&rect.x<panel.x+50,
+      'Página ativa não está alinhada à esquerda em '+route+': '+JSON.stringify({rect,panel}));
+    await page.locator('#close-nav').click();
+    const width=await page.evaluate(()=>document.documentElement.scrollWidth);
+    await check(width<=viewport.width+4,'Overflow horizontal em '+route+': '+width);
     activePages.push(route);
     if(viewport.width===390&&['municipal','overview','health','vital','sus','aps-history','screening','finance','production','sources'].includes(route)){
       await page.screenshot({path:path.join(snapDir,route+'-390px.png'),fullPage:true,animations:'disabled'});
     }
    }
-   await page.locator('#nav-mobile [data-page="sources"]').click();
+   await page.locator('[data-open-nav]').click();await page.locator('#mobile-drawer [data-page="sources"]').click();
    await page.locator('#source-groups details').first().waitFor({timeout:20000});
    await check((await page.locator('#source-groups details').count())>=3,'Catálogo incompleto');
    await check(!errors.some(e=>/TypeError|ReferenceError|SyntaxError/.test(e)),
