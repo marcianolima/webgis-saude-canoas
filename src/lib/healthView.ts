@@ -16,7 +16,7 @@ export function healthPage(mode:'surveillance'|'vital'='surveillance'):string{
  '<h2 class="subheading text-2xl md:text-3xl mt-1">'+(surveillance?'Vigilância epidemiológica':'Nascimentos e mortalidade')+'</h2>'+
  '<p class="text-sm text-slate-500 dark:text-slate-300 mt-2 max-w-2xl">'+(surveillance?'Notificações de dengue, chikungunya e zika entre residentes. Notificação não é sinônimo de caso confirmado ou de incidência.':'Nascidos vivos e óbitos não fetais de residentes, independentemente de onde ocorreu o atendimento. São contagens anuais, não taxas.')+'</p></header>'+
  '<div role="status" aria-live="polite" id="health-status" class="panel p-4 text-sm">Carregando séries oficiais…</div>'+
- '<div class="mb-4"><button data-page="'+(surveillance?'vital':'health')+'" type="button" class="text-sm font-semibold underline text-teal-700 dark:text-teal-300">'+(surveillance?'Ver nascimentos e óbitos →':'Ver vigilância epidemiológica →')+'</button></div><div id="health-panel" class="mt-5 space-y-5"></div></section>';
+ '<div id="health-panel" class="mt-5 space-y-5"></div></section>';
 }
 function stateLabel(value:string){
  return value==='ok'?'<span class="pill bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200">Validado</span>':
