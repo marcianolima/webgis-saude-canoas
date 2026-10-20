@@ -60,6 +60,11 @@ type HeaderAction={page:Page;label:string;icon:string};
 const headerActions:Partial<Record<Page,HeaderAction[]>>={
  municipal:[{page:'sources',label:'Fontes',icon:'database'}],
  overview:[{page:'health',label:'Vigilância',icon:'activity'},{page:'production',label:'Produção',icon:'clipboard-list'}],
+ health:[{page:'vital',label:'Nascimentos e óbitos',icon:'users'}],
+ vital:[{page:'health',label:'Vigilância',icon:'activity'}],
+ sus:[{page:'aps-history',label:'Histórico APS',icon:'trending-up'},{page:'production',label:'Produção',icon:'clipboard-list'}],
+ 'aps-history':[{page:'sus',label:'APS atual',icon:'heart-pulse'},{page:'production',label:'Produção',icon:'clipboard-list'}],
+ screening:[{page:'sus',label:'Atenção Primária',icon:'heart-pulse'}],
  map:[{page:'facilities',label:'Estabelecimentos',icon:'building-2'}],
  facilities:[{page:'map',label:'Mapa',icon:'map-pinned'}],
  finance:[{page:'production',label:'Produção',icon:'clipboard-list'}],
