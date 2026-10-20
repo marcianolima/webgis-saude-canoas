@@ -61,10 +61,7 @@ export function municipalPage(summary:DataSummary){
  '<p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Pendências de acesso e validação não são escondidas.</p></div>'+
  '<button type="button" data-page="sources" class="text-xs font-bold text-teal-700 dark:text-teal-300 underline">Metodologia →</button></div>'+
  '<div id="municipal-pending" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3"></div></details>'+
- '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">'+
- '<button type="button" data-page="overview" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Analisar o território e CNES →</button>'+
- '<button type="button" data-page="health" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Vigilância epidemiológica →</button>'+
- '<button type="button" data-page="sus" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Atenção Primária →</button>'+ '<button type="button" data-page="production" class="panel p-4 text-left text-sm font-semibold text-teal-700 dark:text-teal-300">Produção mensal SIH/SIA →</button></div>'+
+
  '</section>';
 }
 const healthLabels:Record<string,string>={
