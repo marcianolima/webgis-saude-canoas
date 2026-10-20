@@ -53,7 +53,7 @@ export function susPage(mode:SusMode='primary'){
  (selected?'<div role="note" class="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-xs text-amber-800 dark:text-amber-200">'+
  'Estabelecimento selecionado: <strong>'+safe(selected.name)+' · CNES '+safe(selected.cnes)+'</strong>. Estes indicadores são municipais e não podem ser atribuídos automaticamente à unidade. Os dados individuais permanecem disponíveis na ficha CNES acima.</div>':'')+
  '<div role="status" aria-live="polite" id="sus-status" class="panel p-4 text-sm text-slate-500 dark:text-slate-300">Carregando indicadores oficiais de assistência…</div>'+
- '<div class="flex flex-wrap gap-3 mt-4">'+(mode==='historic'?'<button data-page="sus" type="button" class="ui-section-link">APS e equipes atuais →</button>':'<button data-page="aps-history" type="button" class="ui-section-link">Indicadores históricos do SISAB →</button>')+'<button data-page="production" type="button" class="ui-section-link">Produção SIH/SIA por CNES →</button></div>'+
+
  '<div class="ui-context mt-4">'+safe(group.note)+'</div>'+
  '<div id="sus-content" class="space-y-5 mt-5"></div></section>';
 }
