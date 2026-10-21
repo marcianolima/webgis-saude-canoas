@@ -49,7 +49,7 @@ export async function mountSources(summary:DataSummary){
    return doc&&typeof doc.sources==='object'?doc:null;
   }catch{return null}
  }
- const [health,sus,aps,production]=await Promise.all([readOptional('indicators.json'),readOptional('sus.json'),readOptional('aps.json'),readOptional('production.json')]);
+ const [health,sus,aps,production,farmacia]=await Promise.all([readOptional('indicators.json'),readOptional('sus.json'),readOptional('aps.json'),readOptional('production.json'),readOptional('farmacia_siaps.json')]);
  if(token!==active||!parent.isConnected)return;
  for(const [group,document] of [['Vigilância e estatísticas vitais',health],['Assistência, APS e financiamento',sus],['SISAB · indicadores históricos Previne Brasil',aps]] as const){
   if(!document)continue;
@@ -60,6 +60,9 @@ export async function mountSources(summary:DataSummary){
    rows.push({id,family:group,...item,reference,years:item.yearsAvailable?.length?item.yearsAvailable.join(', '):undefined});
   }
  }
+ if(farmacia)for(const [id,meta] of Object.entries(farmacia.sources)){
+  rows.push({id,family:'Assistência farmacêutica e SIAPS · novas fontes',...meta});
+ }
  if(production)for(const [id,meta] of Object.entries(production.sources)){
   const months=Array.isArray((meta as any).monthsAvailable)?(meta as any).monthsAvailable as string[]:[];
   rows.push({id,family:'Produção mensal SIH/SIA · Parquet',label:meta.label,status:meta.status,
@@ -68,7 +71,7 @@ export async function mountSources(summary:DataSummary){
  }
  const duplicates=new Set<string>();
  const list=rows.filter(row=>{const k=row.family+':'+row.id;if(duplicates.has(k))return false;duplicates.add(k);return true});
- const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento','SISAB · indicadores históricos Previne Brasil','Produção mensal SIH/SIA · Parquet'];
+ const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento','SISAB · indicadores históricos Previne Brasil','Assistência farmacêutica e SIAPS · novas fontes','Produção mensal SIH/SIA · Parquet'];
  function render(){
   const filter=(document.querySelector<HTMLSelectElement>('#sources-filter')?.value||'all');
   const q=(document.querySelector<HTMLInputElement>('#sources-search')?.value||'').toLocaleLowerCase('pt-BR');
