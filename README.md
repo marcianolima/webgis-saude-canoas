@@ -172,3 +172,12 @@ Os indicadores do Previne Brasil de 2024 são históricos e não representam o f
 ### Homologação
 
 A publicação automática executa testes de dados Python e build TypeScript/Vite no GitHub Actions. Esses testes não substituem validação visual em celulares Android/iOS reais, testes com leitor de tela ou comparação epidemiológica aprofundada entre fontes. Nenhum dado bruto ou pessoal foi adicionado na revisão de interface.
+
+
+## Novas fontes: assistência farmacêutica e SIAPS (outubro/2026)
+
+A seção **Farmácia e SIAPS** reúne o status de envio da BNAFAR, as publicações Qualifar-SUS e os módulos atuais de APS no SIAPS, preservando a distinção entre *fonte disponível* e *indicador municipal homologado*. A navegação e o catálogo de transparência mostram o status específico de cada integração, sem valores substituídos por zero.
+
+O script `scripts/farmacia_siaps.py` identifica automaticamente a planilha Qualifar-SUS mais recente e atualiza o link oficial em `public/data/farmacia_siaps.json`. O painel municipal de envio (Looker Studio) e as exportações CSV/XLSX do SIAPS estão registrados, mas **não tiveram suas séries de Canoas validadas**, portanto não são apresentados resultados municipais fictícios.
+
+Consulte [FONTES_BNAFAR_SIAPS.md](./FONTES_BNAFAR_SIAPS.md) para fontes oficiais, periodicidade, limitações e requisitos de homologação das séries.
