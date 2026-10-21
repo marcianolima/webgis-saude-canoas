@@ -100,6 +100,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 8
         run: python scripts/aps_sisab.py
+      - name: Atualizar catálogo de BNAFAR e SIAPS (sem métricas presumidas)
+        if: steps.decide.outputs.collect == 'true'
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python scripts/farmacia_siaps.py
       - name: Informar qualidade do snapshot e falhas de coleta
         if: steps.decide.outputs.collect == 'true'
         shell: bash
