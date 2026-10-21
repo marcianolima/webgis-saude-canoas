@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0",
+  "municipality": "4304606",
+  "updatedAt": null,
+  "sources": {
+    "bnafar_envio": {
+      "label": "BNAFAR — situação mensal do envio municipal",
+      "status": "not_loaded",
+      "url": "https://lookerstudio.google.com/reporting/9f4ae971-614c-4d68-98e2-9aef9df915d2",
+      "reference": null,
+      "retrievedAt": null,
+      "cadence": "mensal",
+      "note": "Painel público Looker Studio. Não há extrato municipal validado incorporado ao WebGIS. A existência de envio não equivale a estoque ou dispensação de medicamentos."
+    },
+    "qualifar_monitoramento": {
+      "label": "Qualifar-SUS — monitoramento do envio",
+      "status": "partial",
+      "url": "https://bnafar.github.io/statusenvio/arquivos/qualifarsus/ciclo_04_2026/2026.10.13_Status_Qualifar_SUS_4_ciclo_2026.xlsx",
+      "reference": "2026-10-13",
+      "retrievedAt": null,
+      "cadence": "semanal",
+      "note": "Planilha oficial de monitoramento publicada. O resultado específico de Canoas não foi extraído ou validado; a planilha não mede quantidade dispensada."
+    },
+    "siaps_cofinanciamento": {
+      "label": "SIAPS — cofinanciamento atual da APS",
+      "status": "not_loaded",
+      "url": "https://siaps.saude.gov.br/publico",
+      "reference": null,
+      "retrievedAt": null,
+      "cadence": "competência / quadrimestre",
+      "note": "Indicadores atuais, numeradores e denominadores disponíveis no portal. Exportação pública municipal ainda não incorporada e validada."
+    },
+    "siaps_qualidade": {
+      "label": "SIAPS — qualidade das equipes APS",
+      "status": "not_loaded",
+      "url": "https://siaps.saude.gov.br/publico",
+      "reference": null,
+      "retrievedAt": null,
+      "cadence": "competência / quadrimestre",
+      "note": "Não confundir com série histórica do Previne Brasil, que encerra em 2024. Resultados por equipe requerem INE, competência e definição técnica."
+    },
+    "siaps_praticas": {
+      "label": "SIAPS — práticas assistenciais",
+      "status": "not_loaded",
+      "url": "https://siaps.saude.gov.br/publico",
+      "reference": null,
+      "retrievedAt": null,
+      "cadence": "competência",
+      "note": "Consultas, procedimentos, atividades coletivas e visitas domiciliares. Quantidade de pessoas e quantidade de atendimentos são medidas diferentes."
+    }
+  },
+  "series": {},
+  "externalPublication": {
+    "bnafarStatusPage": "https://bnafar.github.io/statusenvio/",
+    "siaps": "https://siaps.saude.gov.br/publico",
+    "siapsManual": "https://sisaps.saude.gov.br/sistemas/siaps/docs/manual/utilizando-sistema/"
+  }
+}
