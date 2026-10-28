@@ -8,7 +8,7 @@ const path=require('node:path');
 const origin='http://127.0.0.1:4173';
 const snapDir=path.resolve('artifacts/mobile-ux');
 const routes=[
-  'municipal','overview','map','facilities','health','vital','sus',
+  'municipal','overview','map','facilities','health','vital','sus','farmacia-siaps',
   'aps-history','screening','finance','production','sources'
 ];
 async function check(condition,detail){if(!condition)throw new Error(detail)}
@@ -34,7 +34,13 @@ async function main(){
    await page.locator('[data-open-nav]').waitFor({timeout:20000});
    await page.locator('[data-open-nav]').click();
    await check((await page.locator('#mobile-drawer .sidebar-link.active').getAttribute('data-page'))==='municipal','Página inicial não é municipal');
-   await page.locator('#close-nav').click();
+   await check(await page.locator('.main-shift').evaluate(el=>el.hasAttribute('inert')),'Conteúdo de fundo deve ficar inerte com menu aberto');
+   await page.locator('#close-nav').focus();
+   await page.keyboard.press('Shift+Tab');
+   await check(await page.locator('.drawer-panel a[href]').last().evaluate(el=>el===document.activeElement),'Foco não ficou preso no menu pelo teclado');
+   await page.keyboard.press('Escape');
+   await check(await page.locator('#mobile-drawer').isHidden(),'Escape não fechou o menu');
+   await check(!(await page.locator('.main-shift').evaluate(el=>el.hasAttribute('inert'))),'Conteúdo principal permaneceu inerte após fechar menu');
    const activePages=[];
    for(const route of routes){
     await page.locator('[data-open-nav]').click();
@@ -57,7 +63,7 @@ async function main(){
     const width=await page.evaluate(()=>document.documentElement.scrollWidth);
     await check(width<=viewport.width+4,'Overflow horizontal em '+route+': '+width);
     activePages.push(route);
-    if(viewport.width===390&&['municipal','overview','health','vital','sus','aps-history','screening','finance','production','sources'].includes(route)){
+    if(viewport.width===390&&['municipal','overview','health','vital','sus','farmacia-siaps','aps-history','screening','finance','production','sources'].includes(route)){
       await page.screenshot({path:path.join(snapDir,route+'-390px.png'),fullPage:true,animations:'disabled'});
     }
    }
@@ -66,9 +72,27 @@ async function main(){
    await check((await page.locator('#source-groups details').count())>=3,'Catálogo incompleto');
    await check(!errors.some(e=>/TypeError|ReferenceError|SyntaxError/.test(e)),
       'Erros JavaScript em '+viewport.width+'px: '+errors.join('; '));
-   console.log('MOBILE_SMOKE_OK',viewport.width,activePages.length,'páginas, sem overflow de documento');
+   console.log('MOBILE_SMOKE_OK',viewport.width,activePages.length,'páginas, sem overflow de documento e foco protegido');
    await page.close();
   }
+  const desktop=await browser.newPage({viewport:{width:1280,height:800},locale:'pt-BR',reducedMotion:'reduce'});
+  await desktop.goto(origin,{waitUntil:'domcontentloaded'});
+  await desktop.locator('.health-desktop-nav').waitFor({timeout:20000});
+  await check(await desktop.locator('.skip-link').count()===1,'Link de salto de conteúdo ausente');
+  await desktop.locator('.health-desktop-nav [data-nav-group="assistencia"]').click();
+  await desktop.locator('.health-desktop-nav [data-page="farmacia-siaps"]').click();
+  await check((await desktop.locator('.health-desktop-nav .sidebar-link.active').getAttribute('data-page'))==='farmacia-siaps','Rota Farmácia/SIAPS não abre no desktop');
+  await desktop.locator('#farmacia-siaps-status').waitFor({timeout:20000});
+  await desktop.locator('#theme').click();
+  await check(await desktop.locator('html').evaluate(el=>el.classList.contains('dark')),'Alternância para tema escuro falhou');
+  await desktop.reload({waitUntil:'domcontentloaded'});
+  await desktop.locator('#theme').waitFor({timeout:20000});
+  await check(await desktop.locator('html').evaluate(el=>el.classList.contains('dark')),'Tema escuro não persistiu');
+  const width=await desktop.evaluate(()=>document.documentElement.scrollWidth);
+  await check(width<=1284,'Overflow horizontal no desktop: '+width);
+  await desktop.screenshot({path:path.join(snapDir,'desktop-1280px.png'),fullPage:true,animations:'disabled'});
+  console.log('DESKTOP_SMOKE_OK',1280,'tema persistente, navegação, sem overflow');
+  await desktop.close();
  }finally{
   if(browser)await browser.close();
   server.kill('SIGTERM');

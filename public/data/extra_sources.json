@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0",
+  "municipality": "4304606",
+  "updatedAt": "2026-10-28",
+  "series": {},
+  "sources": {
+    "piaps_rs_2026": {
+      "label": "PIAPS 2026 — Programa Estadual de Incentivos para Atenção Primária (RS)",
+      "status": "not_loaded",
+      "url": "https://atencaoprimaria.rs.gov.br/painel-piaps",
+      "reference": null,
+      "retrievedAt": null,
+      "cadence": "mensal / anual conforme componente",
+      "note": "Painel estadual com filtros municipais; inclui equipes APS, incentivos, equidade e estratificação de risco. Ainda não houve extração municipal validada, portanto sem valores publicados."
+    },
+    "srag_sivep_2026": {
+      "label": "SRAG — Sivep-Gripe, vigilância respiratória (2019–2026)",
+      "status": "not_loaded",
+      "url": "https://dadosabertos.saude.gov.br/dataset/srag-2019-a-2026",
+      "reference": null,
+      "retrievedAt": null,
+      "cadence": "semanal",
+      "note": "Banco nacional atualizado semanalmente; requer filtro correto por residência ou notificação, definição de caso, deduplicação, dicionário e supressão de pequenos grupos. Não equivale a incidência sem população e critérios."
+    },
+    "pni_doses_2026": {
+      "label": "PNI 2026 — doses aplicadas por competência",
+      "status": "not_loaded",
+      "url": "https://dadosabertos.saude.gov.br/dataset/doses-aplicadas-pelo-programa-de-nacional-de-imunizacoes-pni-2026",
+      "reference": null,
+      "retrievedAt": null,
+      "cadence": "mensal (publicação revisada)",
+      "note": "Dados nacionais mensais de aplicação. Doses aplicadas não representam cobertura: exige imunobiológico, esquema e denominador elegível. Não há série municipal homologada no WebGIS."
+    },
+    "sisagua_vigilancia": {
+      "label": "SISAGUA — vigilância da qualidade da água",
+      "status": "not_loaded",
+      "url": "https://dadosabertos.saude.gov.br/dataset/sisagua-vigilancia-parametros-basicos",
+      "reference": null,
+      "retrievedAt": null,
+      "cadence": "por campanha de coleta / publicação oficial",
+      "note": "Monitoramento sanitário de parâmetros de água para consumo humano. Amostras e desconformidades não podem ser inferidas como percentual de domicílios expostos; aguarda recorte municipal validado."
+    }
+  }
+}

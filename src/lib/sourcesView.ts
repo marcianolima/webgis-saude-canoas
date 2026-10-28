@@ -49,7 +49,7 @@ export async function mountSources(summary:DataSummary){
    return doc&&typeof doc.sources==='object'?doc:null;
   }catch{return null}
  }
- const [health,sus,aps,production,farmacia]=await Promise.all([readOptional('indicators.json'),readOptional('sus.json'),readOptional('aps.json'),readOptional('production.json'),readOptional('farmacia_siaps.json')]);
+ const [health,sus,aps,production,farmacia,extra]=await Promise.all([readOptional('indicators.json'),readOptional('sus.json'),readOptional('aps.json'),readOptional('production.json'),readOptional('farmacia_siaps.json'),readOptional('extra_sources.json')]);
  if(token!==active||!parent.isConnected)return;
  for(const [group,document] of [['Vigilância e estatísticas vitais',health],['Assistência, APS e financiamento',sus],['SISAB · indicadores históricos Previne Brasil',aps]] as const){
   if(!document)continue;
@@ -59,6 +59,9 @@ export async function mountSources(summary:DataSummary){
    const reference=String(item.reference|| (series.length?(series[series.length-1].period||series[series.length-1].year||''):''));
    rows.push({id,family:group,...item,reference,years:item.yearsAvailable?.length?item.yearsAvailable.join(', '):undefined});
   }
+ }
+ if(extra)for(const [id,meta] of Object.entries(extra.sources)){
+  rows.push({id,family:'Vigilância complementar e programas estaduais',...meta});
  }
  if(farmacia)for(const [id,meta] of Object.entries(farmacia.sources)){
   rows.push({id,family:'Assistência farmacêutica e SIAPS · novas fontes',...meta});
@@ -71,7 +74,7 @@ export async function mountSources(summary:DataSummary){
  }
  const duplicates=new Set<string>();
  const list=rows.filter(row=>{const k=row.family+':'+row.id;if(duplicates.has(k))return false;duplicates.add(k);return true});
- const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento','SISAB · indicadores históricos Previne Brasil','Assistência farmacêutica e SIAPS · novas fontes','Produção mensal SIH/SIA · Parquet'];
+ const groups=['IBGE, cadastro CNES e leitos','Vigilância e estatísticas vitais','Assistência, APS e financiamento','SISAB · indicadores históricos Previne Brasil','Assistência farmacêutica e SIAPS · novas fontes','Vigilância complementar e programas estaduais','Produção mensal SIH/SIA · Parquet'];
  function render(){
   const filter=(document.querySelector<HTMLSelectElement>('#sources-filter')?.value||'all');
   const q=(document.querySelector<HTMLInputElement>('#sources-search')?.value||'').toLocaleLowerCase('pt-BR');
