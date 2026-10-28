@@ -1,183 +1,97 @@
-# WebGIS Saúde Canoas — V1.3
+# WebGIS Saúde Canoas — versão 1.5.0 (fechamento técnico do ciclo v1)
 
-Aplicação pública territorial sobre Canoas/RS, código IBGE 4304606.
+[![Atualização e deploy](https://github.com/marcianolima/webgis-saude-canoas/actions/workflows/update-data.yml/badge.svg)](https://github.com/marcianolima/webgis-saude-canoas/actions/workflows/update-data.yml)
+[![Homologação de interface](https://github.com/marcianolima/webgis-saude-canoas/actions/workflows/ux-smoke.yml/badge.svg)](https://github.com/marcianolima/webgis-saude-canoas/actions/workflows/ux-smoke.yml)
 
-**Acesso:** https://marcianolima.github.io/webgis-saude-canoas/  
-**GitHub Actions:** https://github.com/marcianolima/webgis-saude-canoas/actions/workflows/update-data.yml
+**[Abrir WebGIS Saúde Canoas](https://marcianolima.github.io/webgis-saude-canoas/)** · [Código-fonte](https://github.com/marcianolima/webgis-saude-canoas) · [Metodologia e fontes](./FONTES_BNAFAR_SIAPS.md)
 
-## O que a versão 1.0 entrega
+Aplicação territorial pública de indicadores e estabelecimentos de saúde de **Canoas, Rio Grande do Sul** (IBGE **4304606**). Projeto demonstrativo de dados abertos, **não é sistema oficial da Secretaria Municipal de Saúde** nem substitui CNES, DATASUS, e-SUS APS/PEC, SIAPS ou outros sistemas do SUS.
 
-1. Visão geral de estabelecimentos, população e leitos, com gráficos por tipologia e bairro.
-2. Mapa MapLibre com fallback Leaflet, agrupamento, pesquisa, filtros por categoria e disponibilidade de leitos.
-3. Rede assistencial com catálogo CNES, busca por bairro e exportação CSV dos pontos filtrados.
-4. Nova seção de indicadores com séries anuais de dengue, chikungunya, Zika, nascidos vivos (SINASC) e óbitos (SIM), sujeitas à disponibilidade e validação do arquivo oficial.
-5. Transparência sobre fonte, competência, metodologia, situação da coleta e períodos preliminares.
+## Funcionalidades
 
-Tecnologias: TypeScript, Vite, Tailwind CSS, MapLibre, Leaflet, ECharts e Python 3.12. Hospedagem no GitHub Pages, sem servidor próprio.
+O aplicativo é responsivo, com menu agrupado em desktop e drawer no celular, destaque/alinhamento da página ativa à esquerda, navegação por teclado, tema claro/escuro persistente, atalhos contextuais e indicação de carregamento e ausência de informação.
 
-## Fontes e critérios
+| Página | Conteúdo |
+| --- | --- |
+| **Panorama municipal** | Indicadores de população, rede, leitos e sínteses municipais com referência temporal |
+| **Rede e território** | Gráficos de estabelecimentos por tipologia e bairro, análise contextual por CNES |
+| **Mapa** | Pontos CNES em MapLibre, agrupamento e seleção, com alternativa Leaflet em caso de indisponibilidade |
+| **Estabelecimentos** | Catálogo completo, busca/filtros, ficha por CNES, exportação CSV e vínculos de leitos quando existentes |
+| **Vigilância** | Séries anuais de dengue, chikungunya e Zika; distinguir notificações de casos confirmados |
+| **Nascimentos e óbitos** | SINASC e SIM por residência, com alertas de dados preliminares |
+| **Atenção Primária** | Indicadores validados de assistência MGDI/RIPSA |
+| **Farmácia e SIAPS** | Monitoramento e links BNAFAR/Qualifar e SIAPS; sem inventar indicadores municipais |
+| **APS · histórico** | Indicadores do SISAB/Previne Brasil, identificados como série histórica encerrada |
+| **Prevenção e exames** | Exames e rastreamento com unidades/competências próprias |
+| **Financiamento e RIPSA** | eMulti, repasses e séries de produção/financiamento com critérios explícitos |
+| **Produção SIH/SIA** | AIH/RD e produção aprovada PA por competência e CNES; meses incompletos claramente assinalados |
+| **Fontes e metodologia** | Catálogo pesquisável, filtros por status, exportação CSV, origem, período e limitações |
 
-| Indicador | Origem | Recorte/método | Situação |
-|---|---|---|---|
-| População | IBGE SIDRA/Cidades | Estimativas anuais, IBGE 4304606 | Validado |
-| Estabelecimentos | Cadastro Nacional de Estabelecimentos de Saúde (CNES) | CSV nacional, ativos em Canoas, CNES únicos; inclui setor privado | Validado |
-| Leitos existentes/SUS | Hospitais e Leitos, Ministério da Saúde | Uma competência e CNES único; não somar novamente campos de UTI | Validado |
-| Dengue | Sinan/Dengue | Registros notificados de residentes (ID_MN_RESI); não equivale a casos confirmados | Validado |
-| Nascidos vivos | SINASC | Residência materna CODMUNRES; 2025 preliminar | Validado |
-| Óbitos não fetais | SIM | Residência CODMUNRES e TIPOBITO=2; 2025 preliminar | Validado |
-| Chikungunya | Sinan/Febre de Chikungunya | Notificações de residentes, arquivo anual completo; não casos confirmados | Validado, 2025–2026 |
-| Zika | Sinan/Vírus Zika | Notificações de residentes, arquivo anual completo; não casos confirmados | Validado, 2025–2026 |
-| SIA | DATASUS e DEMAS | Produção ambulatorial por competência; não equivale a pacientes únicos | Cobertura insuficiente na API testada, sem total publicado |
-| SIH | DATASUS e DEMAS | Produção hospitalar por competência, local de internação ou residência | Cobertura insuficiente na API testada, sem total publicado |
-| PNI/RNDS | OPENDATASUS | Doses/cobertura requerem denominador e coortes verificadas | Pendente |
-| e-SUS APS/PEC | SISAB e rede municipal | Extração de dados clínicos locais depende de acesso autorizado e LGPD | Pendente |
+Ao selecionar um estabelecimento, a aplicação mantém o CNES entre seções pertinentes. O vínculo pode ser compartilhado por `?cnes=NNNNNNN`. Estatísticas calculadas para a população residente **não** são atribuídas artificialmente ao estabelecimento.
 
-Fontes oficiais:
-- https://www.ibge.gov.br/cidades-e-estados/rs/canoas.html
-- https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude
-- https://dadosabertos.saude.gov.br/dataset/hospitais-e-leitos
-- https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue
-- https://dadosabertos.saude.gov.br/dataset/arboviroses-febre-de-chikungunya
-- https://dadosabertos.saude.gov.br/dataset/arboviroses-zika-virus
-- https://dadosabertos.saude.gov.br/dataset/sistema-de-informacao-sobre-nascidos-vivos-sinasc
-- https://dadosabertos.saude.gov.br/dataset/sim
-- https://datasus.saude.gov.br/assistencia-a-saude/
-- https://apidadosabertos.saude.gov.br/static/swagger.json
+## Situação dos dados: referência auditada de 27/10/2026
 
-**Regras de qualidade:** só publicar totais com cobertura comprovada; não substituir ausências por zero; não usar notificações como casos confirmados; não combinar períodos diferentes ou dados de residência e ocorrência. Referência da fonte difere da data de coleta.
+A publicação automática mais recente inspecionada na auditoria de fechamento foi em **27/10/2026**; o retrato diário do CNES corresponde àquela captura. Os números são **snapshots**, não valores permanentes:
 
-## Privacidade e processamento
+| Conjunto | Recorte publicado | Situação |
+| --- | --- | --- |
+| CNES, estabelecimentos ativos de todos os tipos | **971** unidades, **964** com coordenadas; **35** UBS e **6** hospitalares pela classificação CNES | Validado em 27/10/2026 |
+| CNES, leitos existentes e vinculados ao SUS | **668** existentes, dos quais **539** SUS | Competência **09/2026** |
+| IBGE, população estimada | **359.845** habitantes | Referência **2026** |
+| SINAN arboviroses | Séries municipais por residência, sujeitas à atualização de cada arquivo | Dados preliminares nos anos recentes |
+| SIM / SINASC | Séries anuais por residência | Alguns períodos preliminares |
+| SIH, AIH reduzida (RD) | **15/21** competências solicitadas, de 01/2025 a 09/2026 | **Parcial**; não somar meses faltantes como zero |
+| SIA, produção aprovada (PA) | **12/21** competências solicitadas, de 01/2025 a 09/2026 | **Parcial**; PA não cobre todos os instrumentos SIA |
+| SISAB/Previne Brasil | Série histórica até 2024 | Não equivale a SIAPS atual |
+| BNAFAR / Qualifar / SIAPS atual | Catálogo e links de consulta oficiais | Sem série municipal homologada |
+| PIAPS-RS, SRAG/Sivep-Gripe, PNI 2026, SISAGUA | Novas fontes documentadas e visíveis em **Fontes e metodologia** | **Catalogadas; sem integração estatística municipal** |
 
-As bases nacionais podem conter microdados sensíveis. O processamento acontece somente no runner temporário do GitHub Actions. Os arquivos individuais não são salvos em public/, não são enviados como artefatos e nunca são persistidos no repositório. Os visitantes recebem apenas agregados municipais e campos cadastrais públicos do CNES.
+**Atenção:** 971 estabelecimentos CNES **não** significa 971 unidades públicas ou 971 unidades municipais. Os leitos existentes não representam ocupação nem disponibilidade em tempo real. Doses não equivalem a cobertura vacinal; notificações não equivalem a incidência ou casos confirmados. Dados de bairros são declarados no cadastro CNES, sem equivalência automática com limites oficiais dos bairros do GeoCanoas.
 
-Arquivos publicados:
-- public/data/summary.json: população, CNES, leitos e fontes;
-- public/data/establishments.geojson: pontos públicos de estabelecimentos;
-- public/data/indicators.json: séries anuais validadas e metadados.
+A aba **Fontes e metodologia** e os arquivos JSON descrevem os estados de cada coletor. Valores ausentes, competências incompletas e integrações sem cobertura validada não são preenchidos com zero.
 
-## Atualização e deploy
+## Dados, processamento e privacidade
 
-O workflow verifica testes, atualiza snapshots e publica a pasta dist/ no GitHub Pages. Executa diariamente às 08:17 UTC (05:17 Brasília). Bases nacionais volumosas têm cache temporal de 7 dias quando preliminares e 30 dias nos arquivos históricos. É possível solicitar reprocessamento manual pela aba Actions.
+Os arquivos publicáveis são **agregados municipais e atributos cadastrais públicos de estabelecimentos**, sem prontuários, CPF, CNS ou dados identificáveis de pacientes. Microdados nacionais eventualmente necessários são processados em runner temporário e não commitados em `public/`.
 
-Para desenvolver localmente, execute npm install, python -m unittest discover -s tests -v e npm run build. Node.js 22+ e Python 3.12+.
+| Arquivo | Conteúdo |
+| --- | --- |
+| `public/data/summary.json` | População, rede CNES, leitos, proveniência |
+| `public/data/establishments.geojson` | Pontos públicos CNES válidos |
+| `public/data/facilities.json` | Inventário público por CNES, inclusive sem coordenadas |
+| `public/data/indicators.json` | Vigilância e estatísticas vitais agregadas |
+| `public/data/sus.json` | Indicadores MGDI/RIPSA e assistência |
+| `public/data/production.json` | Produção SIH/SIA por competências e CNES com limiares de privacidade |
+| `public/data/aps.json` | Indicadores históricos SISAB |
+| `public/data/farmacia_siaps.json` | Referências BNAFAR/Qualifar/SIAPS, sem números não validados |
+| `public/data/extra_sources.json` | Catálogo PIAPS, SRAG, PNI e SISAGUA — sem números não validados |
 
-## Homologação UX
+Fontes oficiais principais: [CNES](https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude), [Hospitais e leitos](https://dadosabertos.saude.gov.br/dataset/hospitais-e-leitos), [IBGE](https://www.ibge.gov.br/cidades-e-estados/rs/canoas.html), [DATASUS](https://datasus.saude.gov.br/assistencia-a-saude/), [SINASC](https://dadosabertos.saude.gov.br/dataset/sistema-de-informacao-sobre-nascidos-vivos-sinasc), [SIM](https://dadosabertos.saude.gov.br/dataset/sim), [SISAB histórico](https://dadosabertos.saude.gov.br/dataset/indicadores_desempenho_sisab), [BNAFAR](https://bnafar.github.io/statusenvio/), [SIAPS](https://siaps.saude.gov.br/publico), [PIAPS-RS](https://atencaoprimaria.rs.gov.br/painel-piaps), [SRAG/Sivep-Gripe](https://dadosabertos.saude.gov.br/dataset/srag-2019-a-2026), [PNI 2026](https://dadosabertos.saude.gov.br/dataset/doses-aplicadas-pelo-programa-de-nacional-de-imunizacoes-pni-2026) e [SISAGUA](https://dadosabertos.saude.gov.br/dataset/sisagua-vigilancia-parametros-basicos).
 
-A aplicação foi construída para leitura em desktop e dispositivos móveis, com informação progressiva, legendas, tabelas de apoio e explicações metodológicas. A revisão visual detalhada em aparelhos físicos e as preferências de layout do usuário são parte da homologação posterior à entrega técnica.
+## Tecnologias e execução
 
-A versão 1.0 é um painel exploratório público; não é produto oficial da SMS e não substitui os sistemas municipais ou nacionais de saúde.
+- **Frontend:** TypeScript, Vite, Tailwind CSS, ECharts, MapLibre GL JS, alternativa Leaflet, ícones Lucide. Aplicação estática no GitHub Pages.
+- **ETL:** Python 3.12 e PySUS para fluxos de produção, com limites de download, validação de competência e testes de contrato.
+- **CI/CD:** GitHub Actions; o workflow [update-data.yml](./.github/workflows/update-data.yml) verifica, atualiza quando necessário e publica. A coleta diária é agendada para **08:17 UTC (05:17, horário de Brasília)**. Publicações têm latência própria de cada origem e podem falhar isoladamente, preservando snapshots anteriores.
+- **UX:** [ux-smoke.yml](./.github/workflows/ux-smoke.yml) compila e usa Chromium headless/Playwright para smoke tests mobile **360, 390 e 768 px** e desktop **1280 px**, incluindo menu, foco, tema, overflow e capturas.
 
-## Resultados confirmados da primeira carga v1.0
+```bash
+npm install
+python -m unittest discover -s tests -v
+npm run build
+npm run dev
+```
 
-| Série por residência | 2024 | 2025 | 2026 |
-|---|---:|---:|---:|
-| Dengue (notificações) | — | 1.037 | 32 |
-| Chikungunya (notificações) | — | 6 | 4 |
-| Zika (notificações) | — | 3 | 0 |
-| SINASC (nascidos vivos) | 3.435 | 3.698 | — |
-| SIM (óbitos não fetais) | 3.136 | 1.771 | — |
+Pré-requisitos: Node.js 22+, npm e Python 3.12+. Para homologação de navegador, instalar Playwright e Chromium conforme [workflow de smoke](./.github/workflows/ux-smoke.yml); o comando é `node scripts/smoke-mobile.cjs` com o projeto compilado.
 
-**Fonte:** arquivos anuais do Ministério da Saúde extraídos em 17/10/2026. Os anos recentes são sujeitos a revisão; particularmente, 2025 no SIM/SINASC e 2026 nas arboviroses têm caráter preliminar. Não comparar notificações com casos confirmados.
+## Qualidade, limites e critérios de aceite
 
-Rede CNES: 969 estabelecimentos ativos, 962 com posição geográfica, 35 UBS classificadas e 6 estabelecimentos hospitalares (incluindo hospital-dia). Leitos: 668 existentes, 539 SUS, competência 08/2026.
+Testes automatizados **não equivalem** a homologação epidemiológica, revisão profissional da Secretaria de Saúde ou teste com usuários reais. A publicação é considerada tecnicamente apta somente quando **verify**, build/deploy e smoke de UX terminarem com sucesso no GitHub Actions. A situação de cada execução pode ser acompanhada nos badges acima.
 
-## Seleção individual e análise cruzada — v1.1
+Pendências decorrentes de dependências externas: série municipal atual SIAPS e BNAFAR, cobertura completa SIH/SIA, homologação de doses PNI e SRAG, territórios/bairros oficiais por geoprocessamento e comparação validada de indicadores. Foram documentadas sem resultados simulados. Para ampliar dados, é indispensável verificar dicionários, município por residência/ocorrência, competências, completude, supressão estatística, licenciamento e LGPD.
 
-A aplicação oferece um **explorador contextual de estabelecimentos** nas abas Visão geral, Mapa, Estabelecimentos e Indicadores. Ao selecionar o CNES pela busca, pelo marcador, pela lista ou pelo gráfico de comparação de capacidade, a seleção permanece ativa ao trocar de aba e pode ser compartilhada pelo parâmetro `?cnes=NNNNNNN`.
+## Governança e atualização
 
-O arquivo `public/data/facilities.json` é gerado pelo coletor diário e inclui todos os **969 estabelecimentos ativos** do município, inclusive os 7 sem coordenadas publicadas. Os atributos são públicos e cadastrais: CNES, nome, tipologia, bairro, endereço, telefone, gestão quando preenchida e vínculo SUS quando declarado.
+O código é aberto, mas **os indicadores pertencem às suas fontes**, e nenhuma interpretação deve omitir fonte, competência, universo, denominador ou cobertura. Mudanças de regras nacionais ou revisões retrospectivas podem modificar os números ao longo do tempo. Para identificar a competência de cada bloco, utilize **Fontes e metodologia** no próprio painel.
 
-A base de leitos possui **capacidade individual por CNES** na competência 08/2026: leitos existentes, leitos SUS e respectivos subconjuntos de UTI. A visualização evita a soma duplicada das UTIs. Registros sem correspondência em leitos recebem **valor indisponível**, nunca zero presumido. O gráfico comparativo é clicável e seleciona o estabelecimento da barra escolhida.
-
-Quando há seleção, o painel geral troca os cartões para dados da unidade e passa a calcular os gráficos territoriais com o recorte do seu bairro e da sua categoria. Gráficos de dengue, nascimentos, mortalidade e população permanecem **explicitamente municipais**, pois os microdados foram agregados por residência e não identificam atendimento por CNES.
-
-Não são fornecidos prontuários, nome de pacientes, CPF/CNS, atendimentos individuais nem inferência de ocupação de leitos. Alguns campos cadastrais podem vir em branco na fonte e são exibidos como não informados.
-
-Teste técnico: `python -m unittest discover -s tests -v` e `npm run build`; o workflow executa ambos os procedimentos e publica o site.
-
-## Dados oficiais MGDI/DATASUS — assistência, financiamento e rastreamento
-
-A partir da revisão de 17/10/2026, a aplicação oferece **uma seção de Assistência e financiamento** com dados municipais validados de **eMulti custeadas e homologadas, repasses federais para eMulti, exames citopatológicos e mamografias de rastreamento**. O processamento é feito a partir dos arquivos CSV ZIP oficiais do Ministério da Saúde disponíveis no catálogo de dados abertos. Cada indicador apresenta sua própria unidade e competência; não há soma de competências acumuladas.
-
-Os indicadores de exames são apresentados com referência predominantemente **anual** nos recursos consultados (e o ano mais recente pode estar incompleto), não devendo ser confundidos com séries mensais de equipes e repasses. Arquivos individuais não são publicados; o agregado por Canoas está em `public/data/sus.json`.
-
-O arquivo oficial da **razão de consultas APS por 100 habitantes** passou a ser processado integralmente após a correção dos limites de arquivo; a série municipal está disponível no painel. A extração integral de SIH e SIA pelos arquivos mensais DBC ainda depende de uma via de acesso estável — o endereço HTTPS do DATASUS testado apresentou timeout no runner, e a API DEMAS retornou apenas amostras. Portanto, **os cinco indicadores específicos publicados não representam o total de produção hospitalar ou ambulatorial do SUS.**
-
-Recursos utilizados: `emultcust.csv.zip`, `emulthomol.csv.zip`, `emultvlrff.csv.zip`, `ccmec25a64.csv.zip`, `ccmec50a69.csv.zip`, publicados em `https://demas-dados-abertos.s3.amazonaws.com/csv/`. O script `scripts/sus_sources.py` realiza validação de município, período, valor e cobertura antes da publicação.
-
-## Atualização da página inicial municipal (versão 1.2)
-
-A aplicação abre no **Painel Municipal de Saúde**, que agrega IBGE, CNES, leitos, SINAN, SIM, SINASC e indicadores de assistência MGDI em seções distintas e com referências temporais e metodológicas identificadas. A seleção de um estabelecimento não substitui esses valores por informações individuais. A antiga visão geral foi preservada como **Análise territorial**, onde a seleção por CNES é mantida.
-
-O coletor `scripts/sus_sources.py` usa ZIP em streaming, retries progressivos, limites configuráveis (350 MiB compactados, 1.500 MiB descompactados e 12 milhões de linhas), sem armazenar microdados no GitHub. Foram integrados os indicadores RIPSA de consultas médicas APS e especializadas por 100 habitantes, internações hospitalares anuais e valor médio por AIH. **Só aparecerão como disponíveis se o CSV completo comprovar dados municipais.** A unidade e o denominador de cada indicador são preservados. Problemas persistentes são sinalizados no GitHub Actions e no painel; não são convertidos em zero.
-
-A fonte oficial de cobertura vacinal é publicada no TabNet e em arquivos nacionais PNI por mês, mas exige seleção de vacina/dose/faixa etária e compatibilização de denominadores. Até existir um agregador validado, não haverá um índice municipal único artificial. O acesso aos arquivos mensais DBC de SIH/SIA permanece como integração separada para não confundir os indicadores RIPSA com totais hospitalares ou ambulatoriais.
-
-## Avanço RIPSA — integração de consultas e internações anuais
-
-O arquivo de razão de consultas médicas na APS (`mgdi_ms_4iu.csv.zip`) contém dados por faixa etária. A versão municipal utiliza **somente a categoria `sg_categoria=TC` (Total)**; não soma razões por faixa etária. O mesmo tratamento de total é aplicado às consultas especializadas (`mgdi_ms_0bx.csv.zip`), que também fornecem decomposição por especialidade.
-
-O recurso oficial RIPSA `ripsa019rc.csv.zip`, indicador REC.3.02, apresenta por município e ano o numerador (valor das internações) e o denominador (número de internações). O coletor produz dois indicadores independentes: **internações hospitalares SUS agregadas anuais** (denominador) e **valor médio pago por AIH** (numerador ÷ denominador × multiplicador). Somente dados do município 430460 e anos únicos são aceitos. Não são pacientes distintos, internações por residência, produção discriminada por CNES nem substitutos integrais dos arquivos DBC mensais SIH/SUS.
-
-Fontes: https://dadosabertos.saude.gov.br/dataset/ripsa-recursos-dimensao-3-recursos-financeiros-assistencia-a-saude/resource/ripsa019rc_csv e https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_4iu_csv.
-
-**Correção de unidade COB.1.02:** o Ministério da Saúde/RIPSA define a razão de consultas na atenção especializada **por 100 habitantes** (não por habitante). O arquivo `sus.json` e o painel exibem esta unidade, preservando a série de 43,18/100 hab. em 2024. Fontes: https://dadosabertos.saude.gov.br/dataset/ripsa-cobertura-dimensao-1-consultas-medicas-e-odontologicas/resource/mgdi_ms_0bx_json e https://tabnetbd.saude.gov.br/cgi/idb2025/.
-
-## Integrações complementares de saúde — outubro de 2026
-
-### Produção hospitalar e ambulatorial por CNES
-
-A aplicação ganhou a seção **Produção SIH/SIA**, com histórico mensal extraído dos arquivos públicos Parquet do PySUS 2.11.7 (espelho de arquivos originais DATASUS), filtrados por município do estabelecimento **Canoas, 430460**. A atualização é executada no GitHub Actions e o arquivo `public/data/production.json` contém **somente agregados por competência e CNES**; informações pessoais não são persistidas nem publicadas.
-
-- **SIH/SUS, arquivo RD:** quantidade mensal de AIHs reduzidas e soma do campo `VAL_TOT` por município de internação e CNES. Não são pessoas únicas ou internações por município de residência.
-- **SIA/SUS, arquivo PA:** quantidade de procedimentos aprovados `PA_QTDAPR` e valores aprovados `PA_VALAPR`, por município do estabelecimento e CNES. **Não é a produção integral de todos os instrumentos do SIA**, como APAC e BPA, e não são pacientes únicos.
-- Grupos individuais por CNES com menos de cinco unidades de produção não são divulgados. Os agregados municipais incluem todas as linhas elegíveis, inclusive as de grupos suprimidos na comparação individual.
-- São fornecidas lista de competências efetivamente disponíveis, valores em reais, filtros por CNES, gráficos, tabelas e exportação CSV. **Não extrapolar totais anuais de meses parciais.** O workflow continuará tentando competências ainda ausentes, respeitando os limites e as condições do espelho de dados.
-- A análise no **Painel Municipal** é independente da seleção de estabelecimento; a página individual pode adotar o CNES selecionado.
-
-A versão inicial comprovou 15 competências SIH/RD e 13 competências SIA/PA no intervalo iniciado em janeiro de 2025. Lacunas de acesso ou competência não são substituídas por zero. A quantidade de períodos varia com novas coletas e deve ser conferida nos metadados publicados.
-
-### Indicadores históricos SISAB / Previne Brasil
-
-Integração de séries municipais históricas dos arquivos `sisab_indicador_desempenho_2024Q1.csv.zip`, `2024Q2` e `2024Q3`, com visão **geral** do município (sem agregar linhas das visões de equipes válidas ou homologadas). São mantidos os percentuais oficiais de pré-natal, exames de sífilis e HIV em gestantes, odontologia da gestante, exames citopatológicos, vacinação infantil e acompanhamento de diabetes. Essas medidas seguem o modelo **Previne Brasil antigo**, não representam o modelo atual de financiamento da APS e não substituem coberturas vacinais PNI.
-
-Os agregados históricos constam em `public/data/aps.json` e no painel municipal. O script `scripts/aps_sisab.py` verifica município, quadrimestre, visão geral, porcentagem, numerador e denominador.
-
-### Vacinação (PNI/RNDS): limite ainda não resolvido
-
-O recurso nacional de setembro de 2026 está disponível, mas contém aproximadamente 1,79 GB **compactados**. O espelho PNI consultado pelo PySUS não retornou arquivos estaduais para RS/2025 ou RS/2026. Ainda não há uma cobertura vacinal municipal validada. A futura coleta terá de filtrar o conjunto bruto em processamento externo e definir imunizante, dose, faixa etária e denominador apropriados; nenhum valor ausente é publicado como zero.
-
-### Atualização da qualidade das fontes
-
-A área **Sobre os dados** unifica fontes e indicadores CNES, IBGE, SINAN, SIM, SINASC, MGDI/RIPSA, SISAB e produção SIH/SIA, com filtro por estado de coleta, metadados e exportação. O projeto tem testes de regressão para assegurar que o total municipal seja superior ou igual à soma dos grupos CNES divulgados e que não existam identificadores pessoais nos snapshots.
-
-### Revisão de consistência e sigilo estatístico — outubro de 2026
-
-A auditoria dos extratos SIH/RD e SIA/PA identificou volume estadual anômalo no Parquet SIA/PA de janeiro/2025: **302.285 linhas**, frente a aproximadamente **4,1–4,7 milhões** nos meses de comparação. Sem comprovação de completude, essa competência foi **colocada em quarentena**: ela não entra nos gráficos, tabelas comparativas nem exportações como total mensal válido. Sua referência e o motivo ficam registrados em `public/data/production.json` (`qualityFlags` e `sources.sia.rejectedMonths`). O extrator rejeita novos arquivos SIA/PA com menos de um milhão de registros estaduais: é um filtro conservador de plausibilidade, **não uma regra de completude oficial**.
-
-Quando existem CNES com menos de cinco unidades de produção, aplicamos **supressão primária** e também **supressão complementar** do menor grupo restante. Essa última impede deduzir o valor do CNES ocultado simplesmente subtraindo os demais estabelecimentos do total municipal. Os resultados previamente publicados foram reprocessados para a nova regra. Nenhum limiar agregado é garantia absoluta de anonimização.
-
-O catálogo agora identifica SIH/SIA como **parcialmente integrados**: produção mensal RD e PA agregada por CNES está disponível, mas as desagregações por diagnóstico e procedimento, a cobertura integral do SIA e parte das competências ainda não estão. Os períodos solicitados, períodos aceitos e períodos em revisão constam no JSON; a interface evidencia as competências ausentes. As séries anuais RIPSA não devem ser somadas às competências mensais SIH/RD.
-
-## Versão 1.4 — revisão de frontend orientada a dispositivos móveis
-
-A navegação foi reorganizada por significado dos dados e público de uso. O **Panorama Municipal** continua sendo a primeira página, agora com os indicadores principais e blocos expansíveis por assunto. Novas seções separadas: **Vigilância**, **Nascimentos e óbitos**, **Atenção Primária**, **APS · histórico Previne Brasil**, **Prevenção e exames**, **Financiamento e RIPSA**, **Produção SIH/SIA**, além das páginas territoriais CNES e de **Fontes e metodologia**.
-
-Na visualização móvel, as abas são roláveis horizontalmente. A aba ativa recebe destaque visual e é posicionada à esquerda após a navegação, inclusive para páginas finais do menu. Os links temáticos carregados de forma assíncrona utilizam delegação de eventos.
-
-Os gráficos apresentam uma grandeza por vez, acompanhada da sua referência temporal, unidade e explicação. A série histórica de população IBGE foi mantida na análise territorial; botões antigos de SIH, SIA e dengue ligados ao resumo vazio foram substituídos por navegação às páginas com dados oficiais. Os grupos de indicadores e fontes têm seções expansíveis; a produção SIH/SIA tem zoom/controle temporal móvel e marca competências em revisão, ausentes ou suprimidas. As fichas CNES apresentam leitos como **estoques cadastrais**, e não vagas disponíveis.
-
-Os indicadores do Previne Brasil de 2024 são históricos e não representam o financiamento atual; os dados municipais não são atribuídos automaticamente a CNES individuais. A contagem de procedimentos SIA/PA não representa pacientes únicos nem produção SIA integral. O catálogo informa o status parcial quando necessário.
-
-### Homologação
-
-A publicação automática executa testes de dados Python e build TypeScript/Vite no GitHub Actions. Esses testes não substituem validação visual em celulares Android/iOS reais, testes com leitor de tela ou comparação epidemiológica aprofundada entre fontes. Nenhum dado bruto ou pessoal foi adicionado na revisão de interface.
-
-
-## Novas fontes: assistência farmacêutica e SIAPS (outubro/2026)
-
-A seção **Farmácia e SIAPS** reúne o status de envio da BNAFAR, as publicações Qualifar-SUS e os módulos atuais de APS no SIAPS, preservando a distinção entre *fonte disponível* e *indicador municipal homologado*. A navegação e o catálogo de transparência mostram o status específico de cada integração, sem valores substituídos por zero.
-
-O script `scripts/farmacia_siaps.py` identifica automaticamente a planilha Qualifar-SUS mais recente e atualiza o link oficial em `public/data/farmacia_siaps.json`. O painel municipal de envio (Looker Studio) e as exportações CSV/XLSX do SIAPS estão registrados, mas **não tiveram suas séries de Canoas validadas**, portanto não são apresentados resultados municipais fictícios.
-
-Consulte [FONTES_BNAFAR_SIAPS.md](./FONTES_BNAFAR_SIAPS.md) para fontes oficiais, periodicidade, limitações e requisitos de homologação das séries.
+**Licença:** consulte [LICENSE](./LICENSE). **Escopo do projeto:** exploratório, informativo e de transparência pública.

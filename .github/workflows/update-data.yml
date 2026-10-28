@@ -1,6 +1,8 @@
 name: Verificar, atualizar dados e publicar WebGIS Saúde
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
@@ -29,6 +31,7 @@ jobs:
         run: python -m unittest discover -s tests -v
 
   update:
+    if: github.event_name != 'pull_request'
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 55
@@ -169,7 +172,7 @@ jobs:
 
   deploy:
     needs: [verify, update]
-    if: always() && needs.verify.result == 'success' && (needs.update.result == 'success' || needs.update.result == 'skipped')
+    if: github.event_name != 'pull_request' && always() && needs.verify.result == 'success' && (needs.update.result == 'success' || needs.update.result == 'skipped')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment:

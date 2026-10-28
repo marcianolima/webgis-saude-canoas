@@ -10,7 +10,7 @@ def contents(path):
 class FrontendNavigationTests(unittest.TestCase):
     def test_all_thematic_pages_are_routed(self):
         app=contents("src/main.ts")
-        for page in ("municipal","overview","map","facilities","health","vital","sus",
+        for page in ("municipal","overview","map","facilities","health","vital","sus","farmacia-siaps",
                      "aps-history","screening","finance","production","sources"):
             self.assertIn("'"+page+"'",app)
             self.assertIn(page+":" if page!="aps-history" else "'aps-history':",app)
@@ -32,6 +32,11 @@ class FrontendNavigationTests(unittest.TestCase):
         self.assertIn(".health-drawer[hidden]",css)
         self.assertIn(".nav-group-items[hidden]",css)
         self.assertIn(".health-topbar",css)
+        self.assertIn("Pular para o conteúdo principal",app)
+        self.assertIn("toggleAttribute('inert',open)",app)
+        self.assertIn("event.key!=='Tab'",app)
+        self.assertIn("drawerLastFocus",app)
+        self.assertIn(".skip-link:focus",css)
     def test_async_theme_buttons_remain_navigable(self):
         app=contents("src/main.ts")
         home=contents("src/lib/municipalView.ts")

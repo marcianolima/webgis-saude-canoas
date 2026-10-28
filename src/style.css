@@ -142,3 +142,8 @@ body.nav-lock{overflow:hidden}
 @media(min-width:1024px){.mobile-brand-mark{display:none}}
 
 @media(max-width:1023px){.drawer-foot{border-top:1px solid #315062;padding:14px 12px 4px;font-size:12px;font-weight:700;color:#64d2bd}}
+
+/* Acessibilidade: salto de navegação e foco visível em toda a interface. */
+.skip-link{position:fixed;left:12px;top:-100px;z-index:120;padding:10px 15px;background:#093d48;color:white;font-weight:800;border-radius:10px;box-shadow:0 7px 25px #0004}
+.skip-link:focus{top:10px;outline:3px solid #4bd6a8;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.skip-link{transition:none}}
