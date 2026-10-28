@@ -13,7 +13,7 @@ class FrontendNavigationTests(unittest.TestCase):
         for page in ("municipal","overview","map","facilities","health","vital","sus","farmacia-siaps",
                      "aps-history","screening","finance","production","sources"):
             self.assertIn("'"+page+"'",app)
-            self.assertIn(page+":" if page!="aps-history" else "'aps-history':",app)
+            self.assertIn("'"+page+"':" if page in ("aps-history","farmacia-siaps") else page+":",app)
         self.assertIn("healthPage('vital')",app)
         self.assertIn("susPage('historic')",app)
         self.assertIn("susPage('screening')",app)
