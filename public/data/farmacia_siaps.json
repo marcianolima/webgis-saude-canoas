@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "municipality": "4304606",
-  "updatedAt": "2026-11-19T17:26:47+00:00",
+  "updatedAt": "2026-11-24T19:31:49+00:00",
   "sources": {
     "bnafar_envio": {
       "label": "BNAFAR — situação mensal do envio municipal",
@@ -15,9 +15,9 @@
     "qualifar_monitoramento": {
       "label": "Qualifar-SUS — monitoramento do envio",
       "status": "partial",
-      "url": "https://bnafar.github.io/statusenvio/arquivos/qualifarsus/ciclo_01_2027/2026.11.16_Status_Qualifar_SUS_1_ciclo_2027.xlsx",
-      "reference": "2026-11-16",
-      "retrievedAt": "2026-11-19T17:26:47+00:00",
+      "url": "https://bnafar.github.io/statusenvio/arquivos/qualifarsus/ciclo_01_2027/2026.11.24_Status_Qualifar_SUS_1_ciclo_2027.xlsx",
+      "reference": "2026-11-24",
+      "retrievedAt": "2026-11-24T19:31:49+00:00",
       "cadence": "semanal",
       "note": "Planilha oficial de monitoramento publicada. O resultado específico de Canoas não foi extraído ou validado; a planilha não mede quantidade dispensada."
     },
